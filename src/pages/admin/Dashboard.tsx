@@ -233,7 +233,7 @@ const AdminDashboard = () => {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Dashboard</h1>
+        <h1 className="text-3xl font-semibold">Dashboard</h1>
         <div className="flex items-center space-x-2">
           <Calendar className="w-4 h-4" />
           <select 
@@ -257,7 +257,7 @@ const AdminDashboard = () => {
             <IndianRupee className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">₹{stats.totalRevenue.toLocaleString('en-IN')}</div>
+            <div className="text-2xl font-semibold">₹{stats.totalRevenue.toLocaleString('en-IN')}</div>
             <p className="text-xs text-muted-foreground">
               <span className="text-green-600">+{stats.revenueGrowth}%</span> from last period
             </p>
@@ -270,7 +270,7 @@ const AdminDashboard = () => {
             <ShoppingCart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.totalOrders}</div>
+            <div className="text-2xl font-semibold">{stats.totalOrders}</div>
             <p className="text-xs text-muted-foreground">
               <span className="text-green-600">+{stats.ordersGrowth}%</span> from last period
             </p>
@@ -283,7 +283,7 @@ const AdminDashboard = () => {
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.totalProducts}</div>
+            <div className="text-2xl font-semibold">{stats.totalProducts}</div>
             <p className="text-xs text-muted-foreground">
               <span className="text-green-600">+{stats.productsGrowth}%</span> from last period
             </p>
@@ -296,7 +296,7 @@ const AdminDashboard = () => {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.totalCustomers}</div>
+            <div className="text-2xl font-semibold">{stats.totalCustomers}</div>
             <p className="text-xs text-muted-foreground">
               <span className="text-green-600">+{stats.customersGrowth}%</span> from last period
             </p>

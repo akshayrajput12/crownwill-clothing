@@ -112,27 +112,27 @@ const CheckoutAddressDetails = ({
   };
 
   return (
-    <Card className="border-[#E6D5B8] bg-[#FFFDF7] shadow-sm">
-      <CardHeader className="border-b border-[#E6D5B8]">
-        <CardTitle className="flex items-center text-lg text-[#783838] uppercase font-orange-avenue font-normal tracking-wide">
-          <MapPin className="h-5 w-5 mr-2 text-[#8B2131]" />
+    <Card className="border-brand-gray-200 bg-brand-offwhite shadow-sm">
+      <CardHeader className="border-b border-brand-gray-200">
+        <CardTitle className="flex items-center text-lg text-brand-black uppercase font-orange-avenue font-normal tracking-wide">
+          <MapPin className="h-5 w-5 mr-2 text-brand-black" />
           Complete Address Details
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6 pt-6">
 
         {/* Delivery Information */}
-        <div className="bg-[#FFF0DE] border border-[#E6D5B8] rounded-sm p-4">
+        <div className="bg-brand-cream border border-brand-gray-200 rounded-sm p-4">
           <div className="flex items-start space-x-3">
-            <Clock className="h-5 w-5 text-[#8B2131] mt-0.5" />
+            <Clock className="h-5 w-5 text-brand-black mt-0.5" />
             <div>
-              <h4 className="font-medium text-[#2C1810] text-sm">
+              <h4 className="font-medium text-brand-black text-sm">
                 Nationwide Delivery
               </h4>
-              <p className="text-[#5D4037] text-sm mt-1">
+              <p className="text-brand-gray-700 text-sm mt-1">
                 We deliver your crownveil pieces across the country within 3–5 business days.
                 {!meetsThreshold(subtotal, settings.free_delivery_threshold) && (
-                  <span className="block mt-1 font-medium text-[#8B2131]">
+                  <span className="block mt-1 font-medium text-brand-black">
                     Add {formatCurrency(toNumber(settings.free_delivery_threshold) - subtotal, settings.currency_symbol)} more for FREE delivery!
                   </span>
                 )}
@@ -145,12 +145,12 @@ const CheckoutAddressDetails = ({
         {savedAddresses.length > 0 && !useExistingAddress && (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h4 className="font-medium text-[#2C1810]">Use Saved Address</h4>
+              <h4 className="font-medium text-brand-black">Use Saved Address</h4>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setShowAddressForm(true)}
-                className="border-[#8B2131] text-[#8B2131] hover:bg-[#8B2131] hover:text-white"
+                className="border-brand-black text-brand-black hover:bg-brand-black hover:text-white"
               >
                 Add New Address
               </Button>
@@ -161,29 +161,29 @@ const CheckoutAddressDetails = ({
                 <div
                   key={address.id}
                   className={`p-4 border rounded-sm cursor-pointer transition-all ${selectedAddress?.id === address.id
-                    ? 'border-[#8B2131] bg-[#FFF0DE]'
-                    : 'border-[#E6D5B8] hover:border-[#8B2131]/50'
+                    ? 'border-brand-black bg-brand-cream'
+                    : 'border-brand-gray-200 hover:border-brand-black/50'
                     }`}
                   onClick={() => handleSavedAddressSelect(address)}
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center space-x-2 mb-1">
-                        <span className="font-medium text-sm text-[#2C1810]">{address.name}</span>
-                        <span className="text-xs bg-[#E6D5B8]/30 text-[#5D4037] px-2 py-1 rounded-sm uppercase tracking-wide">
+                        <span className="font-medium text-sm text-brand-black">{address.name}</span>
+                        <span className="text-xs bg-brand-gray-200/30 text-brand-gray-700 px-2 py-1 rounded-sm uppercase tracking-wide">
                           {address.type}
                         </span>
                         {address.is_default && (
-                          <span className="text-xs bg-[#8B2131] text-white px-2 py-1 rounded-sm uppercase tracking-wide">
+                          <span className="text-xs bg-brand-black text-white px-2 py-1 rounded-sm uppercase tracking-wide">
                             Default
                           </span>
                         )}
                       </div>
-                      <p className="text-sm text-[#5D4037]">
+                      <p className="text-sm text-brand-gray-700">
                         {address.address_line_1}
                         {address.address_line_2 && `, ${address.address_line_2}`}
                       </p>
-                      <p className="text-sm text-[#5D4037]">
+                      <p className="text-sm text-brand-gray-700">
                         {address.city}, {address.state} - {address.pincode}
                       </p>
                     </div>
@@ -196,7 +196,7 @@ const CheckoutAddressDetails = ({
               <Button
                 variant="ghost"
                 onClick={() => setShowAddressForm(true)}
-                className="text-[#8B2131] hover:text-[#701a26] hover:bg-[#FFF8F0]"
+                className="text-brand-black hover:text-brand-charcoal hover:bg-brand-offwhite"
               >
                 + Add New Address Instead
               </Button>
@@ -208,10 +208,10 @@ const CheckoutAddressDetails = ({
         {(savedAddresses.length === 0 || showAddressForm || useExistingAddress) && (
           <>
             {useExistingAddress && (
-              <div className="flex items-center justify-between p-3 bg-[#F0FFF4] border border-[#C6F6D5] rounded-sm">
+              <div className="flex items-center justify-between p-3 bg-brand-success-light border border-brand-success-light rounded-sm">
                 <div className="flex items-center space-x-2">
                   <div className="w-2 h-2 bg-green-600 rounded-full"></div>
-                  <span className="text-sm font-medium text-[#22543D]">
+                  <span className="text-sm font-medium text-brand-black">
                     Using saved address: {selectedAddress?.name}
                   </span>
                 </div>
@@ -223,7 +223,7 @@ const CheckoutAddressDetails = ({
                     setSelectedAddress(null);
                     setShowAddressForm(true);
                   }}
-                  className="text-green-700 hover:text-green-800 hover:bg-[#C6F6D5]"
+                  className="text-green-700 hover:text-green-800 hover:bg-brand-success-light"
                 >
                   Change
                 </Button>
@@ -231,14 +231,14 @@ const CheckoutAddressDetails = ({
             )}
 
             {/* Current Address Display */}
-            <div className="bg-[#F0F4FF] border border-[#C3DAFE] rounded-sm p-4">
+            <div className="bg-brand-offwhite border border-brand-gray-200 rounded-sm p-4">
               <div className="flex items-start space-x-3">
-                <MapPin className="h-5 w-5 text-[#3182CE] mt-0.5" />
+                <MapPin className="h-5 w-5 text-brand-blue mt-0.5" />
                 <div>
-                  <h4 className="font-medium text-[#2A4365] text-sm">
+                  <h4 className="font-medium text-brand-blue text-sm">
                     Delivery Address
                   </h4>
-                  <p className="text-[#2C5282] text-sm mt-1">
+                  <p className="text-brand-blue text-sm mt-1">
                     {addressDetails.city && addressDetails.state && addressDetails.pincode
                       ? `${addressDetails.city}, ${addressDetails.state} - ${addressDetails.pincode}`
                       : 'Please fill in your city, state, and pincode below'
@@ -250,7 +250,7 @@ const CheckoutAddressDetails = ({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="plotNumber" className="text-sm font-medium text-[#2C1810]">
+                <Label htmlFor="plotNumber" className="text-sm font-medium text-brand-black">
                   Plot/House Number *
                 </Label>
                 <Input
@@ -259,13 +259,13 @@ const CheckoutAddressDetails = ({
                   placeholder="e.g., 123, A-45"
                   value={addressDetails.plotNumber}
                   onChange={(e) => setAddressDetails({ ...addressDetails, plotNumber: e.target.value })}
-                  className="h-12 border-[#E6D5B8] focus:ring-[#8B2131] bg-white"
+                  className="h-12 border-brand-gray-200 focus:ring-brand-black bg-white"
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="buildingName" className="text-sm font-medium text-[#2C1810]">
+                <Label htmlFor="buildingName" className="text-sm font-medium text-brand-black">
                   Building/Society Name
                 </Label>
                 <Input
@@ -274,13 +274,13 @@ const CheckoutAddressDetails = ({
                   placeholder="e.g., Green Valley Apartments"
                   value={addressDetails.buildingName}
                   onChange={(e) => setAddressDetails({ ...addressDetails, buildingName: e.target.value })}
-                  className="h-12 border-[#E6D5B8] focus:ring-[#8B2131] bg-white"
+                  className="h-12 border-brand-gray-200 focus:ring-brand-black bg-white"
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="street" className="text-sm font-medium text-[#2C1810]">
+              <Label htmlFor="street" className="text-sm font-medium text-brand-black">
                 Street/Area *
               </Label>
               <Input
@@ -289,7 +289,7 @@ const CheckoutAddressDetails = ({
                 placeholder="e.g., MG Road, Sector 15"
                 value={addressDetails.street}
                 onChange={(e) => setAddressDetails({ ...addressDetails, street: e.target.value })}
-                className="h-12 border-[#E6D5B8] focus:ring-[#8B2131] bg-white"
+                className="h-12 border-brand-gray-200 focus:ring-brand-black bg-white"
                 required
               />
             </div>
@@ -297,7 +297,7 @@ const CheckoutAddressDetails = ({
             {/* City, State, and Pincode */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="city" className="text-sm font-medium text-[#2C1810]">
+                <Label htmlFor="city" className="text-sm font-medium text-brand-black">
                   City *
                 </Label>
                 <Input
@@ -306,13 +306,13 @@ const CheckoutAddressDetails = ({
                   placeholder="Enter your city"
                   value={addressDetails.city}
                   onChange={(e) => setAddressDetails({ ...addressDetails, city: e.target.value })}
-                  className="h-12 border-[#E6D5B8] focus:ring-[#8B2131] bg-white"
+                  className="h-12 border-brand-gray-200 focus:ring-brand-black bg-white"
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="state" className="text-sm font-medium text-[#2C1810]">
+                <Label htmlFor="state" className="text-sm font-medium text-brand-black">
                   State *
                 </Label>
                 <Input
@@ -321,13 +321,13 @@ const CheckoutAddressDetails = ({
                   placeholder="Enter your state"
                   value={addressDetails.state}
                   onChange={(e) => setAddressDetails({ ...addressDetails, state: e.target.value })}
-                  className="h-12 border-[#E6D5B8] focus:ring-[#8B2131] bg-white"
+                  className="h-12 border-brand-gray-200 focus:ring-brand-black bg-white"
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="pincode" className="text-sm font-medium text-[#2C1810]">
+                <Label htmlFor="pincode" className="text-sm font-medium text-brand-black">
                   Pincode *
                 </Label>
                 <Input
@@ -336,7 +336,7 @@ const CheckoutAddressDetails = ({
                   placeholder="Enter 6-digit pincode"
                   value={addressDetails.pincode}
                   onChange={(e) => setAddressDetails({ ...addressDetails, pincode: e.target.value })}
-                  className="h-12 border-[#E6D5B8] focus:ring-[#8B2131] bg-white"
+                  className="h-12 border-brand-gray-200 focus:ring-brand-black bg-white"
                   maxLength={6}
                   required
                 />
@@ -344,7 +344,7 @@ const CheckoutAddressDetails = ({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="landmark" className="text-sm font-medium text-[#2C1810]">
+              <Label htmlFor="landmark" className="text-sm font-medium text-brand-black">
                 Nearby Landmark
               </Label>
               <Input
@@ -353,14 +353,14 @@ const CheckoutAddressDetails = ({
                 placeholder="e.g., Near Metro Station"
                 value={addressDetails.landmark}
                 onChange={(e) => setAddressDetails({ ...addressDetails, landmark: e.target.value })}
-                className="h-12 border-[#E6D5B8] focus:ring-[#8B2131] bg-white"
+                className="h-12 border-brand-gray-200 focus:ring-brand-black bg-white"
               />
             </div>
 
             {/* Address saving options - only show for authenticated users */}
             {currentUser && (
               <div className="space-y-3">
-                <Label className="text-xs font-medium text-[#2C1810]">Save this address as</Label>
+                <Label className="text-xs font-medium text-brand-black">Save this address as</Label>
                 <RadioGroup
                   value={addressDetails.addressType}
                   onValueChange={(value: 'home' | 'work' | 'other') =>
@@ -369,16 +369,16 @@ const CheckoutAddressDetails = ({
                   className="flex space-x-6"
                 >
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="home" id="home" className="text-[#8B2131]" />
-                    <Label htmlFor="home" className="cursor-pointer text-[#5D4037]">Home</Label>
+                    <RadioGroupItem value="home" id="home" className="text-brand-black" />
+                    <Label htmlFor="home" className="cursor-pointer text-brand-gray-700">Home</Label>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="work" id="work" className="text-[#8B2131]" />
-                    <Label htmlFor="work" className="cursor-pointer text-[#5D4037]">Work</Label>
+                    <RadioGroupItem value="work" id="work" className="text-brand-black" />
+                    <Label htmlFor="work" className="cursor-pointer text-brand-gray-700">Work</Label>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="other" id="other" className="text-[#8B2131]" />
-                    <Label htmlFor="other" className="cursor-pointer text-[#5D4037]">Other</Label>
+                    <RadioGroupItem value="other" id="other" className="text-brand-black" />
+                    <Label htmlFor="other" className="cursor-pointer text-brand-gray-700">Other</Label>
                   </div>
                 </RadioGroup>
 
@@ -387,7 +387,7 @@ const CheckoutAddressDetails = ({
                     placeholder="Enter custom name (e.g., Friend's Place)"
                     value={addressDetails.saveAs}
                     onChange={(e) => setAddressDetails({ ...addressDetails, saveAs: e.target.value })}
-                    className="h-12 mt-2 border-[#E6D5B8] focus:ring-[#8B2131]"
+                    className="h-12 mt-2 border-brand-gray-200 focus:ring-brand-black"
                   />
                 )}
               </div>
@@ -395,15 +395,15 @@ const CheckoutAddressDetails = ({
 
             {/* Save Address Option - only show for authenticated users */}
             {currentUser && !useExistingAddress && (
-              <div className="flex items-center space-x-2 p-4 bg-[#F0F4FF] border border-[#C3DAFE] rounded-sm">
+              <div className="flex items-center space-x-2 p-4 bg-brand-offwhite border border-brand-gray-200 rounded-sm">
                 <input
                   type="checkbox"
                   id="saveAddress"
                   checked={true}
                   readOnly
-                  className="rounded text-[#3182CE] focus:ring-[#3182CE]"
+                  className="rounded text-brand-blue focus:ring-brand-blue"
                 />
-                <Label htmlFor="saveAddress" className="text-sm text-[#2A4365]">
+                <Label htmlFor="saveAddress" className="text-sm text-brand-blue">
                   Save this address to your profile for future orders
                   {savedAddresses.length >= 3 && (
                     <span className="block text-xs text-orange-600 mt-1">
@@ -425,7 +425,7 @@ const CheckoutAddressDetails = ({
         )}
 
         <div className="flex justify-between pt-4">
-          <Button variant="outline" onClick={onPrev} size="lg" className="px-8 border-[#E6D5B8] text-[#5D4037] hover:bg-[#FFF8F0]">
+          <Button variant="outline" onClick={onPrev} size="lg" className="px-8 border-brand-gray-200 text-brand-gray-700 hover:bg-brand-offwhite">
             Back
           </Button>
           <Button
@@ -436,7 +436,7 @@ const CheckoutAddressDetails = ({
                 : !addressDetails.plotNumber || !addressDetails.street || !addressDetails.city || !addressDetails.state || !addressDetails.pincode
             }
             size="lg"
-            className="px-8 bg-[#8B2131] hover:bg-[#701a26] text-white text-sm"
+            className="px-8 bg-brand-black hover:bg-brand-charcoal text-white text-sm"
           >
             Continue to Payment
           </Button>

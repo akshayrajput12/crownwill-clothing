@@ -15,6 +15,8 @@ export interface Product {
   nutrition?: string;
   inStock: boolean;
   slug: string;
+  /** Selected garment size. Cart lines are keyed by product id + size. */
+  size?: string;
   serves?: number;
   nutritionalInfo?: {
     totalEnergy: string;
@@ -50,8 +52,8 @@ interface Store {
   cartItems: CartItem[];
   isCartOpen: boolean;
   addToCart: (product: Product) => void;
-  removeFromCart: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
+  removeFromCart: (productId: string, size?: string) => void;
+  updateQuantity: (productId: string, quantity: number, size?: string) => void;
   clearCart: () => void;
   toggleCart: () => void;
 
@@ -103,12 +105,15 @@ export const useStore = create<Store>()(
       // Cart actions
       addToCart: (product) => {
         const { cartItems } = get();
-        const existingItem = cartItems.find(item => item.id === product.id);
+        // Same product in a different size is its own line.
+        const isSameLine = (item: CartItem) =>
+          item.id === product.id && (item.size ?? '') === (product.size ?? '');
+        const existingItem = cartItems.find(isSameLine);
 
         let updatedCartItems;
         if (existingItem) {
           updatedCartItems = cartItems.map(item =>
-            item.id === product.id
+            isSameLine(item)
               ? { ...item, quantity: item.quantity + 1 }
               : item
           );
@@ -120,20 +125,24 @@ export const useStore = create<Store>()(
         saveCartToLocalStorage(updatedCartItems);
       },
 
-      removeFromCart: (productId) => {
-        const updatedCartItems = get().cartItems.filter(item => item.id !== productId);
+      removeFromCart: (productId, size) => {
+        const updatedCartItems = get().cartItems.filter(item =>
+          size === undefined
+            ? item.id !== productId
+            : !(item.id === productId && (item.size ?? '') === size)
+        );
         set({ cartItems: updatedCartItems });
         saveCartToLocalStorage(updatedCartItems);
       },
 
-      updateQuantity: (productId, quantity) => {
+      updateQuantity: (productId, quantity, size) => {
         if (quantity <= 0) {
-          get().removeFromCart(productId);
+          get().removeFromCart(productId, size);
           return;
         }
 
         const updatedCartItems = get().cartItems.map(item =>
-          item.id === productId
+          item.id === productId && (size === undefined || (item.size ?? '') === size)
             ? { ...item, quantity }
             : item
         );

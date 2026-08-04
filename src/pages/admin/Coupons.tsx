@@ -138,7 +138,7 @@ const AdminCoupons = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Coupons</h1>
+        <h1 className="text-3xl font-semibold">Coupons</h1>
         <div className="flex space-x-2">
           <Button onClick={() => navigate('/admin/coupons/assign')}>
             <Tag className="w-4 h-4 mr-2" />
@@ -159,7 +159,7 @@ const AdminCoupons = () => {
             <Tag className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{coupons.length}</div>
+            <div className="text-2xl font-semibold">{coupons.length}</div>
           </CardContent>
         </Card>
         
@@ -169,7 +169,7 @@ const AdminCoupons = () => {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-semibold">
               {coupons.filter(c => c.status === 'active').length}
             </div>
           </CardContent>
@@ -181,7 +181,7 @@ const AdminCoupons = () => {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-semibold">
               {coupons.reduce((sum, c) => sum + c.usedCount, 0)}
             </div>
           </CardContent>
@@ -193,7 +193,7 @@ const AdminCoupons = () => {
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-semibold">
               {coupons.filter(c => c.status === 'expired').length}
             </div>
           </CardContent>

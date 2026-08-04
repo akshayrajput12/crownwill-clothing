@@ -33,7 +33,7 @@ const CheckoutPayment = ({
 
   return (
     <div className="space-y-6">
-      <h2 className="text-xl text-[#783838] uppercase font-instrument font-normal tracking-wide border-b border-[#E6D5B8] pb-4 mb-6">
+      <h2 className="text-xl text-brand-black uppercase font-instrument font-normal tracking-wide border-b border-brand-gray-200 pb-4 mb-6">
         Select Payment Method
       </h2>
 
@@ -44,25 +44,25 @@ const CheckoutPayment = ({
           <Label
             htmlFor="online"
             className={`relative flex flex-col p-6 cursor-pointer border rounded-lg transition-all duration-300 ${paymentMethod === 'online'
-              ? 'border-[#8B2131] bg-[#FFF8F0] ring-1 ring-[#8B2131]'
-              : 'border-[#E6D5B8] bg-white hover:border-[#8B2131]/50 hover:bg-[#FFFDF7]'
+              ? 'border-brand-black bg-brand-offwhite ring-1 ring-brand-black'
+              : 'border-brand-gray-200 bg-white hover:border-brand-black/50 hover:bg-brand-offwhite'
               }`}
           >
             <div className="flex justify-between items-start mb-4">
-              <div className={`p-3 rounded-full ${paymentMethod === 'online' ? 'bg-[#8B2131] text-white' : 'bg-[#F5F5F5] text-[#5D4037]'}`}>
+              <div className={`p-3 rounded-full ${paymentMethod === 'online' ? 'bg-brand-black text-white' : 'bg-brand-offwhite text-brand-gray-700'}`}>
                 <CreditCard className="h-6 w-6" />
               </div>
-              <RadioGroupItem value="online" id="online" className="text-[#8B2131] border-[#8B2131]" />
+              <RadioGroupItem value="online" id="online" className="text-brand-black border-brand-black" />
             </div>
 
             <div>
-              <h3 className="text-base text-[#783838] uppercase font-instrument font-normal tracking-wide mb-1">Pay Online</h3>
-              <p className="text-sm text-[#5D4037] leading-relaxed">
+              <h3 className="text-base text-brand-black uppercase font-instrument font-normal tracking-wide mb-1">Pay Online</h3>
+              <p className="text-sm text-brand-gray-700 leading-relaxed">
                 Credit Card, Debit Card, UPI, Net Banking.
               </p>
             </div>
 
-            <div className="mt-4 flex items-center text-xs text-[#2C1810] font-medium bg-white/50 w-fit px-2 py-1 rounded border border-[#E6D5B8]">
+            <div className="mt-4 flex items-center text-xs text-brand-black font-medium bg-white/50 w-fit px-2 py-1 rounded border border-brand-gray-200">
               <ShieldCheck className="h-3 w-3 mr-1 text-green-600" />
               Secured by Razorpay
             </div>
@@ -74,24 +74,24 @@ const CheckoutPayment = ({
           <Label
             htmlFor="cod"
             className={`relative flex flex-col p-6 cursor-pointer border rounded-lg transition-all duration-300 ${paymentMethod === 'cod'
-              ? 'border-[#8B2131] bg-[#FFF8F0] ring-1 ring-[#8B2131]'
-              : 'border-[#E6D5B8] bg-white hover:border-[#8B2131]/50 hover:bg-[#FFFDF7]'
+              ? 'border-brand-black bg-brand-offwhite ring-1 ring-brand-black'
+              : 'border-brand-gray-200 bg-white hover:border-brand-black/50 hover:bg-brand-offwhite'
               }`}
           >
             <div className="flex justify-between items-start mb-4">
-              <div className={`p-3 rounded-full ${paymentMethod === 'cod' ? 'bg-[#8B2131] text-white' : 'bg-[#F5F5F5] text-[#5D4037]'}`}>
+              <div className={`p-3 rounded-full ${paymentMethod === 'cod' ? 'bg-brand-black text-white' : 'bg-brand-offwhite text-brand-gray-700'}`}>
                 <Banknote className="h-6 w-6" />
               </div>
-              <RadioGroupItem value="cod" id="cod" className="text-[#8B2131] border-[#8B2131]" />
+              <RadioGroupItem value="cod" id="cod" className="text-brand-black border-brand-black" />
             </div>
 
             <div>
-              <h3 className="text-base text-[#783838] uppercase font-instrument font-normal tracking-wide mb-1">Cash on Delivery</h3>
-              <p className="text-sm text-[#5D4037] leading-relaxed">
+              <h3 className="text-base text-brand-black uppercase font-instrument font-normal tracking-wide mb-1">Cash on Delivery</h3>
+              <p className="text-sm text-brand-gray-700 leading-relaxed">
                 Pay comfortably with cash when your order arrives.
               </p>
               {Number(settings.cod_charge) > 0 && (
-                <p className="text-xs text-[#8B2131] mt-2 font-medium">
+                <p className="text-xs text-brand-black mt-2 font-medium">
                   + {settings.currency_symbol}{Number(settings.cod_charge).toFixed(2)} COD Convenience Fee
                 </p>
               )}
@@ -115,13 +115,13 @@ const CheckoutPayment = ({
         <Button
           variant="outline"
           onClick={onPrev}
-          className="px-8 py-6 h-auto border-[#E6D5B8] text-[#5D4037] hover:bg-[#FFF8F0] hover:text-[#2C1810]"
+          className="px-8 py-6 h-auto border-brand-gray-200 text-brand-gray-700 hover:bg-brand-offwhite hover:text-brand-black"
         >
           Back
         </Button>
         <Button
           onClick={handleNext}
-          className="px-8 py-6 h-auto bg-[#8B2131] hover:bg-[#701a26] text-white font-medium text-lg shadow-md hover:shadow-lg transition-all"
+          className="px-8 py-6 h-auto bg-brand-black hover:bg-brand-charcoal text-white font-medium text-lg shadow-md hover:shadow-lg transition-all"
         >
           Continue to Review
         </Button>

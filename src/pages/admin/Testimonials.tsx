@@ -260,7 +260,7 @@ const Testimonials = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Testimonials</h1>
+        <h1 className="text-3xl font-semibold">Testimonials</h1>
       </div>
 
       <Card>

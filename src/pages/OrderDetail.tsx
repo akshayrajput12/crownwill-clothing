@@ -205,7 +205,7 @@ const UserOrderDetail = () => {
   if (!order) {
     return (
       <div className="container mx-auto px-4 py-8 text-center">
-        <h1 className="text-2xl font-bold mb-4">Order not found</h1>
+        <h1 className="text-2xl font-semibold mb-4">Order not found</h1>
         <Button onClick={() => navigate('/profile?tab=orders')}>
           Back to Orders
         </Button>
@@ -224,7 +224,7 @@ const UserOrderDetail = () => {
               Back to Orders
             </Button>
             <div>
-              <h1 className="text-3xl font-bold">Order #{order.orderNumber}</h1>
+              <h1 className="text-3xl font-semibold">Order #{order.orderNumber}</h1>
               <p className="text-muted-foreground">
                 Placed on {formatDate(order.orderDate)}
               </p>
@@ -330,7 +330,7 @@ const UserOrderDetail = () => {
 
                   <Separator />
                   
-                  <div className="flex justify-between items-center font-bold text-lg">
+                  <div className="flex justify-between items-center font-semibold text-lg">
                     <span>Total Amount</span>
                     <span className="text-primary">₹{order.total.toLocaleString('en-IN')}</span>
                   </div>
@@ -501,7 +501,7 @@ const UserOrderDetail = () => {
                   
                   <div className="flex justify-between">
                     <span className="text-sm">Total Amount</span>
-                    <span className="text-sm font-bold">₹{order.total.toLocaleString('en-IN')}</span>
+                    <span className="text-sm font-semibold">₹{order.total.toLocaleString('en-IN')}</span>
                   </div>
 
                   {order.razorpayPaymentId && (

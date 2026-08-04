@@ -32,21 +32,21 @@ const CheckoutContactInfo = ({ customerInfo, setCustomerInfo, onNext }: Checkout
   };
 
   return (
-    <Card className="border-[#E6D5B8] bg-[#FFFDF7] shadow-sm">
-      <CardHeader className="border-b border-[#E6D5B8]">
-        <CardTitle className="flex items-center text-lg text-[#783838] uppercase font-instrument font-normal tracking-wide">
-          <User className="h-5 w-5 mr-2 text-[#8B2131]" />
+    <Card className="border-brand-gray-200 bg-brand-offwhite shadow-sm">
+      <CardHeader className="border-b border-brand-gray-200">
+        <CardTitle className="flex items-center text-lg text-brand-black uppercase font-instrument font-normal tracking-wide">
+          <User className="h-5 w-5 mr-2 text-brand-black" />
           Contact Information
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6 pt-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="name" className="text-xs font-normal text-[#2C1810] font-instrument uppercase tracking-wide">
+            <Label htmlFor="name" className="text-xs font-normal text-brand-black font-instrument uppercase tracking-wide">
               Full Name *
             </Label>
             <div className="relative">
-              <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#8B2131]/50 h-4 w-4" />
+              <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-brand-black/50 h-4 w-4" />
               <Input
                 id="name"
                 type="text"
@@ -59,18 +59,18 @@ const CheckoutContactInfo = ({ customerInfo, setCustomerInfo, onNext }: Checkout
                     setContactErrors([]);
                   }
                 }}
-                className={`pl-10 h-12 border-[#E6D5B8] focus:ring-[#8B2131] bg-white text-[#2C1810] placeholder:text-[#5D4037]/50 font-instrument font-normal ${contactErrors.some(e => e.includes('name') || e.includes('Name')) ? 'border-red-500' : ''}`}
+                className={`pl-10 h-12 border-brand-gray-200 focus:ring-brand-black bg-white text-brand-black placeholder:text-brand-gray-700/50 font-instrument font-normal ${contactErrors.some(e => e.includes('name') || e.includes('Name')) ? 'border-red-500' : ''}`}
                 required
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="phone" className="text-xs font-normal text-[#2C1810] font-instrument uppercase tracking-wide">
+            <Label htmlFor="phone" className="text-xs font-normal text-brand-black font-instrument uppercase tracking-wide">
               Phone Number *
             </Label>
             <div className="relative">
-              <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#8B2131]/50 h-4 w-4" />
+              <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-brand-black/50 h-4 w-4" />
               <Input
                 id="phone"
                 type="tel"
@@ -82,7 +82,7 @@ const CheckoutContactInfo = ({ customerInfo, setCustomerInfo, onNext }: Checkout
                     setContactErrors([]);
                   }
                 }}
-                className={`pl-10 h-12 border-[#E6D5B8] focus:ring-[#8B2131] bg-white text-[#2C1810] placeholder:text-[#5D4037]/50 font-instrument font-normal ${contactErrors.some(e => e.includes('phone') || e.includes('Phone')) ? 'border-red-500' : ''}`}
+                className={`pl-10 h-12 border-brand-gray-200 focus:ring-brand-black bg-white text-brand-black placeholder:text-brand-gray-700/50 font-instrument font-normal ${contactErrors.some(e => e.includes('phone') || e.includes('Phone')) ? 'border-red-500' : ''}`}
                 required
               />
             </div>
@@ -90,11 +90,11 @@ const CheckoutContactInfo = ({ customerInfo, setCustomerInfo, onNext }: Checkout
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="email" className="text-xs font-normal text-[#2C1810] font-instrument uppercase tracking-wide">
+          <Label htmlFor="email" className="text-xs font-normal text-brand-black font-instrument uppercase tracking-wide">
             Email Address *
           </Label>
           <div className="relative">
-            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#8B2131]/50 h-4 w-4" />
+            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-brand-black/50 h-4 w-4" />
             <Input
               id="email"
               type="email"
@@ -106,7 +106,7 @@ const CheckoutContactInfo = ({ customerInfo, setCustomerInfo, onNext }: Checkout
                   setContactErrors([]);
                 }
               }}
-              className={`pl-10 h-12 border-[#E6D5B8] focus:ring-[#8B2131] bg-white text-[#2C1810] placeholder:text-[#5D4037]/50 font-instrument font-normal ${contactErrors.some(e => e.includes('email') || e.includes('Email')) ? 'border-red-500' : ''}`}
+              className={`pl-10 h-12 border-brand-gray-200 focus:ring-brand-black bg-white text-brand-black placeholder:text-brand-gray-700/50 font-instrument font-normal ${contactErrors.some(e => e.includes('email') || e.includes('Email')) ? 'border-red-500' : ''}`}
               required
             />
           </div>
@@ -131,14 +131,14 @@ const CheckoutContactInfo = ({ customerInfo, setCustomerInfo, onNext }: Checkout
           </div>
         )}
 
-        <div className="bg-[#EBF8FF] border border-[#BEE3F8] rounded-sm p-4">
+        <div className="bg-brand-success-light border border-brand-success-light rounded-sm p-4">
           <div className="flex items-start space-x-3">
-            <Shield className="h-5 w-5 text-[#2B6CB0] mt-0.5" />
+            <Shield className="h-5 w-5 text-brand-blue mt-0.5" />
             <div>
-              <h4 className="font-normal text-[#2C5282] text-sm font-instrument uppercase tracking-wide">
+              <h4 className="font-normal text-brand-blue text-sm font-instrument uppercase tracking-wide">
                 Your information is secure
               </h4>
-              <p className="text-[#3182CE] text-sm mt-1 font-instrument">
+              <p className="text-brand-blue text-sm mt-1 font-instrument">
                 We use your contact details only for order updates and delivery coordination.
               </p>
             </div>
@@ -146,7 +146,7 @@ const CheckoutContactInfo = ({ customerInfo, setCustomerInfo, onNext }: Checkout
         </div>
 
         <div className="flex justify-end pt-4">
-          <Button onClick={handleNext} size="lg" className="px-8 bg-[#8B2131] hover:bg-[#701a26] text-white font-instrument font-normal tracking-widest uppercase">
+          <Button onClick={handleNext} size="lg" className="px-8 bg-brand-black hover:bg-brand-charcoal text-white font-instrument font-normal tracking-widest uppercase">
             Continue to Location
           </Button>
         </div>

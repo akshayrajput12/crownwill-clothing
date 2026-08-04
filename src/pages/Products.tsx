@@ -7,6 +7,7 @@ import ProductFiltersComponent, { ProductFilters } from '../components/ProductFi
 import { Input } from '@/components/ui/input';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { applyProductSearch, noteSearchError } from '@/lib/productSearch';
 import { scrollToTopInstant } from '@/utils/scrollToTop';
 import { Button } from '@/components/ui/button';
 
@@ -116,12 +117,12 @@ const Products = () => {
       // First, get the total count
       let countQuery = supabase
         .from('products')
-        .select('*', { count: 'exact', head: true })
+        .select('id', { count: 'exact', head: true })
         .eq('is_active', true);
 
-      // Apply search term filter
+      // Indexed full-text search over name + description.
       if (searchTerm) {
-        countQuery = countQuery.ilike('name', `%${searchTerm}%`);
+        countQuery = applyProductSearch(countQuery, searchTerm);
       }
 
       // Apply category filters (Primary source of truth now)
@@ -166,7 +167,8 @@ const Products = () => {
       let query = supabase
         .from('products')
         .select(`
-          *,
+          id,name,description,price,original_price,images,sku,category_id,
+          stock_quantity,is_bestseller,new_arrival,created_at,features,
           categories (
             id,
             name
@@ -176,7 +178,7 @@ const Products = () => {
         .range((pageNum - 1) * 10, pageNum * 10 - 1);
 
 
-      if (searchTerm) query = query.ilike('name', `%${searchTerm}%`);
+      if (searchTerm) query = applyProductSearch(query, searchTerm);
 
       // Apply category filters
       if (filters && filters.categories.length > 0) {
@@ -211,7 +213,15 @@ const Products = () => {
 
       const { data, error } = await query;
 
-      if (error) throw error;
+      if (error) {
+        // Search index not deployed yet: switch to the LIKE path and retry once.
+        if (noteSearchError(error)) {
+          setLoading(false);
+          setIsLoadingMore(false);
+          return fetchProducts(pageNum);
+        }
+        throw error;
+      }
 
       if (pageNum === 1) {
         setProducts(data || []);
@@ -285,7 +295,7 @@ const Products = () => {
           >
             <div className="p-6 h-full overflow-y-auto">
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-lg font-bold text-gray-900 flex items-center">
+                <h3 className="text-lg font-semibold text-gray-900 flex items-center">
                   <Filter className="w-5 h-5 mr-2 text-primary" />
                   Filters
                 </h3>
@@ -325,7 +335,7 @@ const Products = () => {
           <div className="flex-1">
 
             {/* View Controls - Minimalist & Royal Font */}
-            <div className="flex justify-between items-center mb-6 border-b border-[#D4C3A3]/30 pb-4">
+            <div className="flex justify-between items-center mb-6 border-b border-brand-gray-200/30 pb-4">
               {/* Mobile Filter Toggle */}
               <Button
                 variant="outline"
@@ -336,25 +346,25 @@ const Products = () => {
               </Button>
 
               <div className="flex justify-end w-full lg:w-auto items-center gap-4">
-                <span className="text-[10px] uppercase tracking-[0.2em] text-[#9B4E4E] font-medium hidden sm:block font-inter">View Options</span>
+                <span className="text-[10px] uppercase tracking-[0.2em] text-brand-charcoal font-medium hidden sm:block font-inter">View Options</span>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setGridCols(4)}
-                    className={`p-2 transition-colors ${gridCols === 4 ? 'text-[#8B2131] bg-[#F9F3EA]' : 'text-[#D4C3A3] hover:text-[#8B2131]'}`}
+                    className={`p-2 transition-colors ${gridCols === 4 ? 'text-brand-black bg-brand-offwhite' : 'text-brand-gray-200 hover:text-brand-black'}`}
                     title="Small Grid"
                   >
                     <LayoutGrid className="w-5 h-5" />
                   </button>
                   <button
                     onClick={() => setGridCols(3)}
-                    className={`p-2 transition-colors ${gridCols === 3 ? 'text-[#8B2131] bg-[#F9F3EA]' : 'text-[#D4C3A3] hover:text-[#8B2131]'}`}
+                    className={`p-2 transition-colors ${gridCols === 3 ? 'text-brand-black bg-brand-offwhite' : 'text-brand-gray-200 hover:text-brand-black'}`}
                     title="Grid"
                   >
                     <Grid className="w-5 h-5" />
                   </button>
                   <button
                     onClick={() => setGridCols(1)}
-                    className={`p-2 transition-colors ${gridCols === 1 ? 'text-[#8B2131] bg-[#F9F3EA]' : 'text-[#D4C3A3] hover:text-[#8B2131]'}`}
+                    className={`p-2 transition-colors ${gridCols === 1 ? 'text-brand-black bg-brand-offwhite' : 'text-brand-gray-200 hover:text-brand-black'}`}
                     title="List View"
                   >
                     <List className="w-5 h-5" />

@@ -291,7 +291,7 @@ const AdminAnalytics = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Analytics</h1>
+        <h1 className="text-3xl font-semibold">Analytics</h1>
         <div className="flex items-center space-x-2">
           <select
             value={dateRange}
@@ -317,7 +317,7 @@ const AdminAnalytics = () => {
             <IndianRupee className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatPrice(analyticsData.revenue.current)}</div>
+            <div className="text-2xl font-semibold">{formatPrice(analyticsData.revenue.current)}</div>
             <div className="flex items-center text-xs">
               {analyticsData.revenue.trend === 'up' ? (
                 <TrendingUp className="w-3 h-3 text-green-500 mr-1" />
@@ -338,7 +338,7 @@ const AdminAnalytics = () => {
             <ShoppingCart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{analyticsData.orders.current}</div>
+            <div className="text-2xl font-semibold">{analyticsData.orders.current}</div>
             <div className="flex items-center text-xs">
               {analyticsData.orders.trend === 'up' ? (
                 <TrendingUp className="w-3 h-3 text-green-500 mr-1" />
@@ -359,7 +359,7 @@ const AdminAnalytics = () => {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{analyticsData.customers.current}</div>
+            <div className="text-2xl font-semibold">{analyticsData.customers.current}</div>
             <div className="flex items-center text-xs">
               {analyticsData.customers.trend === 'up' ? (
                 <TrendingUp className="w-3 h-3 text-green-500 mr-1" />
@@ -380,7 +380,7 @@ const AdminAnalytics = () => {
             <BarChart3 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatPrice(analyticsData.avgOrderValue.current)}</div>
+            <div className="text-2xl font-semibold">{formatPrice(analyticsData.avgOrderValue.current)}</div>
             <div className="flex items-center text-xs">
               {analyticsData.avgOrderValue.trend === 'up' ? (
                 <TrendingUp className="w-3 h-3 text-green-500 mr-1" />
@@ -413,7 +413,7 @@ const AdminAnalytics = () => {
                 {topCategories.map((category: any, index) => (
                   <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
                     <div className="flex items-center space-x-4">
-                      <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-primary-foreground text-sm font-bold">
+                      <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-primary-foreground text-sm font-semibold">
                         {index + 1}
                       </div>
                       <div>
@@ -442,7 +442,7 @@ const AdminAnalytics = () => {
                 {topCustomers.map((customer: any, index) => (
                   <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
                     <div className="flex items-center space-x-4">
-                      <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-primary-foreground text-sm font-bold">
+                      <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-primary-foreground text-sm font-semibold">
                         {customer.name.charAt(0)}
                       </div>
                       <div>

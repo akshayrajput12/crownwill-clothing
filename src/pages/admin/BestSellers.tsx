@@ -180,7 +180,7 @@ const AdminBestSellers = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Best Sellers</h1>
+        <h1 className="text-3xl font-semibold">Best Sellers</h1>
         <div className="flex items-center space-x-2">
           <select
             value={dateRange}
@@ -202,7 +202,7 @@ const AdminBestSellers = () => {
             <IndianRupee className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatPrice(totalRevenue)}</div>
+            <div className="text-2xl font-semibold">{formatPrice(totalRevenue)}</div>
             <p className="text-xs text-muted-foreground">
               +12.5% from last period
             </p>
@@ -215,7 +215,7 @@ const AdminBestSellers = () => {
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalUnitsSold}</div>
+            <div className="text-2xl font-semibold">{totalUnitsSold}</div>
             <p className="text-xs text-muted-foreground">
               +8.2% from last period
             </p>
@@ -228,7 +228,7 @@ const AdminBestSellers = () => {
             <Star className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{averageRating.toFixed(1)}</div>
+            <div className="text-2xl font-semibold">{averageRating.toFixed(1)}</div>
             <p className="text-xs text-muted-foreground">
               Across all bestsellers
             </p>
@@ -241,7 +241,7 @@ const AdminBestSellers = () => {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{bestSellers.length}</div>
+            <div className="text-2xl font-semibold">{bestSellers.length}</div>
             <p className="text-xs text-muted-foreground">
               Bestseller products
             </p>
@@ -274,7 +274,7 @@ const AdminBestSellers = () => {
                 <TableRow key={product.id}>
                   <TableCell>
                     <div className="flex items-center space-x-2">
-                      <div className="w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold">
+                      <div className="w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-semibold">
                         {product.rank}
                       </div>
                       {product.rank <= 3 && (

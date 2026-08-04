@@ -66,10 +66,10 @@ const CollectionCarousel = () => {
 
   if (loading) {
     return (
-      <section className="py-20 bg-[#FAF9F6]">
+      <section className="py-20 bg-brand-white">
         <div className="container mx-auto px-4">
           <div className="flex justify-center items-center h-40">
-            <div className="w-8 h-8 border-2 border-[#783838] border-t-transparent rounded-full animate-spin"></div>
+            <div className="w-8 h-8 border-2 border-brand-black border-t-transparent rounded-full animate-spin"></div>
           </div>
         </div>
       </section>
@@ -79,16 +79,16 @@ const CollectionCarousel = () => {
   if (categories.length === 0) return null;
 
   return (
-    <section className="py-12 md:py-16 bg-[#F9F3EA]">
+    <section className="py-12 md:py-16 bg-brand-offwhite">
       <div className="w-full max-w-[1800px] mx-auto px-4 md:px-8 lg:px-12">
 
         {/* Section Title - Minimal */}
         <div className="flex flex-col items-center justify-center mb-10 space-y-3">
-          <span className="text-[10px] uppercase tracking-[0.25em] text-[#9B4E4E] font-medium font-orange-avenue">CURATED FOR YOU</span>
-          <h2 className="text-xl md:text-2xl lg:text-3xl text-[#783838] uppercase font-orange-avenue font-normal tracking-wide">
+          <span className="text-[10px] uppercase tracking-[0.25em] text-brand-charcoal font-medium font-orange-avenue">CURATED FOR YOU</span>
+          <h2 className="text-xl md:text-2xl lg:text-3xl text-brand-black uppercase font-orange-avenue font-normal tracking-wide">
             THE COLLECTIONS
           </h2>
-          <div className="w-12 h-0.5 bg-[#B38B46]/30 mt-2"></div>
+          <div className="w-12 h-0.5 bg-brand-yellow-dark/30 mt-2"></div>
         </div>
 
         {/* Categories Carousel */}
@@ -124,14 +124,14 @@ const CollectionCarousel = () => {
                       </div>
 
                       {/* Overlay - Gradient always present for readability */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#2E1212]/80 via-transparent to-transparent opacity-60 group-hover:opacity-90 transition-opacity duration-500" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-brand-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-90 transition-opacity duration-500" />
 
                       {/* Category Name */}
                       <div className="absolute bottom-6 left-0 right-0 text-center px-4">
-                        <h3 className="font-orange-avenue text-[#FAF9F6] text-lg md:text-xl tracking-widest font-normal uppercase transition-all duration-500 group-hover:-translate-y-1">
+                        <h3 className="font-orange-avenue text-brand-white text-lg md:text-xl tracking-widest font-normal uppercase transition-all duration-500 group-hover:-translate-y-1">
                           {category.name}
                         </h3>
-                        <span className="inline-block mt-2 text-[10px] text-[#B38B46] uppercase tracking-[0.2em] opacity-0 transform translate-y-2 transition-all duration-500 group-hover:opacity-100 group-hover:translate-y-0">
+                        <span className="inline-block mt-2 text-[10px] text-brand-yellow-dark uppercase tracking-[0.2em] opacity-0 transform translate-y-2 transition-all duration-500 group-hover:opacity-100 group-hover:translate-y-0">
                           View Collection
                         </span>
                       </div>
@@ -140,8 +140,8 @@ const CollectionCarousel = () => {
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious className="hidden md:flex -left-12 border-[#D4B6A2]/30 bg-transparent hover:bg-[#783838] text-[#783838] hover:text-white transition-colors" />
-            <CarouselNext className="hidden md:flex -right-12 border-[#D4B6A2]/30 bg-transparent hover:bg-[#783838] text-[#783838] hover:text-white transition-colors" />
+            <CarouselPrevious className="hidden md:flex -left-12 border-brand-gray-200/30 bg-transparent hover:bg-brand-black text-brand-black hover:text-white transition-colors" />
+            <CarouselNext className="hidden md:flex -right-12 border-brand-gray-200/30 bg-transparent hover:bg-brand-black text-brand-black hover:text-white transition-colors" />
           </Carousel>
         </div>
 

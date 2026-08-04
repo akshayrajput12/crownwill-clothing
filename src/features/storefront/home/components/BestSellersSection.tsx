@@ -135,16 +135,16 @@ const BestSellersSection = () => {
   };
 
   return (
-    <section className="py-12 md:py-16 bg-[#F9F3EA] relative overflow-hidden">
+    <section className="py-12 md:py-16 bg-brand-offwhite relative overflow-hidden">
       {/* Background accent - Crownveil Theme */}
-      <div className="absolute top-0 left-0 w-full h-full bg-[#F9F3EA] -z-10"></div>
+      <div className="absolute top-0 left-0 w-full h-full bg-brand-offwhite -z-10"></div>
 
       <div className="max-w-[1600px] mx-auto px-6 relative z-10">
         {/* Header Area */}
-        <div className="flex flex-col items-center justify-center text-center mb-8 gap-4 pb-4 border-b border-[#D4C3A3]/30 relative">
+        <div className="flex flex-col items-center justify-center text-center mb-8 gap-4 pb-4 border-b border-brand-gray-200/30 relative">
           <div>
-            <span className="text-[10px] uppercase tracking-[0.25em] text-[#9B4E4E] mb-2 block font-medium font-orange-avenue">SHOP THE ICONS</span>
-            <h2 className="text-xl md:text-2xl lg:text-3xl text-[#783838] uppercase font-orange-avenue font-normal tracking-wide">
+            <span className="text-[10px] uppercase tracking-[0.25em] text-brand-charcoal mb-2 block font-medium font-orange-avenue">SHOP THE ICONS</span>
+            <h2 className="text-xl md:text-2xl lg:text-3xl text-brand-black uppercase font-orange-avenue font-normal tracking-wide">
               MOST COVETED
             </h2>
           </div>
@@ -155,8 +155,8 @@ const BestSellersSection = () => {
               <button
                 onClick={prevSlide}
                 disabled={!canGoPrev}
-                className={`w-12 h-12 flex items-center justify-center border border-[#D4C3A3] transition-all duration-300 rounded-full ${canGoPrev
-                  ? 'bg-transparent text-[#2C1810] hover:bg-[#8B2131] hover:text-white hover:border-[#8B2131]'
+                className={`w-12 h-12 flex items-center justify-center border border-brand-gray-200 transition-all duration-300 rounded-full ${canGoPrev
+                  ? 'bg-transparent text-brand-black hover:bg-brand-black hover:text-white hover:border-brand-black'
                   : 'bg-transparent text-gray-300 cursor-not-allowed'
                   }`}
               >
@@ -165,8 +165,8 @@ const BestSellersSection = () => {
               <button
                 onClick={nextSlide}
                 disabled={!canGoNext}
-                className={`w-12 h-12 flex items-center justify-center border border-[#D4C3A3] transition-all duration-300 rounded-full ${canGoNext
-                  ? 'bg-transparent text-[#2C1810] hover:bg-[#8B2131] hover:text-white hover:border-[#8B2131]'
+                className={`w-12 h-12 flex items-center justify-center border border-brand-gray-200 transition-all duration-300 rounded-full ${canGoNext
+                  ? 'bg-transparent text-brand-black hover:bg-brand-black hover:text-white hover:border-brand-black'
                   : 'bg-transparent text-gray-300 cursor-not-allowed'
                   }`}
               >
@@ -187,9 +187,9 @@ const BestSellersSection = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {Array.from({ length: 4 }).map((_, index) => (
                 <div key={index} className="animate-pulse">
-                  <div className="bg-[#D4C3A3]/20 aspect-[4/5] w-full mb-4"></div>
-                  <div className="h-4 bg-[#D4C3A3]/20 w-3/4 mb-2"></div>
-                  <div className="h-4 bg-[#D4C3A3]/20 w-1/2"></div>
+                  <div className="bg-brand-gray-200/20 aspect-[4/5] w-full mb-4"></div>
+                  <div className="h-4 bg-brand-gray-200/20 w-3/4 mb-2"></div>
+                  <div className="h-4 bg-brand-gray-200/20 w-1/2"></div>
                 </div>
               ))}
             </div>
@@ -221,10 +221,10 @@ const BestSellersSection = () => {
               </div>
             </div>
           ) : (
-            <div className="text-center py-20 border border-[#D4C3A3]/20 p-8">
-              <Star className="w-12 h-12 text-[#D4C3A3] mx-auto mb-4" />
-              <h3 className="text-xl font-orange-avenue font-normal text-[#2C1810] mb-2">No bestsellers available</h3>
-              <p className="text-[#5D4037] font-light">Check back later for the pieces our customers wear on repeat.</p>
+            <div className="text-center py-20 border border-brand-gray-200/20 p-8">
+              <Star className="w-12 h-12 text-brand-gray-200 mx-auto mb-4" />
+              <h3 className="text-xl font-orange-avenue font-normal text-brand-black mb-2">No bestsellers available</h3>
+              <p className="text-brand-gray-700 font-light">Check back later for the pieces our customers wear on repeat.</p>
             </div>
           )}
         </div>
@@ -232,7 +232,7 @@ const BestSellersSection = () => {
         <div className="text-center mt-12">
           <button
             onClick={() => navigate('/products')}
-            className="group inline-flex items-center gap-3 bg-[#8B2131] text-white px-10 py-4 text-xs font-orange-avenue font-normal uppercase tracking-[0.2em] hover:bg-[#2C1810] transition-all duration-300"
+            className="group inline-flex items-center gap-3 bg-brand-black text-white px-10 py-4 text-xs font-orange-avenue font-normal uppercase tracking-[0.2em] hover:bg-brand-black transition-all duration-300"
           >
             View Full Collection <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </button>

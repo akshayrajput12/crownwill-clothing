@@ -104,7 +104,7 @@ const Contact = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold mb-4">Get in Touch</h1>
+        <h1 className="text-4xl font-semibold mb-4">Get in Touch</h1>
         <p className="text-xl text-muted-foreground">
           Have a question about fit, fabrics or your order? Send us a message and our team will respond as soon as possible.
         </p>

@@ -685,9 +685,9 @@ const Checkout = () => {
 
   if (cartItems.length === 0) {
     return (
-      <div className="container mx-auto px-4 py-16 text-center min-h-[60vh] flex flex-col items-center justify-center bg-[#FFFDF7]">
-        <h1 className="text-3xl text-[#783838] uppercase font-inter font-normal tracking-wide mb-4">Your cart is empty</h1>
-        <Button onClick={() => navigate('/products')} className="bg-[#8B2131] hover:bg-[#701a26] text-white">
+      <div className="container mx-auto px-4 py-16 text-center min-h-[60vh] flex flex-col items-center justify-center bg-brand-offwhite">
+        <h1 className="text-3xl text-brand-black uppercase font-inter font-normal tracking-wide mb-4">Your cart is empty</h1>
+        <Button onClick={() => navigate('/products')} className="bg-brand-black hover:bg-brand-charcoal text-white">
           Continue Shopping
         </Button>
       </div>
@@ -696,19 +696,19 @@ const Checkout = () => {
 
   if (settingsLoading) {
     return (
-      <div className="container mx-auto px-4 py-16 text-center bg-[#FFFDF7] min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#8B2131] mx-auto"></div>
-        <p className="mt-4 text-[#5D4037]">Loading checkout...</p>
+      <div className="container mx-auto px-4 py-16 text-center bg-brand-offwhite min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-black mx-auto"></div>
+        <p className="mt-4 text-brand-gray-700">Loading checkout...</p>
       </div>
     );
   }
 
   if (settingsError) {
     return (
-      <div className="container mx-auto px-4 py-16 text-center bg-[#FFFDF7] min-h-screen">
-        <div className="text-[#C53030] mb-4">⚠️ Error loading settings</div>
-        <p className="text-[#5D4037]">Please refresh the page to try again.</p>
-        <Button onClick={() => window.location.reload()} className="mt-4 bg-[#8B2131] hover:bg-[#701a26]">
+      <div className="container mx-auto px-4 py-16 text-center bg-brand-offwhite min-h-screen">
+        <div className="text-brand-red mb-4">⚠️ Error loading settings</div>
+        <p className="text-brand-gray-700">Please refresh the page to try again.</p>
+        <Button onClick={() => window.location.reload()} className="mt-4 bg-brand-black hover:bg-brand-charcoal">
           Refresh Page
         </Button>
       </div>
@@ -716,23 +716,23 @@ const Checkout = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#FFFDF7] pb-10">
+    <div className="min-h-screen bg-brand-offwhite pb-10">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center space-x-4">
-            <Button variant="ghost" onClick={() => navigate(-1)} size="sm" className="text-[#5D4037] hover:text-[#8B2131] hover:bg-[#FFF8F0]">
+            <Button variant="ghost" onClick={() => navigate(-1)} size="sm" className="text-brand-gray-700 hover:text-brand-black hover:bg-brand-offwhite">
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back
             </Button>
-            <h1 className="text-3xl text-[#783838] uppercase font-inter font-normal tracking-wide">Checkout</h1>
+            <h1 className="text-3xl text-brand-black uppercase font-inter font-normal tracking-wide">Checkout</h1>
           </div>
 
           {/* Mobile Total Display */}
           <div className="xl:hidden">
             <div className="text-right">
-              <p className="text-sm text-[#5D4037]">Total</p>
-              <p className="text-lg font-bold text-[#8B2131]">{formatPrice(total)}</p>
+              <p className="text-sm text-brand-gray-700">Total</p>
+              <p className="text-lg font-semibold text-brand-black">{formatPrice(total)}</p>
             </div>
           </div>
         </div>
@@ -828,16 +828,16 @@ const Checkout = () => {
 
           {/* Order Summary Sidebar */}
           <div className="xl:col-span-1 order-1 xl:order-2">
-            <Card className="sticky top-4 border-[#E6D5B8] bg-[#FFF8F0] shadow-sm">
-              <CardHeader className="border-b border-[#E6D5B8]">
-                <CardTitle className="text-[#783838] uppercase font-inter font-normal tracking-wide">Order Summary</CardTitle>
+            <Card className="sticky top-4 border-brand-gray-200 bg-brand-offwhite shadow-sm">
+              <CardHeader className="border-b border-brand-gray-200">
+                <CardTitle className="text-brand-black uppercase font-inter font-normal tracking-wide">Order Summary</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 pt-6">
                 {/* Quick Items Summary */}
                 {currentStep < 4 && (
                   <>
                     <div className="space-y-3">
-                      <h4 className="font-normal text-sm text-[#5D4037] font-inter uppercase tracking-wide">
+                      <h4 className="font-normal text-sm text-brand-gray-700 font-inter uppercase tracking-wide">
                         {cartItems.reduce((sum, item) => sum + toNumber(item.quantity), 0)} items in cart
                       </h4>
                       {cartItems.slice(0, 3).map((item) => (
@@ -845,45 +845,45 @@ const Checkout = () => {
                           <img
                             src={item.image}
                             alt={item.name}
-                            className="w-10 h-10 object-cover rounded-sm border border-[#E6D5B8]"
+                            className="w-10 h-10 object-cover rounded-sm border border-brand-gray-200"
                           />
                           <div className="flex-1 min-w-0">
-                            <h5 className="font-normal text-sm truncate text-[#783838] font-inter uppercase tracking-wide">{item.name}</h5>
-                            <p className="text-xs text-[#5D4037] font-inter">
+                            <h5 className="font-normal text-sm truncate text-brand-black font-inter uppercase tracking-wide">{item.name}</h5>
+                            <p className="text-xs text-brand-gray-700 font-inter">
                               {item.weight} × {item.quantity}
                             </p>
                           </div>
-                          <div className="text-sm font-normal text-[#2C1810] font-inter">
+                          <div className="text-sm font-normal text-brand-black font-inter">
                             {formatPrice(toNumber(item.price) * toNumber(item.quantity))}
                           </div>
                         </div>
                       ))}
                       {cartItems.length > 3 && (
-                        <p className="text-xs text-[#8B2131] text-center cursor-pointer hover:underline">
+                        <p className="text-xs text-brand-black text-center cursor-pointer hover:underline">
                           +{cartItems.length - 3} more items
                         </p>
                       )}
                     </div>
 
-                    <Separator className="bg-[#E6D5B8]" />
+                    <Separator className="bg-brand-gray-200" />
                   </>
                 )}
 
-                <div className="flex justify-between text-[#5D4037] font-inter text-sm">
+                <div className="flex justify-between text-brand-gray-700 font-inter text-sm">
                   <span className="uppercase tracking-wide">Subtotal</span>
-                  <span className="font-normal text-[#2C1810]">{formatPrice(subtotal)}</span>
+                  <span className="font-normal text-brand-black">{formatPrice(subtotal)}</span>
                 </div>
 
-                <div className="flex justify-between text-[#5D4037] font-inter text-sm">
+                <div className="flex justify-between text-brand-gray-700 font-inter text-sm">
                   <span className="uppercase tracking-wide">Tax ({toNumber(settings.tax_rate).toFixed(0)}%)</span>
-                  <span className="font-normal text-[#2C1810]">{formatPrice(tax)}</span>
+                  <span className="font-normal text-brand-black">{formatPrice(tax)}</span>
                 </div>
 
-                <div className="flex justify-between text-[#5D4037] font-inter text-sm">
+                <div className="flex justify-between text-brand-gray-700 font-inter text-sm">
                   <span className="uppercase tracking-wide">Delivery Fee</span>
-                  <span className="font-normal text-[#2C1810]">
+                  <span className="font-normal text-brand-black">
                     {deliveryFee === 0 ? (
-                      <span className="text-[#38A169] font-normal tracking-wide">
+                      <span className="text-brand-success font-normal tracking-wide">
                         FREE
                       </span>
                     ) : (
@@ -893,42 +893,42 @@ const Checkout = () => {
                 </div>
 
                 {paymentMethod === 'cod' && toNumber(settings.cod_charge) > 0 && (
-                  <div className="flex justify-between text-[#5D4037]">
+                  <div className="flex justify-between text-brand-gray-700">
                     <span>COD Fee</span>
                     <span>{formatPrice(codFee)}</span>
                   </div>
                 )}
 
                 {discount > 0 && (
-                  <div className="flex justify-between text-[#2F855A]">
+                  <div className="flex justify-between text-brand-success">
                     <span>Discount</span>
                     <span>-{formatPrice(discount)}</span>
                   </div>
                 )}
 
-                <Separator className="bg-[#E6D5B8]" />
+                <Separator className="bg-brand-gray-200" />
 
                 {currentStep < 4 && (
                   <div className="space-y-3">
-                    <Label className="flex items-center text-[#2C1810]">
+                    <Label className="flex items-center text-brand-black">
                       <Tag className="h-4 w-4 mr-2" />
                       Apply Coupon
                     </Label>
 
                     {appliedCoupon ? (
-                      <div className="flex items-center justify-between p-3 bg-[#F0FFF4] border border-[#C6F6D5] rounded-sm">
+                      <div className="flex items-center justify-between p-3 bg-brand-success-light border border-brand-success-light rounded-sm">
                         <div className="flex items-center space-x-2">
-                          <Tag className="h-4 w-4 text-[#2F855A]" />
+                          <Tag className="h-4 w-4 text-brand-success" />
                           <div>
-                            <span className="text-sm font-medium text-[#22543D]">
+                            <span className="text-sm font-medium text-brand-black">
                               {appliedCoupon.code} Applied
                             </span>
-                            <p className="text-xs text-[#2F855A]">
+                            <p className="text-xs text-brand-success">
                               {appliedCoupon.description}
                             </p>
                           </div>
                         </div>
-                        <Button variant="ghost" size="sm" onClick={removeCoupon} className="text-[#2F855A] hover:text-[#22543D] hover:bg-[#C6F6D5]">
+                        <Button variant="ghost" size="sm" onClick={removeCoupon} className="text-brand-success hover:text-brand-black hover:bg-brand-success-light">
                           Remove
                         </Button>
                       </div>
@@ -938,9 +938,9 @@ const Checkout = () => {
                           placeholder="Enter coupon code"
                           value={couponCode}
                           onChange={(e) => setCouponCode(e.target.value)}
-                          className="bg-white border-[#E6D5B8] focus:ring-[#8B2131]"
+                          className="bg-white border-brand-gray-200 focus:ring-brand-black"
                         />
-                        <Button variant="outline" onClick={applyCoupon} className="border-[#8B2131] text-[#8B2131] hover:bg-[#8B2131] hover:text-white">
+                        <Button variant="outline" onClick={applyCoupon} className="border-brand-black text-brand-black hover:bg-brand-black hover:text-white">
                           Apply
                         </Button>
                       </div>
@@ -948,23 +948,23 @@ const Checkout = () => {
                   </div>
                 )}
 
-                <Separator className="bg-[#E6D5B8]" />
+                <Separator className="bg-brand-gray-200" />
 
-                <div className="flex justify-between font-normal text-lg text-[#2C1810] font-inter">
+                <div className="flex justify-between font-normal text-lg text-brand-black font-inter">
                   <span className="uppercase tracking-wide">Total</span>
-                  <span className="text-[#783838]">{formatPrice(total)}</span>
+                  <span className="text-brand-black">{formatPrice(total)}</span>
                 </div>
 
                 {/* Minimum Order Warning */}
                 {subtotal < toNumber(settings.min_order_amount) && (
-                  <div className="bg-[#FFFAF0] border border-[#FEEBC8] rounded-sm p-3 mt-3">
+                  <div className="bg-brand-offwhite border border-brand-cream rounded-sm p-3 mt-3">
                     <div className="flex items-center space-x-2">
-                      <span className="text-[#C05621]">⚠️</span>
+                      <span className="text-brand-yellow-dark">⚠️</span>
                       <div>
-                        <p className="text-sm text-[#9C4221] font-medium">
+                        <p className="text-sm text-brand-yellow-dark font-medium">
                           Minimum Order: {formatCurrency(settings.min_order_amount, settings.currency_symbol)}
                         </p>
-                        <p className="text-xs text-[#C05621]">
+                        <p className="text-xs text-brand-yellow-dark">
                           Add {formatCurrency(toNumber(settings.min_order_amount) - subtotal, settings.currency_symbol)} more to proceed
                         </p>
                       </div>
@@ -976,7 +976,7 @@ const Checkout = () => {
                 <div className="hidden xl:block">
                   {currentStep < 4 && (
                     <Button
-                      className="w-full bg-[#8B2131] hover:bg-[#701a26] text-white font-inter font-normal tracking-widest uppercase"
+                      className="w-full bg-brand-black hover:bg-brand-charcoal text-white font-inter font-normal tracking-widest uppercase"
                       size="lg"
                       onClick={handleNextStep}
                       disabled={isProcessingPayment || !isMinOrderMet}
@@ -991,27 +991,27 @@ const Checkout = () => {
         </div>
 
         {/* Mobile Sticky Bottom Bar */}
-        <div className="xl:hidden fixed bottom-0 left-0 right-0 bg-[#FFFDF7] border-t border-[#E6D5B8] p-4 z-50">
+        <div className="xl:hidden fixed bottom-0 left-0 right-0 bg-brand-offwhite border-t border-brand-gray-200 p-4 z-50">
           <div className="container mx-auto">
             {currentStep < 4 ? (
               <div className="flex items-center justify-between">
                 <div className="flex-1">
-                  <p className="text-sm text-[#5D4037]">
+                  <p className="text-sm text-brand-gray-700">
                     Step {currentStep} of {steps.length}
                   </p>
-                  <p className="font-medium text-[#2C1810]">{steps[currentStep - 1]?.title}</p>
+                  <p className="font-medium text-brand-black">{steps[currentStep - 1]?.title}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="text-right mr-4 font-inter">
-                    <p className="text-sm text-[#5D4037] uppercase tracking-wide">Total</p>
-                    <p className="font-normal text-[#8B2131]">{formatPrice(total)}</p>
+                    <p className="text-sm text-brand-gray-700 uppercase tracking-wide">Total</p>
+                    <p className="font-normal text-brand-black">{formatPrice(total)}</p>
                   </div>
                   {currentStep > 1 && (
                     <Button
                       variant="outline"
                       onClick={handlePrevStep}
                       size="sm"
-                      className="border-[#E6D5B8] text-[#5D4037]"
+                      className="border-brand-gray-200 text-brand-gray-700"
                     >
                       Back
                     </Button>
@@ -1020,7 +1020,7 @@ const Checkout = () => {
                     onClick={handleNextStep}
                     disabled={isProcessingPayment || (currentStep === 4 && !isMinOrderMet)}
                     size="sm"
-                    className="min-w-[100px] bg-[#8B2131] text-white"
+                    className="min-w-[100px] bg-brand-black text-white"
                   >
                     Continue
                   </Button>
@@ -1036,7 +1036,7 @@ const Checkout = () => {
                 <Button
                   onClick={handlePlaceOrder}
                   disabled={isProcessingPayment || !isMinOrderMet}
-                  className="w-full bg-[#8B2131] text-white"
+                  className="w-full bg-brand-black text-white"
                   size="lg"
                 >
                   {isProcessingPayment ? 'Processing...' : `Place Order - ${formatPrice(total)}`}

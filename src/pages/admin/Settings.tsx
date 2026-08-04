@@ -109,7 +109,7 @@ const AdminSettings = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Settings</h1>
+        <h1 className="text-3xl font-semibold">Settings</h1>
         <Button onClick={handleSave} disabled={saving}>
           <Save className="w-4 h-4 mr-2" />
           {saving ? 'Saving...' : 'Save Changes'}

@@ -122,16 +122,16 @@ const SeasonalEdit = () => {
   };
 
   return (
-    <section className="py-12 md:py-16 bg-[#F9F3EA] relative overflow-hidden">
+    <section className="py-12 md:py-16 bg-brand-offwhite relative overflow-hidden">
       {/* Background accent */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#FFFDF7] to-[#FFF8F0] opacity-50 -z-10"></div>
+      <div className="absolute inset-0 bg-gradient-to-b from-brand-offwhite to-brand-offwhite opacity-50 -z-10"></div>
 
       <div className="max-w-[1600px] mx-auto px-6 relative z-10">
 
-        <div className="flex flex-col items-center justify-center text-center mb-8 gap-4 border-b border-[#E6D5B8] pb-4 relative">
+        <div className="flex flex-col items-center justify-center text-center mb-8 gap-4 border-b border-brand-gray-200 pb-4 relative">
           <div>
             <span className="text-[10px] uppercase tracking-[0.25em] text-secondary mb-2 block font-medium">CURATED FOR THE SEASON</span>
-            <h2 className="text-xl md:text-2xl lg:text-3xl text-[#783838] uppercase font-instrument font-normal tracking-wide">
+            <h2 className="text-xl md:text-2xl lg:text-3xl text-brand-black uppercase font-instrument font-normal tracking-wide">
               SEASONAL LAYERS
             </h2>
           </div>
@@ -141,8 +141,8 @@ const SeasonalEdit = () => {
               <button
                 onClick={prevSlide}
                 disabled={!canGoPrev}
-                className={`w-12 h-12 flex items-center justify-center border border-[#E6D5B8] transition-all duration-300 rounded-full ${canGoPrev
-                  ? 'bg-transparent text-[#2C1810] hover:bg-[#8B2131] hover:text-white hover:border-[#8B2131]'
+                className={`w-12 h-12 flex items-center justify-center border border-brand-gray-200 transition-all duration-300 rounded-full ${canGoPrev
+                  ? 'bg-transparent text-brand-black hover:bg-brand-black hover:text-white hover:border-brand-black'
                   : 'bg-transparent text-gray-300 cursor-not-allowed'
                   }`}
               >
@@ -151,8 +151,8 @@ const SeasonalEdit = () => {
               <button
                 onClick={nextSlide}
                 disabled={!canGoNext}
-                className={`w-12 h-12 flex items-center justify-center border border-[#E6D5B8] transition-all duration-300 rounded-full ${canGoNext
-                  ? 'bg-transparent text-[#2C1810] hover:bg-[#8B2131] hover:text-white hover:border-[#8B2131]'
+                className={`w-12 h-12 flex items-center justify-center border border-brand-gray-200 transition-all duration-300 rounded-full ${canGoNext
+                  ? 'bg-transparent text-brand-black hover:bg-brand-black hover:text-white hover:border-brand-black'
                   : 'bg-transparent text-gray-300 cursor-not-allowed'
                   }`}
               >
@@ -167,9 +167,9 @@ const SeasonalEdit = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {Array.from({ length: 4 }).map((_, index) => (
                 <div key={index} className="animate-pulse">
-                  <div className="bg-[#E6D5B8]/20 aspect-[4/5] w-full mb-4"></div>
-                  <div className="h-4 bg-[#E6D5B8]/20 w-3/4 mb-2"></div>
-                  <div className="h-4 bg-[#E6D5B8]/20 w-1/2"></div>
+                  <div className="bg-brand-gray-200/20 aspect-[4/5] w-full mb-4"></div>
+                  <div className="h-4 bg-brand-gray-200/20 w-3/4 mb-2"></div>
+                  <div className="h-4 bg-brand-gray-200/20 w-1/2"></div>
                 </div>
               ))}
             </div>
@@ -201,10 +201,10 @@ const SeasonalEdit = () => {
               </div>
             </div>
           ) : (
-            <div className="text-center py-20 border border-[#E6D5B8]/20 p-8">
-              <Gift className="w-12 h-12 text-[#E6D5B8] mx-auto mb-4" />
-              <h3 className="text-xl font-instrument font-normal text-[#2C1810] mb-2">Seasonal pieces are on the way</h3>
-              <p className="text-[#5D4037] font-light">Check back shortly for the next refined edit.</p>
+            <div className="text-center py-20 border border-brand-gray-200/20 p-8">
+              <Gift className="w-12 h-12 text-brand-gray-200 mx-auto mb-4" />
+              <h3 className="text-xl font-instrument font-normal text-brand-black mb-2">Seasonal pieces are on the way</h3>
+              <p className="text-brand-gray-700 font-light">Check back shortly for the next refined edit.</p>
             </div>
           )}
         </div>
@@ -212,7 +212,7 @@ const SeasonalEdit = () => {
         <div className="text-center mt-12">
           <button
             onClick={() => navigate('/products?sort=newest')}
-            className="group inline-flex items-center gap-3 bg-[#8B2131] text-white px-10 py-4 text-xs font-instrument font-normal uppercase tracking-[0.2em] hover:bg-[#2C1810] transition-all duration-300"
+            className="group inline-flex items-center gap-3 bg-brand-black text-white px-10 py-4 text-xs font-instrument font-normal uppercase tracking-[0.2em] hover:bg-brand-black transition-all duration-300"
           >
             View All Specials <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </button>

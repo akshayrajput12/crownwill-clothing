@@ -174,25 +174,25 @@ export default function Profile() {
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">My Profile</h1>
+          <h1 className="text-3xl font-semibold mb-2">My Profile</h1>
           <p className="text-muted-foreground">Manage your account and view your orders</p>
         </div>
 
         <Tabs defaultValue={defaultTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="profile" className="flex items-center gap-2">
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto gap-1 p-1">
+            <TabsTrigger value="profile" className="flex items-center justify-center gap-2 text-[12px] sm:text-[13px] py-2">
               <User className="w-4 h-4" />
               Profile
             </TabsTrigger>
-            <TabsTrigger value="orders" className="flex items-center gap-2">
+            <TabsTrigger value="orders" className="flex items-center justify-center gap-2 text-[12px] sm:text-[13px] py-2">
               <Package className="w-4 h-4" />
               Orders
             </TabsTrigger>
-            <TabsTrigger value="addresses" className="flex items-center gap-2">
+            <TabsTrigger value="addresses" className="flex items-center justify-center gap-2 text-[12px] sm:text-[13px] py-2">
               <MapPin className="w-4 h-4" />
               Addresses
             </TabsTrigger>
-            <TabsTrigger value="settings" className="flex items-center gap-2">
+            <TabsTrigger value="settings" className="flex items-center justify-center gap-2 text-[12px] sm:text-[13px] py-2">
               <Settings className="w-4 h-4" />
               Settings
             </TabsTrigger>
@@ -290,7 +290,7 @@ export default function Profile() {
                             </p>
                           </div>
                           <div className="text-right">
-                            <p className="font-bold text-lg">₹{order.total?.toLocaleString('en-IN')}</p>
+                            <p className="font-semibold text-lg">₹{order.total?.toLocaleString('en-IN')}</p>
                           </div>
                         </div>
                         <div className="flex justify-between items-center">

@@ -32,6 +32,13 @@ export interface AppSettings {
   store_pincode: string;
   business_hours_start: string;
   business_hours_end: string;
+
+  // Social / messaging handles — footer only renders the ones that are filled in.
+  whatsapp_number: string;
+  instagram_url: string;
+  facebook_url: string;
+  twitter_url: string;
+  linkedin_url: string;
 }
 
 // Only minimal defaults for type safety - real values come from database
@@ -58,7 +65,12 @@ const defaultSettings: AppSettings = {
   store_address: '',
   store_pincode: '201016',
   business_hours_start: '09:00',
-  business_hours_end: '20:00'
+  business_hours_end: '20:00',
+  whatsapp_number: '',
+  instagram_url: '',
+  facebook_url: '',
+  twitter_url: '',
+  linkedin_url: ''
 };
 
 export const useSettings = () => {
@@ -99,7 +111,12 @@ export const useSettings = () => {
             'store_address',
             'business_hours_start',
             'business_hours_end',
-            'delivery_time_estimate'
+            'delivery_time_estimate',
+            'whatsapp_number',
+            'instagram_url',
+            'facebook_url',
+            'twitter_url',
+            'linkedin_url'
           ]);
         data = result.data;
         fetchError = result.error;
@@ -115,8 +132,6 @@ export const useSettings = () => {
         data.forEach((setting: any) => {
           const key = setting.key as keyof AppSettings;
           let value = setting.value;
-
-          console.log(`Raw setting ${key}:`, value, typeof value);
 
           try {
             // Parse database values - they are stored as JSONB
@@ -136,7 +151,6 @@ export const useSettings = () => {
             }
             // If it's already a number or boolean, keep it as is
 
-            console.log(`Parsed setting ${key}:`, value, typeof value);
             (settingsMap as any)[key] = value;
           } catch (error) {
             console.error(`Failed to parse setting ${key}:`, value, error);
@@ -147,7 +161,6 @@ export const useSettings = () => {
 
         // Only fill missing keys with defaults, prioritize database values
         const finalSettings = { ...defaultSettings, ...settingsMap } as AppSettings;
-        console.log('Final settings from database:', finalSettings);
         setSettings(finalSettings);
       } else {
         console.error('No settings found in database!');

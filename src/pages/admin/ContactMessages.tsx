@@ -202,7 +202,7 @@ const AdminContactMessages = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Contact Messages</h1>
+        <h1 className="text-3xl font-semibold">Contact Messages</h1>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
           <SelectTrigger className="w-48">
             <SelectValue placeholder="Filter by status" />
@@ -225,7 +225,7 @@ const AdminContactMessages = () => {
             <MessageSquare className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.total}</div>
+            <div className="text-2xl font-semibold">{stats.total}</div>
           </CardContent>
         </Card>
         
@@ -235,7 +235,7 @@ const AdminContactMessages = () => {
             <AlertCircle className="h-4 w-4 text-blue-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">{stats.new}</div>
+            <div className="text-2xl font-semibold text-blue-600">{stats.new}</div>
           </CardContent>
         </Card>
         
@@ -245,7 +245,7 @@ const AdminContactMessages = () => {
             <Clock className="h-4 w-4 text-yellow-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">{stats.inProgress}</div>
+            <div className="text-2xl font-semibold text-yellow-600">{stats.inProgress}</div>
           </CardContent>
         </Card>
         
@@ -255,7 +255,7 @@ const AdminContactMessages = () => {
             <CheckCircle className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{stats.resolved}</div>
+            <div className="text-2xl font-semibold text-green-600">{stats.resolved}</div>
           </CardContent>
         </Card>
       </div>

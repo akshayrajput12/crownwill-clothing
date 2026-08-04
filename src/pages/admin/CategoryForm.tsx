@@ -223,7 +223,7 @@ const CategoryForm = ({ category: propCategory, isEdit = false }: CategoryFormPr
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Categories
         </Button>
-        <h1 className="text-3xl font-bold">
+        <h1 className="text-3xl font-semibold">
           {isEdit ? 'Edit Category' : 'Add New Category'}
         </h1>
       </div>

@@ -94,20 +94,20 @@ const SocialGallery = () => {
 
   if (loading) {
     return (
-      <section className="py-24 bg-[#FFFDF7] relative overflow-hidden">
+      <section className="brand-section-padding bg-brand-offwhite relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 relative z-10">
-          <div className="text-center mb-16">
-            <span className="text-xs font-medium uppercase tracking-[0.3em] text-[#8B2131] mb-4 block">
+          <div className="text-center mb-12">
+            <span className="text-xs font-medium uppercase tracking-[0.3em] text-brand-black mb-4 block">
               @CROWNVEIL
             </span>
             <div className="flex items-center justify-center gap-2 mb-4">
-              <h2 className="text-2xl md:text-3xl font-instrument font-normal text-[#2C1810]">
+              <h2 className="text-2xl md:text-3xl font-instrument font-normal text-brand-black">
                 Trending on Instagram
               </h2>
             </div>
           </div>
           <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#8B2131]"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-black"></div>
           </div>
         </div>
       </section>
@@ -119,31 +119,25 @@ const SocialGallery = () => {
   }
 
   return (
-    <section className="py-24 bg-[#F9F3EA] relative overflow-hidden">
+    <section className="brand-section-padding bg-brand-offwhite relative overflow-hidden">
       {/* Royal Background Accents */}
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#FFEBE8] rounded-full filter blur-[100px] opacity-60 pointer-events-none -translate-y-1/2 translate-x-1/2"></div>
-      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#E6D5B8] rounded-full filter blur-[100px] opacity-30 pointer-events-none translate-y-1/2 -translate-x-1/2"></div>
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-brand-cream rounded-full filter blur-[100px] opacity-60 pointer-events-none -translate-y-1/2 translate-x-1/2"></div>
+      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-brand-gray-200 rounded-full filter blur-[100px] opacity-30 pointer-events-none translate-y-1/2 -translate-x-1/2"></div>
 
       <div className="max-w-[1600px] mx-auto px-6 relative z-10">
         <motion.div
-          className="text-center mb-16"
+          className="text-center mb-12"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <span className="w-12 h-[1px] bg-[#8B2131]"></span>
-            <span className="text-xs uppercase tracking-[0.3em] text-[#8B2131]">SOCIAL MEDIA</span>
-            <span className="w-12 h-[1px] bg-[#8B2131]"></span>
-          </div>
+          <p className="eyebrow mb-3">@crownveil</p>
 
-          <h2 className="text-2xl md:text-4xl text-[#2C1810] mb-6 uppercase tracking-wider font-instrument font-normal">
-            FOLLOW OUR DELIGHTFUL JOURNEY
-          </h2>
+          <h2 className="section-title mb-4">Follow the Journey</h2>
 
-          <p className="text-lg text-[#5D4037] max-w-2xl mx-auto font-light leading-relaxed">
-            Join the crownveil community for new drops, styling notes and behind-the-scenes edits.
+          <p className="section-subtitle max-w-xl mx-auto">
+            New drops, styling notes and behind-the-scenes edits.
           </p>
         </motion.div>
 
@@ -170,7 +164,7 @@ const SocialGallery = () => {
               {instagramPosts.map((post) => (
                 <CarouselItem key={post.id} className="pl-4 basis-full sm:basis-1/2 lg:basis-1/3 xl:basis-1/4">
                   <motion.div
-                    className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 border border-[#F5E6D3] h-full"
+                    className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 border border-brand-offwhite h-full"
                     whileHover={{ y: -8 }}
                   >
                     <div className="relative group">
@@ -187,19 +181,19 @@ const SocialGallery = () => {
 
             {/* Custom Navigation */}
             <div className="hidden md:block">
-              <CarouselPrevious className="left-[-50px] w-12 h-12 border-[#E6D5B8] bg-transparent hover:bg-[#8B2131] hover:text-white hover:border-[#8B2131] transition-all duration-300 text-[#2C1810]" />
-              <CarouselNext className="right-[-50px] w-12 h-12 border-[#E6D5B8] bg-transparent hover:bg-[#8B2131] hover:text-white hover:border-[#8B2131] transition-all duration-300 text-[#2C1810]" />
+              <CarouselPrevious className="left-[-50px] w-12 h-12 border-brand-gray-200 bg-transparent hover:bg-brand-black hover:text-white hover:border-brand-black transition-all duration-300 text-brand-black" />
+              <CarouselNext className="right-[-50px] w-12 h-12 border-brand-gray-200 bg-transparent hover:bg-brand-black hover:text-white hover:border-brand-black transition-all duration-300 text-brand-black" />
             </div>
           </Carousel>
         </div>
 
         {/* Instagram Profile Link */}
-        <div className="text-center mt-16">
+        <div className="text-center mt-12">
           <a
             href="https://www.instagram.com/crownveil"
             target="_blank"
             rel="noopener noreferrer"
-            className="group inline-flex items-center gap-3 bg-[#2C1810] text-white px-8 py-3 rounded-none text-xs font-instrument font-normal uppercase tracking-[0.2em] hover:bg-[#8B2131] transition-all duration-300"
+            className="btn-label group inline-flex items-center gap-3 bg-brand-black text-brand-white px-8 py-4 rounded-[8px] hover:bg-brand-charcoal transition-colors"
           >
             <Instagram className="w-4 h-4" />
             <span>Follow @crownveil</span>

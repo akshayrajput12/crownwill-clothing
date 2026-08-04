@@ -1,3 +1,4 @@
+import { Suspense, lazy } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import ScrollToTop from '@/components/ScrollToTop';
@@ -12,32 +13,35 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import FloatingWhatsApp from '@/components/FloatingWhatsApp';
 import Index from '@/pages/Index';
 import Products from '@/pages/Products';
-import ProductDetail from '@/pages/ProductDetail';
-import Cart from '@/pages/Cart';
-import Checkout from '@/pages/Checkout';
-import Auth from '@/pages/Auth';
-import Profile from '@/pages/Profile';
-import Contact from '@/pages/Contact';
-import About from '@/pages/About';
 import NotFound from '@/pages/NotFound';
-import UserOrderDetail from '@/pages/OrderDetail';
-import AdminLayout from '@/pages/admin/AdminLayout';
-import Dashboard from '@/pages/admin/Dashboard';
-import AdminProducts from '@/pages/admin/Products';
-import ProductForm from '@/pages/admin/ProductForm';
-import Categories from '@/pages/admin/Categories';
-import CategoryForm from '@/pages/admin/CategoryForm';
-import Orders from '@/pages/admin/Orders';
-import OrderDetail from '@/pages/admin/OrderDetail';
-import Customers from '@/pages/admin/Customers';
-import Coupons from '@/pages/admin/Coupons';
-import CouponForm from '@/pages/admin/CouponForm';
-import CouponAssignment from '@/pages/admin/CouponAssignment';
-import BestSellers from '@/pages/admin/BestSellers';
-import Analytics from '@/pages/admin/Analytics';
-import Settings from '@/pages/admin/Settings';
-import InstagramPosts from '@/pages/admin/InstagramPosts';
-import Testimonials from '@/pages/admin/Testimonials';
+
+
+// Code-split: every route below the landing page loads as its own chunk.
+const ProductDetail = lazy(() => import('@/pages/ProductDetail'));
+const Cart = lazy(() => import('@/pages/Cart'));
+const Checkout = lazy(() => import('@/pages/Checkout'));
+const Auth = lazy(() => import('@/pages/Auth'));
+const Profile = lazy(() => import('@/pages/Profile'));
+const Contact = lazy(() => import('@/pages/Contact'));
+const About = lazy(() => import('@/pages/About'));
+const UserOrderDetail = lazy(() => import('@/pages/OrderDetail'));
+const AdminLayout = lazy(() => import('@/pages/admin/AdminLayout'));
+const Dashboard = lazy(() => import('@/pages/admin/Dashboard'));
+const AdminProducts = lazy(() => import('@/pages/admin/Products'));
+const ProductForm = lazy(() => import('@/pages/admin/ProductForm'));
+const Categories = lazy(() => import('@/pages/admin/Categories'));
+const CategoryForm = lazy(() => import('@/pages/admin/CategoryForm'));
+const Orders = lazy(() => import('@/pages/admin/Orders'));
+const OrderDetail = lazy(() => import('@/pages/admin/OrderDetail'));
+const Customers = lazy(() => import('@/pages/admin/Customers'));
+const Coupons = lazy(() => import('@/pages/admin/Coupons'));
+const CouponForm = lazy(() => import('@/pages/admin/CouponForm'));
+const CouponAssignment = lazy(() => import('@/pages/admin/CouponAssignment'));
+const BestSellers = lazy(() => import('@/pages/admin/BestSellers'));
+const Analytics = lazy(() => import('@/pages/admin/Analytics'));
+const Settings = lazy(() => import('@/pages/admin/Settings'));
+const InstagramPosts = lazy(() => import('@/pages/admin/InstagramPosts'));
+const Testimonials = lazy(() => import('@/pages/admin/Testimonials'));
 
 // Protected Route Component
 function ProtectedRoute({ children, requireAdmin = false }: { children: React.ReactNode; requireAdmin?: boolean }) {
@@ -73,6 +77,7 @@ const AppContent = () => {
         <div className="min-h-screen bg-background">
           <ScrollToTop />
           <Header isAdminRoute={isAdminRoute} />
+          <Suspense fallback={<PageLoader text="Loading crownveil..." />}>
           <Routes>
             {/* Public routes */}
             <Route path="/" element={<Index />} />
@@ -141,6 +146,7 @@ const AppContent = () => {
 
             <Route path="*" element={<NotFound />} />
           </Routes>
+          </Suspense>
           <Footer isAdminRoute={isAdminRoute} />
           <CartSidebar isAdminRoute={isAdminRoute} />
           <FloatingWhatsApp />

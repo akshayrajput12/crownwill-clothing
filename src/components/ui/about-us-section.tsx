@@ -475,7 +475,7 @@ function StatCounter({ icon, value, label, suffix, delay }: StatCounterProps) {
         {icon}
       </motion.div>
       {/* Improved responsive font sizing */}
-      <motion.div ref={countRef} className="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center">
+      <motion.div ref={countRef} className="text-2xl sm:text-3xl font-semibold text-gray-900 flex items-center">
         <motion.span>{displayValue}</motion.span>
         <span>{suffix}</span>
       </motion.div>

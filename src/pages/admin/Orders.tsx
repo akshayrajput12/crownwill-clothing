@@ -223,7 +223,7 @@ const AdminOrders = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Orders</h1>
+        <h1 className="text-3xl font-semibold">Orders</h1>
       </div>
 
       {/* Stats Cards */}
@@ -234,7 +234,7 @@ const AdminOrders = () => {
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{orders.length}</div>
+            <div className="text-2xl font-semibold">{orders.length}</div>
           </CardContent>
         </Card>
         
@@ -244,7 +244,7 @@ const AdminOrders = () => {
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-semibold">
               {orders.filter(o => o.status === 'pending' || o.status === 'placed').length}
             </div>
           </CardContent>
@@ -256,7 +256,7 @@ const AdminOrders = () => {
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-semibold">
               {orders.filter(o => o.status === 'processing').length}
             </div>
           </CardContent>
@@ -268,7 +268,7 @@ const AdminOrders = () => {
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-semibold">
               {orders.filter(o => o.status === 'delivered').length}
             </div>
           </CardContent>

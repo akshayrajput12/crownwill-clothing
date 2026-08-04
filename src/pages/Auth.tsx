@@ -147,7 +147,7 @@ export default function Auth() {
 
         <Card className="shadow-xl border-0 bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
           <CardHeader className="text-center pb-2">
-            <CardTitle className="text-2xl font-bold text-foreground">
+            <CardTitle className="text-2xl font-semibold text-foreground">
               Welcome to crownveil
             </CardTitle>
             <CardDescription>

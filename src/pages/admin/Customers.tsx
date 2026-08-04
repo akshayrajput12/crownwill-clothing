@@ -151,7 +151,7 @@ const AdminCustomers = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Customers</h1>
+        <h1 className="text-3xl font-semibold">Customers</h1>
       </div>
 
       {/* Stats */}
@@ -162,7 +162,7 @@ const AdminCustomers = () => {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{customerStats.total}</div>
+            <div className="text-2xl font-semibold">{customerStats.total}</div>
           </CardContent>
         </Card>
 
@@ -172,7 +172,7 @@ const AdminCustomers = () => {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{customerStats.active}</div>
+            <div className="text-2xl font-semibold">{customerStats.active}</div>
           </CardContent>
         </Card>
 
@@ -182,7 +182,7 @@ const AdminCustomers = () => {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{customerStats.inactive}</div>
+            <div className="text-2xl font-semibold">{customerStats.inactive}</div>
           </CardContent>
         </Card>
 
@@ -192,7 +192,7 @@ const AdminCustomers = () => {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">₹{customerStats.totalRevenue.toLocaleString('en-IN')}</div>
+            <div className="text-2xl font-semibold">₹{customerStats.totalRevenue.toLocaleString('en-IN')}</div>
           </CardContent>
         </Card>
 
@@ -202,7 +202,7 @@ const AdminCustomers = () => {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">₹{Math.round(customerStats.avgOrderValue).toLocaleString('en-IN')}</div>
+            <div className="text-2xl font-semibold">₹{Math.round(customerStats.avgOrderValue).toLocaleString('en-IN')}</div>
           </CardContent>
         </Card>
       </div>

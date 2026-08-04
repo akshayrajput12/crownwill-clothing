@@ -114,7 +114,7 @@ const AdminCategories = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Categories</h1>
+        <h1 className="text-3xl font-semibold">Categories</h1>
         <Button onClick={() => navigate('/admin/categories/add')}>
           <Plus className="w-4 h-4 mr-2" />
           Add Category
@@ -129,7 +129,7 @@ const AdminCategories = () => {
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{categories.length}</div>
+            <div className="text-2xl font-semibold">{categories.length}</div>
           </CardContent>
         </Card>
         
@@ -139,7 +139,7 @@ const AdminCategories = () => {
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-semibold">
               {categories.filter(cat => cat.status === 'active').length}
             </div>
           </CardContent>
@@ -151,7 +151,7 @@ const AdminCategories = () => {
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-semibold">
               {categories.reduce((sum, cat) => sum + cat.productCount, 0)}
             </div>
           </CardContent>

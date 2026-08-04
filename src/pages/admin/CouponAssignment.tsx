@@ -165,7 +165,7 @@ const CouponAssignment = () => {
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Coupons
         </Button>
-        <h1 className="text-3xl font-bold">Coupon Assignment</h1>
+        <h1 className="text-3xl font-semibold">Coupon Assignment</h1>
       </div>
 
       {/* Coupon Selection */}

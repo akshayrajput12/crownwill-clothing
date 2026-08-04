@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 
 const DeliverySection = () => {
     return (
-        <section className="py-20 bg-[#F9F3EA] text-center w-full">
+        <section className="py-20 bg-brand-offwhite text-center w-full">
             <div className="container mx-auto px-4 flex flex-col items-center justify-center space-y-12">
 
                 {/* Headings */}
@@ -15,10 +15,10 @@ const DeliverySection = () => {
                     transition={{ duration: 0.6 }}
                     viewport={{ once: true }}
                 >
-                    <h3 className="text-xs md:text-sm tracking-[0.25em] text-[#5D4037] uppercase font-orange-avenue font-normal">
+                    <h3 className="text-xs md:text-sm tracking-[0.25em] text-brand-gray-700 uppercase font-orange-avenue font-normal">
                         SAME DAY DELIVERY IN DELHI
                     </h3>
-                    <h2 className="text-2xl md:text-4xl lg:text-5xl text-[#2C1810] uppercase tracking-wide leading-tight max-w-4xl mx-auto font-orange-avenue font-normal">
+                    <h2 className="text-2xl md:text-4xl lg:text-5xl text-brand-black uppercase tracking-wide leading-tight max-w-4xl mx-auto font-orange-avenue font-normal">
                         DRESS WITH INTENT,<br className="hidden md:block" /> EVERYDAY
                     </h2>
                 </motion.div>
@@ -61,7 +61,7 @@ const DeliverySection = () => {
                 </motion.div>
 
                 {/* Divider - Matches image line separation */}
-                <div className="w-full max-w-[200px] border-t border-[#D4C3A3]"></div>
+                <div className="w-full max-w-[200px] border-t border-brand-gray-200"></div>
 
                 {/* Features Grid */}
                 <motion.div
@@ -73,40 +73,40 @@ const DeliverySection = () => {
                 >
                     {/* 100% Vegetarian */}
                     <div className="flex flex-col items-center space-y-4">
-                        <div className="w-16 h-16 rounded-full bg-[#E5D8C6]/20 flex items-center justify-center mb-2">
-                            <Leaf className="w-8 h-8 text-[#4A1C1F] stroke-[1.5]" />
+                        <div className="w-16 h-16 rounded-full bg-brand-gray-200/20 flex items-center justify-center mb-2">
+                            <Leaf className="w-8 h-8 text-brand-black stroke-[1.5]" />
                         </div>
-                        <span className="text-xs md:text-sm tracking-[0.15em] text-[#5D4037] uppercase font-orange-avenue font-normal text-center">
+                        <span className="text-xs md:text-sm tracking-[0.15em] text-brand-gray-700 uppercase font-orange-avenue font-normal text-center">
                             100% Vegetarian
                         </span>
                     </div>
 
                     {/* Hand Rolled */}
                     <div className="flex flex-col items-center space-y-4">
-                        <div className="w-16 h-16 rounded-full bg-[#E5D8C6]/20 flex items-center justify-center mb-2">
-                            <HandPlatter className="w-8 h-8 text-[#4A1C1F] stroke-[1.5]" />
+                        <div className="w-16 h-16 rounded-full bg-brand-gray-200/20 flex items-center justify-center mb-2">
+                            <HandPlatter className="w-8 h-8 text-brand-black stroke-[1.5]" />
                         </div>
-                        <span className="text-xs md:text-sm tracking-[0.15em] text-[#5D4037] uppercase font-medium font-orange-avenue text-center">
+                        <span className="text-xs md:text-sm tracking-[0.15em] text-brand-gray-700 uppercase font-medium font-orange-avenue text-center">
                             Hand Rolled
                         </span>
                     </div>
 
                     {/* Secure Payments */}
                     <div className="flex flex-col items-center space-y-4">
-                        <div className="w-16 h-16 rounded-full bg-[#E5D8C6]/20 flex items-center justify-center mb-2">
-                            <ShieldCheck className="w-8 h-8 text-[#4A1C1F] stroke-[1.5]" />
+                        <div className="w-16 h-16 rounded-full bg-brand-gray-200/20 flex items-center justify-center mb-2">
+                            <ShieldCheck className="w-8 h-8 text-brand-black stroke-[1.5]" />
                         </div>
-                        <span className="text-xs md:text-sm tracking-[0.15em] text-[#5D4037] uppercase font-medium font-orange-avenue text-center">
+                        <span className="text-xs md:text-sm tracking-[0.15em] text-brand-gray-700 uppercase font-medium font-orange-avenue text-center">
                             Secure Payments
                         </span>
                     </div>
 
                     {/* Door-step Delivery */}
                     <div className="flex flex-col items-center space-y-4">
-                        <div className="w-16 h-16 rounded-full bg-[#E5D8C6]/20 flex items-center justify-center mb-2">
-                            <Truck className="w-8 h-8 text-[#4A1C1F] stroke-[1.5]" />
+                        <div className="w-16 h-16 rounded-full bg-brand-gray-200/20 flex items-center justify-center mb-2">
+                            <Truck className="w-8 h-8 text-brand-black stroke-[1.5]" />
                         </div>
-                        <span className="text-xs md:text-sm tracking-[0.15em] text-[#5D4037] uppercase font-medium font-orange-avenue text-center">
+                        <span className="text-xs md:text-sm tracking-[0.15em] text-brand-gray-700 uppercase font-medium font-orange-avenue text-center">
                             Door-step delivery
                         </span>
                     </div>

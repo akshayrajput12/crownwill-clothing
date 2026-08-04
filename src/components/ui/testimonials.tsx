@@ -24,16 +24,16 @@ const Testimonials = () => {
 
   if (loading) {
     return (
-      <section className="py-24 relative bg-[#FFFDF7] overflow-hidden">
+      <section className="py-24 relative bg-brand-offwhite overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="flex flex-col items-center justify-center max-w-[800px] mx-auto text-center mb-16">
-            <span className="text-xs font-medium uppercase tracking-[0.3em] text-[#8B2131] mb-4 block">TESTIMONIALS</span>
-            <h2 className="text-3xl md:text-4xl font-instrument font-normal text-[#2C1810] mb-6 uppercase">
+            <span className="text-xs font-medium uppercase tracking-[0.3em] text-brand-black mb-4 block">TESTIMONIALS</span>
+            <h2 className="text-3xl md:text-4xl font-instrument font-normal text-brand-black mb-6 uppercase">
               WHAT OUR CUSTOMERS SAY
             </h2>
           </div>
           <div className="flex justify-center items-center h-40">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#8B2131]"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-black"></div>
           </div>
         </div>
       </section>
@@ -49,9 +49,9 @@ const Testimonials = () => {
   const thirdColumn = testimonials.slice(6, 9);
 
   return (
-    <section className="py-24 relative bg-[#F9F3EA] overflow-hidden">
+    <section className="py-24 relative bg-brand-offwhite overflow-hidden">
       {/* Warm neutral background accent */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#FFEBE8] rounded-full filter blur-[120px] opacity-40 pointer-events-none"></div>
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-brand-cream rounded-full filter blur-[120px] opacity-40 pointer-events-none"></div>
 
       <div className="max-w-[1600px] mx-auto px-6 relative z-10">
         <motion.div
@@ -62,15 +62,15 @@ const Testimonials = () => {
           className="flex flex-col items-center justify-center max-w-[800px] mx-auto text-center mb-16"
         >
           <div className="flex items-center justify-center gap-3 mb-4">
-            <span className="w-8 h-[1px] bg-[#8B2131]"></span>
-            <div className="text-xs font-bold uppercase tracking-[0.3em] text-[#8B2131]">TESTIMONIALS</div>
-            <span className="w-8 h-[1px] bg-[#8B2131]"></span>
+            <span className="w-8 h-[1px] bg-brand-black"></span>
+            <div className="text-xs font-semibold uppercase tracking-[0.3em] text-brand-black">TESTIMONIALS</div>
+            <span className="w-8 h-[1px] bg-brand-black"></span>
           </div>
 
-          <h2 className="text-3xl md:text-5xl font-instrument font-normal text-[#2C1810] mb-6 uppercase">
+          <h2 className="text-3xl md:text-5xl font-instrument font-normal text-brand-black mb-6 uppercase">
             WORN & WELL SAID
           </h2>
-          <p className="text-lg text-[#5D4037] max-w-2xl mx-auto font-light leading-relaxed">
+          <p className="text-lg text-brand-gray-700 max-w-2xl mx-auto font-light leading-relaxed">
             See why crownveil customers return for the fit, feel and considered finish of every piece.
           </p>
         </motion.div>

@@ -184,7 +184,7 @@ const GuestOrderPopup: React.FC<GuestOrderPopupProps> = ({ isOpen, onClose, orde
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b">
           <div>
-            <h2 className="text-2xl font-bold text-green-600">Order Placed Successfully!</h2>
+            <h2 className="text-2xl font-semibold text-green-600">Order Placed Successfully!</h2>
             <p className="text-gray-600 mt-1">Order #{orderData.orderNumber}</p>
           </div>
           <div className="flex items-center space-x-3">
@@ -253,7 +253,7 @@ const GuestOrderPopup: React.FC<GuestOrderPopupProps> = ({ isOpen, onClose, orde
                   <span className="font-medium">{orderData.items.reduce((sum, item) => sum + item.quantity, 0)}</span>
                 </div>
                 <Separator />
-                <div className="flex items-center justify-between text-lg font-bold">
+                <div className="flex items-center justify-between text-lg font-semibold">
                   <span>Total Amount</span>
                   <span className="text-green-600">{formatPrice(orderData.total)}</span>
                 </div>
@@ -387,7 +387,7 @@ const GuestOrderPopup: React.FC<GuestOrderPopupProps> = ({ isOpen, onClose, orde
                   </div>
                 )}
                 <Separator />
-                <div className="flex justify-between items-center font-bold text-lg">
+                <div className="flex justify-between items-center font-semibold text-lg">
                   <span>Total Amount</span>
                   <span className="text-green-600">₹{orderData.total.toLocaleString('en-IN')}</span>
                 </div>

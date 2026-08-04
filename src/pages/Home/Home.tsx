@@ -1,50 +1,58 @@
 import React from 'react';
 import SeasonalHero from '@/features/storefront/home/components/SeasonalHero';
-import CollectionCarousel from '@/features/storefront/home/components/CollectionCarousel';
-import BestSellersSection from '@/features/storefront/home/components/BestSellersSection';
+import UltimateSavingCombos from '@/features/storefront/home/components/UltimateSavingCombos';
 import NewArrivalsSection from '@/features/storefront/home/components/NewArrivalsSection';
+import MostWantedCategories from '@/features/storefront/home/components/MostWantedCategories';
 import BrandMarquee from '@/features/storefront/home/components/BrandMarquee';
-import OfferStrip from '@/features/storefront/home/components/OfferStrip';
+import BestSellersRail from '@/features/storefront/home/components/BestSellersRail';
+import EditorialCampaign from '@/features/storefront/home/components/EditorialCampaign';
+import MemberOffers from '@/features/storefront/home/components/MemberOffers';
+import CrownveilstersApproved from '@/features/storefront/home/components/CrownveilstersApproved';
+import CustomerVoices from '@/features/storefront/home/components/CustomerVoices';
 import SocialGallery from '@/features/storefront/home/components/SocialGallery';
-import Testimonials from '@/components/ui/testimonials';
-import EditorialBanner from '@/features/storefront/home/components/EditorialBanner';
-import EssentialEdit from '@/features/storefront/home/components/EssentialEdit';
-import SeasonalEdit from '@/features/storefront/home/components/SeasonalEdit';
-import DeliverySection from './components/DeliverySection';
-import BrandManifesto from '@/features/storefront/home/components/BrandManifesto';
 import FeaturedProductWidget from '@/features/storefront/home/components/FeaturedProductWidget';
 
-const Home = () => {
+/**
+ * Home page composition. Product rails alternate with editorial breaks so the page
+ * never reads as one long grid, and every section hides itself when it has no data.
+ */
+const Home: React.FC = () => {
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen bg-brand-white">
+      {/* 1. Hero carousel */}
       <SeasonalHero />
-      <div className="flex flex-col">
-        <BestSellersSection />
-        <CollectionCarousel />
-        <NewArrivalsSection />
-        <BrandManifesto />
 
-        <EditorialBanner />
+      {/* 2. Bundles */}
+      <UltimateSavingCombos />
 
-        <BrandMarquee
-          items={[
-            "ELEVATED ESSENTIALS",
-            "MODERN UNIFORM",
-            "MADE TO LIVE IN",
-            "REFINED FOR EVERYDAY",
-            "DESIGNED WITH INTENTION",
-            "THE CROWNVEIL EDIT"
-          ]}
-          className="py-6"
-        />
+      {/* 3. New drops */}
+      <NewArrivalsSection />
 
-        <EssentialEdit />
-        <SeasonalEdit />
-        <OfferStrip />
-        <Testimonials />
-    
-        <SocialGallery />
-      </div>
+      {/* 4. Category grid */}
+      <MostWantedCategories />
+
+      {/* 5. Brand marquee */}
+      <BrandMarquee text="Making global fashion accessible" />
+
+      {/* 6. Bestsellers */}
+      <BestSellersRail />
+
+      {/* 7. Editorial break */}
+      <EditorialCampaign />
+
+      {/* 8. Coupons / standing offers */}
+      <MemberOffers />
+
+      {/* 9. Reviews + ambassadors */}
+      <CrownveilstersApproved />
+
+      {/* 10. Testimonials */}
+      <CustomerVoices />
+
+      {/* 11. Instagram */}
+      <SocialGallery />
+
+      {/* Floating spotlight */}
       <FeaturedProductWidget />
     </main>
   );

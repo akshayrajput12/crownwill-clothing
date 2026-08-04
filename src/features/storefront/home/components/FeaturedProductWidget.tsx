@@ -1,137 +1,167 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ShoppingBag } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { X, Eye } from 'lucide-react';
 import QuickViewModal from '@/components/QuickViewModal';
+import { useBestSellers, useNewDrops } from '@/hooks/queries';
+import { PLACEHOLDER_PRODUCT_IMAGE } from '@/lib/brandImages';
+import { formatPrice } from '@/utils/currency';
 
-const FeaturedProductWidget = () => {
-    const [products, setProducts] = useState<any[]>([]);
-    const [currentIndex, setCurrentIndex] = useState(0);
-    const [isVisible, setIsVisible] = useState(true);
-    const [quickViewProduct, setQuickViewProduct] = useState<any>(null);
-    const [isHovered, setIsHovered] = useState(false);
+const ROTATE_MS = 5000;
 
-    useEffect(() => {
-        fetchFeaturedProducts();
-    }, []);
+/**
+ * Floating spotlight card, bottom-left of the storefront.
+ *
+ * Rotates through bestsellers and new arrivals; clicking opens the same quick-view
+ * modal the product grids use. Sits opposite the WhatsApp button so the two never
+ * overlap, and shrinks rather than covering content on small screens.
+ */
+const FeaturedProductWidget: React.FC = () => {
+  const [index, setIndex] = useState(0);
+  const [dismissed, setDismissed] = useState(false);
+  const [paused, setPaused] = useState(false);
+  const [quickViewProduct, setQuickViewProduct] = useState<any | null>(null);
 
-    useEffect(() => {
-        if (products.length > 1 && !isHovered && !quickViewProduct) {
-            const interval = setInterval(() => {
-                setCurrentIndex((prev) => (prev + 1) % products.length);
-            }, 4000); // Change slide every 4 seconds
-            return () => clearInterval(interval);
-        }
-    }, [products, isHovered, quickViewProduct]);
+  const { data: bestSellers = [] } = useBestSellers(4);
+  const { data: newDrops = [] } = useNewDrops(12);
 
-    const fetchFeaturedProducts = async () => {
-        try {
-            // Fetch some random/featured products
-            const { data } = await supabase
-                .from('products')
-                .select('*')
-                .eq('is_active', true)
-                .eq('is_bestseller', true) // Show bestsellers in the widget
-                .limit(5);
+  // Bestsellers first, then genuinely new arrivals, de-duplicated.
+  const seen = new Set<string>();
+  const spotlight = [
+    ...bestSellers.map((p) => ({ product: p, label: 'Bestseller' })),
+    ...newDrops.filter((p) => p.new_arrival).map((p) => ({ product: p, label: 'New arrival' })),
+  ]
+    .filter(({ product }) => {
+      if (seen.has(product.id)) return false;
+      seen.add(product.id);
+      return true;
+    })
+    .slice(0, 6);
 
-            if (data && data.length > 0) {
-                setProducts(data);
-            }
-        } catch (error) {
-            console.error('Error fetching widget products:', error);
-        }
-    };
+  useEffect(() => {
+    if (spotlight.length < 2 || paused || quickViewProduct) return;
+    const timer = window.setInterval(() => {
+      setIndex((prev) => (prev + 1) % spotlight.length);
+    }, ROTATE_MS);
+    return () => window.clearInterval(timer);
+  }, [spotlight.length, paused, quickViewProduct]);
 
-    const currentProduct = products[currentIndex];
+  if (dismissed || spotlight.length === 0) return null;
 
-    if (!isVisible || !currentProduct) return null;
+  const current = spotlight[index % spotlight.length];
+  const product = current.product as any;
+  const image = product.images?.[0] || PLACEHOLDER_PRODUCT_IMAGE;
+  const discount = product.original_price && product.original_price > product.price
+    ? Math.round(((product.original_price - product.price) / product.original_price) * 100)
+    : 0;
 
-    return (
-        <>
-            <AnimatePresence>
-                {isVisible && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 50, scale: 0.9 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 50, scale: 0.9 }}
-                        transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                        className="fixed bottom-6 left-6 z-40 w-28 h-40 md:w-36 md:h-52 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] overflow-hidden cursor-pointer group border-2 border-white"
-                        onMouseEnter={() => setIsHovered(true)}
-                        onMouseLeave={() => setIsHovered(false)}
-                        onClick={() => setQuickViewProduct(currentProduct)}
-                    >
-                        {/* Close Button */}
-                        <button
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                setIsVisible(false);
-                            }}
-                            className="absolute top-2 right-2 z-20 bg-black/20 hover:bg-black/40 text-white rounded-full p-1 backdrop-blur-sm transition-colors"
-                        >
-                            <X className="w-3 h-3" />
-                        </button>
+  return (
+    <>
+      <motion.aside
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+        onMouseEnter={() => setPaused(true)}
+        onMouseLeave={() => setPaused(false)}
+        aria-label="Featured product"
+        className="fixed bottom-4 left-4 sm:bottom-6 sm:left-6 z-40 w-[240px] sm:w-[280px] bg-brand-white border border-brand-gray-200 rounded-[16px] shadow-[0_12px_40px_rgba(0,0,0,0.14)] overflow-hidden"
+      >
+        {/* Rotation progress */}
+        {spotlight.length > 1 && (
+          <div className="absolute top-0 left-0 right-0 h-[2px] bg-brand-gray-200 z-20">
+            <motion.div
+              key={index}
+              initial={{ width: '0%' }}
+              animate={{ width: paused ? '0%' : '100%' }}
+              transition={{ duration: ROTATE_MS / 1000, ease: 'linear' }}
+              className="h-full bg-brand-yellow"
+            />
+          </div>
+        )}
 
-                        {/* Content Container */}
-                        <div className="relative w-full h-full bg-gray-100">
-                            {/* Progress Bar */}
-                            <div className="absolute top-0 left-0 w-full h-1 bg-black/20 z-30">
-                                <motion.div
-                                    key={currentIndex}
-                                    initial={{ width: "0%" }}
-                                    animate={{ width: "100%" }}
-                                    transition={{ duration: 4, ease: "linear" }}
-                                    className="h-full bg-white shadow-[0_0_10px_rgba(255,255,255,0.5)]"
-                                />
-                            </div>
+        <button
+          onClick={() => setDismissed(true)}
+          aria-label="Dismiss featured product"
+          className="absolute top-2.5 right-2.5 z-20 bg-brand-white/90 hover:bg-brand-black hover:text-brand-white text-brand-black rounded-full p-1.5 shadow-sm transition-colors"
+        >
+          <X className="w-3 h-3" />
+        </button>
 
-                            <AnimatePresence mode="wait">
-                                <motion.img
-                                    key={currentProduct.id}
-                                    src={currentProduct.images?.[0] || currentProduct.image || '/placeholder.svg'}
-                                    alt={currentProduct.name}
-                                    className="absolute inset-0 w-full h-full object-cover"
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
-                                    transition={{ duration: 0.5 }}
-                                />
-                            </AnimatePresence>
-
-                            {/* Overlay Gradient */}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
-
-                            {/* Text Content */}
-                            <div className="absolute bottom-0 left-0 w-full p-3 text-white pointer-events-none">
-                                <div className="flex items-center gap-1 mb-1">
-                                    {/* Live/Story indicator icon or similar */}
-                                    <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_5px_rgba(34,197,94,0.8)]"></span>
-                                    <span className="text-[9px] font-instrument font-normal uppercase tracking-wider opacity-90">Trending</span>
-                                </div>
-                                <h4 className="text-xs font-instrument font-normal leading-tight line-clamp-2 drop-shadow-md">
-                                    {currentProduct.name}
-                                </h4>
-                                <div className="mt-1 flex items-center justify-between">
-                                    <span className="text-xs font-instrument font-normal">₹{currentProduct.price}</span>
-                                    <div className="bg-white/20 p-1 rounded-full backdrop-blur-sm">
-                                        <ShoppingBag className="w-3 h-3" />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-
-            {/* Quick View Modal */}
-            {quickViewProduct && (
-                <QuickViewModal
-                    product={quickViewProduct}
-                    isOpen={!!quickViewProduct}
-                    onClose={() => setQuickViewProduct(null)}
+        <button onClick={() => setQuickViewProduct(product)} className="w-full text-left group">
+          <div className="flex items-stretch">
+            {/* Thumbnail */}
+            <div className="relative w-[88px] sm:w-[96px] flex-shrink-0 bg-brand-offwhite overflow-hidden">
+              <AnimatePresence mode="wait">
+                <motion.img
+                  key={product.id}
+                  src={image}
+                  alt={product.name}
+                  className="absolute inset-0 w-full h-full object-cover"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.4 }}
+                  loading="lazy"
+                  decoding="async"
                 />
-            )}
-        </>
-    );
+              </AnimatePresence>
+            </div>
+
+            {/* Copy */}
+            <div className="flex-1 p-3.5 pt-5 flex flex-col gap-1.5 min-w-0">
+              <span className="text-[9px] uppercase tracking-[0.22em] text-brand-gray-500">
+                {current.label}
+              </span>
+
+              <h4 className="card-title text-[13px] line-clamp-2 leading-snug">{product.name}</h4>
+
+              <div className="flex flex-wrap items-baseline gap-x-2">
+                <span className="text-[14px] font-medium text-brand-black">{formatPrice(product.price)}</span>
+                {discount > 0 && (
+                  <>
+                    <span className="price-was text-[11px]">{formatPrice(product.original_price)}</span>
+                    <span className="price-off text-[11px]">{discount}% off</span>
+                  </>
+                )}
+              </div>
+
+              <span className="mt-1 inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.18em] text-brand-black/70 group-hover:text-brand-black">
+                <Eye className="w-3 h-3" /> Quick view
+              </span>
+            </div>
+          </div>
+        </button>
+
+        {/* Dots */}
+        {spotlight.length > 1 && (
+          <div className="flex items-center justify-center gap-1.5 pb-2.5">
+            {spotlight.map((_, dot) => (
+              <button
+                key={dot}
+                onClick={() => setIndex(dot)}
+                aria-label={`Show featured product ${dot + 1}`}
+                className={`h-1 rounded-full transition-all ${
+                  dot === index % spotlight.length ? 'w-4 bg-brand-black' : 'w-1 bg-brand-gray-200'
+                }`}
+              />
+            ))}
+          </div>
+        )}
+      </motion.aside>
+
+      {quickViewProduct && (
+        <QuickViewModal
+          product={{
+            ...quickViewProduct,
+            originalPrice: quickViewProduct.original_price ?? undefined,
+            image: quickViewProduct.images?.[0] || PLACEHOLDER_PRODUCT_IMAGE,
+            slug: quickViewProduct.sku || quickViewProduct.id,
+          }}
+          isOpen={!!quickViewProduct}
+          onClose={() => setQuickViewProduct(null)}
+        />
+      )}
+    </>
+  );
 };
 
 export default FeaturedProductWidget;

@@ -155,7 +155,7 @@ const CouponForm = ({ coupon: propCoupon, isEdit = false }: CouponFormProps) => 
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Coupons
         </Button>
-        <h1 className="text-3xl font-bold">
+        <h1 className="text-3xl font-semibold">
           {isEdit ? 'Edit Coupon' : 'Add New Coupon'}
         </h1>
       </div>

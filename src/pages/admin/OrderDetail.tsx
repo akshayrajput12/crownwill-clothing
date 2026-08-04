@@ -288,7 +288,7 @@ const AdminOrderDetail = () => {
   if (!order) {
     return (
       <div className="container mx-auto px-4 py-8 text-center">
-        <h1 className="text-2xl font-bold mb-4">Order not found</h1>
+        <h1 className="text-2xl font-semibold mb-4">Order not found</h1>
         <Button onClick={() => navigate('/admin/orders')}>
           Back to Orders
         </Button>
@@ -305,7 +305,7 @@ const AdminOrderDetail = () => {
             Back to Orders
           </Button>
           <div>
-            <h1 className="text-3xl font-bold">Order #{order.id}</h1>
+            <h1 className="text-3xl font-semibold">Order #{order.id}</h1>
             <p className="text-muted-foreground">
               Placed on {formatDate(order.orderDate)}
             </p>
@@ -416,7 +416,7 @@ const AdminOrderDetail = () => {
 
                     <Separator className="my-2" />
 
-                    <div className="flex justify-between font-bold text-base">
+                    <div className="flex justify-between font-semibold text-base">
                       <span>Total Amount</span>
                       <span className="text-primary">₹{order.total.toLocaleString('en-IN')}</span>
                     </div>
@@ -654,7 +654,7 @@ const AdminOrderDetail = () => {
 
                 <div className="flex justify-between">
                   <span className="text-sm">Total Amount</span>
-                  <span className="text-sm font-bold">₹{order.total.toLocaleString('en-IN')}</span>
+                  <span className="text-sm font-semibold">₹{order.total.toLocaleString('en-IN')}</span>
                 </div>
 
                 {order.codFee > 0 && (

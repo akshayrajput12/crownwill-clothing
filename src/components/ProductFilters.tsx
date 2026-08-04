@@ -178,7 +178,7 @@ const ProductFiltersComponent = ({ onFiltersChange, categories, selectedFilters 
           <div className="flex justify-end mb-2">
             <button
               onClick={clearAllFilters}
-              className="text-[10px] text-[#8B2131] hover:underline uppercase tracking-widest font-medium"
+              className="text-[10px] text-brand-black hover:underline uppercase tracking-widest font-medium"
             >
               Clear All
             </button>
@@ -186,11 +186,11 @@ const ProductFiltersComponent = ({ onFiltersChange, categories, selectedFilters 
         )}
 
         {/* Availability */}
-        <div className="border-b border-[#E6D5B8]/40 pb-5">
+        <div className="border-b border-brand-gray-200/40 pb-5">
           <Collapsible defaultOpen>
             <CollapsibleTrigger className="flex items-center justify-between w-full group py-1 cursor-pointer">
-              <span className="text-xs font-medium uppercase tracking-[0.15em] text-[#2C1810]">Availability</span>
-              <ChevronDown className="w-3.5 h-3.5 text-[#2C1810] transition-transform duration-300 group-data-[state=open]:rotate-180 opacity-60" />
+              <span className="text-xs font-medium uppercase tracking-[0.15em] text-brand-black">Availability</span>
+              <ChevronDown className="w-3.5 h-3.5 text-brand-black transition-transform duration-300 group-data-[state=open]:rotate-180 opacity-60" />
             </CollapsibleTrigger>
             <CollapsibleContent className="pt-4 space-y-3">
               <div className="flex items-center space-x-3">
@@ -198,9 +198,9 @@ const ProductFiltersComponent = ({ onFiltersChange, categories, selectedFilters 
                   id="in-stock"
                   checked={filters.inStock}
                   onCheckedChange={(checked) => updateFilters({ inStock: !!checked })}
-                  className="w-4 h-4 rounded-none border-[#2C1810]/40 data-[state=checked]:bg-[#2C1810] data-[state=checked]:border-[#2C1810] data-[state=checked]:text-white"
+                  className="w-4 h-4 rounded-none border-brand-black/40 data-[state=checked]:bg-brand-black data-[state=checked]:border-brand-black data-[state=checked]:text-white"
                 />
-                <label htmlFor="in-stock" className="text-sm font-light text-[#5D4037] cursor-pointer hover:text-[#2C1810] transition-colors">
+                <label htmlFor="in-stock" className="text-sm font-light text-brand-gray-700 cursor-pointer hover:text-brand-black transition-colors">
                   In Stock Only
                 </label>
               </div>
@@ -209,9 +209,9 @@ const ProductFiltersComponent = ({ onFiltersChange, categories, selectedFilters 
                   id="bestseller"
                   checked={filters.isBestseller}
                   onCheckedChange={(checked) => updateFilters({ isBestseller: !!checked })}
-                  className="w-4 h-4 rounded-none border-[#2C1810]/40 data-[state=checked]:bg-[#2C1810] data-[state=checked]:border-[#2C1810] data-[state=checked]:text-white"
+                  className="w-4 h-4 rounded-none border-brand-black/40 data-[state=checked]:bg-brand-black data-[state=checked]:border-brand-black data-[state=checked]:text-white"
                 />
-                <label htmlFor="bestseller" className="text-sm font-light text-[#5D4037] cursor-pointer hover:text-[#2C1810] transition-colors">
+                <label htmlFor="bestseller" className="text-sm font-light text-brand-gray-700 cursor-pointer hover:text-brand-black transition-colors">
                   Bestsellers Only
                 </label>
               </div>
@@ -220,9 +220,9 @@ const ProductFiltersComponent = ({ onFiltersChange, categories, selectedFilters 
                   id="new-arrival"
                   checked={filters.isNewArrival}
                   onCheckedChange={(checked) => updateFilters({ isNewArrival: !!checked })}
-                  className="w-4 h-4 rounded-none border-[#2C1810]/40 data-[state=checked]:bg-[#2C1810] data-[state=checked]:border-[#2C1810] data-[state=checked]:text-white"
+                  className="w-4 h-4 rounded-none border-brand-black/40 data-[state=checked]:bg-brand-black data-[state=checked]:border-brand-black data-[state=checked]:text-white"
                 />
-                <label htmlFor="new-arrival" className="text-sm font-light text-[#5D4037] cursor-pointer hover:text-[#2C1810] transition-colors">
+                <label htmlFor="new-arrival" className="text-sm font-light text-brand-gray-700 cursor-pointer hover:text-brand-black transition-colors">
                   New Arrivals
                 </label>
               </div>
@@ -231,11 +231,11 @@ const ProductFiltersComponent = ({ onFiltersChange, categories, selectedFilters 
         </div>
 
         {/* Price */}
-        <div className="border-b border-[#E6D5B8]/40 pb-5">
+        <div className="border-b border-brand-gray-200/40 pb-5">
           <Collapsible defaultOpen>
             <CollapsibleTrigger className="flex items-center justify-between w-full group py-1 cursor-pointer">
-              <span className="text-xs font-medium uppercase tracking-[0.15em] text-[#2C1810]">Price</span>
-              <ChevronDown className="w-3.5 h-3.5 text-[#2C1810] transition-transform duration-300 group-data-[state=open]:rotate-180 opacity-60" />
+              <span className="text-xs font-medium uppercase tracking-[0.15em] text-brand-black">Price</span>
+              <ChevronDown className="w-3.5 h-3.5 text-brand-black transition-transform duration-300 group-data-[state=open]:rotate-180 opacity-60" />
             </CollapsibleTrigger>
             <CollapsibleContent className="pt-5 px-1">
               <div className="space-y-6">
@@ -247,7 +247,7 @@ const ProductFiltersComponent = ({ onFiltersChange, categories, selectedFilters 
                   onValueChange={(value) => updateFilters({ priceRange: value as [number, number] })}
                   className="w-full"
                 />
-                <div className="flex justify-between text-xs text-[#5D4037] font-medium">
+                <div className="flex justify-between text-xs text-brand-gray-700 font-medium">
                   <span>₹{filters.priceRange[0]}</span>
                   <span>₹{filters.priceRange[1]}</span>
                 </div>
@@ -257,11 +257,11 @@ const ProductFiltersComponent = ({ onFiltersChange, categories, selectedFilters 
         </div>
 
         {/* Filter By Product Type (Categories) */}
-        <div className="border-b border-[#E6D5B8]/40 pb-5">
+        <div className="border-b border-brand-gray-200/40 pb-5">
           <Collapsible defaultOpen>
             <CollapsibleTrigger className="flex items-center justify-between w-full group py-1 cursor-pointer">
-              <span className="text-xs font-medium uppercase tracking-[0.15em] text-[#2C1810]">Filter by Product Type</span>
-              <ChevronDown className="w-3.5 h-3.5 text-[#2C1810] transition-transform duration-300 group-data-[state=open]:rotate-180 opacity-60" />
+              <span className="text-xs font-medium uppercase tracking-[0.15em] text-brand-black">Filter by Product Type</span>
+              <ChevronDown className="w-3.5 h-3.5 text-brand-black transition-transform duration-300 group-data-[state=open]:rotate-180 opacity-60" />
             </CollapsibleTrigger>
             <CollapsibleContent className="pt-4 space-y-3">
               {categories.filter(c => c !== 'All').map((category) => (
@@ -270,11 +270,11 @@ const ProductFiltersComponent = ({ onFiltersChange, categories, selectedFilters 
                     id={`category-${category}`}
                     checked={filters.categories.includes(category)}
                     onCheckedChange={() => toggleCategory(category)}
-                    className="w-4 h-4 rounded-none border-[#2C1810]/40 data-[state=checked]:bg-[#2C1810] data-[state=checked]:border-[#2C1810] data-[state=checked]:text-white"
+                    className="w-4 h-4 rounded-none border-brand-black/40 data-[state=checked]:bg-brand-black data-[state=checked]:border-brand-black data-[state=checked]:text-white"
                   />
                   <label
                     htmlFor={`category-${category}`}
-                    className="text-sm font-light text-[#5D4037] cursor-pointer hover:text-[#2C1810] transition-colors"
+                    className="text-sm font-light text-brand-gray-700 cursor-pointer hover:text-brand-black transition-colors"
                   >
                     {category}
                   </label>
@@ -285,11 +285,11 @@ const ProductFiltersComponent = ({ onFiltersChange, categories, selectedFilters 
         </div>
 
         {/* Highlights (Features) */}
-        <div className="border-b border-[#E6D5B8]/40 pb-5">
+        <div className="border-b border-brand-gray-200/40 pb-5">
           <Collapsible>
             <CollapsibleTrigger className="flex items-center justify-between w-full group py-1 cursor-pointer">
-              <span className="text-xs font-medium uppercase tracking-[0.15em] text-[#2C1810]">Highlights</span>
-              <ChevronDown className="w-3.5 h-3.5 text-[#2C1810] transition-transform duration-300 group-data-[state=open]:rotate-180 opacity-60" />
+              <span className="text-xs font-medium uppercase tracking-[0.15em] text-brand-black">Highlights</span>
+              <ChevronDown className="w-3.5 h-3.5 text-brand-black transition-transform duration-300 group-data-[state=open]:rotate-180 opacity-60" />
             </CollapsibleTrigger>
             <CollapsibleContent className="pt-4 space-y-3">
               <div className="max-h-48 overflow-y-auto space-y-3 custom-scrollbar pr-2">
@@ -299,11 +299,11 @@ const ProductFiltersComponent = ({ onFiltersChange, categories, selectedFilters 
                       id={`feature-${feature}`}
                       checked={filters.features.includes(feature)}
                       onCheckedChange={() => toggleFeature(feature)}
-                      className="w-4 h-4 rounded-none border-[#2C1810]/40 data-[state=checked]:bg-[#2C1810] data-[state=checked]:border-[#2C1810] data-[state=checked]:text-white"
+                      className="w-4 h-4 rounded-none border-brand-black/40 data-[state=checked]:bg-brand-black data-[state=checked]:border-brand-black data-[state=checked]:text-white"
                     />
                     <label
                       htmlFor={`feature-${feature}`}
-                      className="text-sm font-light text-[#5D4037] cursor-pointer hover:text-[#2C1810] transition-colors"
+                      className="text-sm font-light text-brand-gray-700 cursor-pointer hover:text-brand-black transition-colors"
                     >
                       {feature}
                     </label>

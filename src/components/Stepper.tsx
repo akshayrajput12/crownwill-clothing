@@ -31,8 +31,8 @@ const Stepper = ({ steps, currentStep, className }: StepperProps) => {
                   className={cn(
                     "flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all font-inter",
                     {
-                      "bg-[#783838] border-[#783838] text-white shadow-md": isActive || isCompleted,
-                      "bg-white border-[#E6D5B8] text-[#5D4037]": !isActive && !isCompleted,
+                      "bg-brand-black border-brand-black text-white shadow-md": isActive || isCompleted,
+                      "bg-white border-brand-gray-200 text-brand-gray-700": !isActive && !isCompleted,
                     }
                   )}
                 >
@@ -49,8 +49,8 @@ const Stepper = ({ steps, currentStep, className }: StepperProps) => {
                     className={cn(
                       "text-sm font-normal tracking-wide font-inter uppercase",
                       {
-                        "text-[#783838]": isActive || isCompleted,
-                        "text-[#5D4037]": !isActive && !isCompleted,
+                        "text-brand-black": isActive || isCompleted,
+                        "text-brand-gray-700": !isActive && !isCompleted,
                       }
                     )}
                   >
@@ -58,8 +58,8 @@ const Stepper = ({ steps, currentStep, className }: StepperProps) => {
                   </div>
                   {step.description && (
                     <div className={cn("text-[10px] mt-1 uppercase tracking-wide font-inter", {
-                      "text-[#783838]/80": isActive,
-                      "text-[#5D4037]/70": !isActive
+                      "text-brand-black/80": isActive,
+                      "text-brand-gray-700/70": !isActive
                     })}>
                       {step.description}
                     </div>
@@ -73,8 +73,8 @@ const Stepper = ({ steps, currentStep, className }: StepperProps) => {
                   className={cn(
                     "flex-1 h-0.5 mx-4 transition-colors",
                     {
-                      "bg-[#783838]": stepNumber < currentStep,
-                      "bg-[#E6D5B8]": stepNumber >= currentStep,
+                      "bg-brand-black": stepNumber < currentStep,
+                      "bg-brand-gray-200": stepNumber >= currentStep,
                     }
                   )}
                 />

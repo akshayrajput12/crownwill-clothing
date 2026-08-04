@@ -319,6 +319,47 @@ export type Database = {
           },
         ]
       }
+      product_sizes: {
+        Row: {
+          id: string
+          product_id: string
+          size: string
+          stock_quantity: number
+          sku: string | null
+          sort_order: number | null
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          product_id: string
+          size: string
+          stock_quantity?: number
+          sku?: string | null
+          sort_order?: number | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          product_id?: string
+          size?: string
+          stock_quantity?: number
+          sku?: string | null
+          sort_order?: number | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_sizes_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
           category_id: string | null
@@ -330,6 +371,7 @@ export type Database = {
           is_active: boolean | null
           is_bestseller: boolean | null
           marketing_info: Json | null
+          new_arrival: boolean | null
           name: string
           nutritional_info: Json | null
           original_price: number | null
@@ -352,6 +394,7 @@ export type Database = {
           is_active?: boolean | null
           is_bestseller?: boolean | null
           marketing_info?: Json | null
+          new_arrival?: boolean | null
           name: string
           nutritional_info?: Json | null
           original_price?: number | null
@@ -374,6 +417,7 @@ export type Database = {
           is_active?: boolean | null
           is_bestseller?: boolean | null
           marketing_info?: Json | null
+          new_arrival?: boolean | null
           name?: string
           nutritional_info?: Json | null
           original_price?: number | null
@@ -644,7 +688,24 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      product_sales: {
+        Row: {
+          product_id: string | null
+          product_name: string | null
+          quantity_sold: number | null
+          total_revenue: number | null
+          sale_date: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_sales_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       create_real_razorpay_order: {

@@ -11,6 +11,14 @@ import { ArrowLeft, Upload, X, ChevronUp, ChevronDown } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import {
+  SIZE_PRESETS,
+  fetchProductSizes,
+  saveProductSizes,
+  sortSizes,
+  totalStock,
+  type SizeVariant,
+} from '@/lib/productSizes';
 
 interface Product {
   id?: string;
@@ -88,6 +96,41 @@ const ProductForm = ({ product: propProduct, isEdit = false }: ProductFormProps)
     state: '',
     fssaiLicense: ''
   });
+
+  // Size & inventory: normalised rows in product_sizes (see lib/productSizes.ts).
+  const DEFAULT_PRESET_SIZES = SIZE_PRESETS;
+
+  const [sizeVariants, setSizeVariants] = useState<SizeVariant[]>(
+    isEdit ? [] : [
+      { size: 'S', stock: 10, sku: '' },
+      { size: 'M', stock: 15, sku: '' },
+      { size: 'L', stock: 20, sku: '' },
+      { size: 'XL', stock: 15, sku: '' },
+      { size: 'XXL', stock: 10, sku: '' }
+    ]
+  );
+  const [customSizeInput, setCustomSizeInput] = useState('');
+
+  const addCustomSize = () => {
+    if (!customSizeInput.trim()) return;
+    const cleanSize = customSizeInput.trim().toUpperCase();
+    if (!sizeVariants.some(s => s.size === cleanSize)) {
+      setSizeVariants(prev => sortSizes([...prev, { size: cleanSize, stock: 10, sku: `${formData.sku || 'SKU'}-${cleanSize}` }]));
+    }
+    setCustomSizeInput('');
+  };
+
+  const updateSizeVariant = (index: number, key: 'stock' | 'sku', value: any) => {
+    setSizeVariants(prev => {
+      const copy = [...prev];
+      copy[index] = { ...copy[index], [key]: value };
+      return copy;
+    });
+  };
+
+  const removeSizeVariant = (index: number) => {
+    setSizeVariants(prev => prev.filter((_, i) => i !== index));
+  };
 
   useEffect(() => {
     fetchCategories();
@@ -170,8 +213,13 @@ const ProductForm = ({ product: propProduct, isEdit = false }: ProductFormProps)
         setSelectedFeatures(convertedFeatures);
       }
       if (data.marketing_info && typeof data.marketing_info === 'object') {
-        setMarketingInfo({ ...marketingInfo, ...(data.marketing_info as any) });
+        // `sizes` used to be stored here; it now lives in product_sizes.
+        const { sizes: _legacySizes, ...marketing } = data.marketing_info as any;
+        setMarketingInfo({ ...marketingInfo, ...marketing });
       }
+
+      // Restore the size grid — without this, editing a product silently reset it.
+      setSizeVariants(await fetchProductSizes(id));
     } catch (error) {
       console.error('Error fetching product:', error);
       toast({
@@ -384,7 +432,8 @@ const ProductForm = ({ product: propProduct, isEdit = false }: ProductFormProps)
         category_id: formData.category_id,
         weight: formData.weight,
         description: formData.description,
-        stock_quantity: Number(formData.stock_quantity) || 0,
+        // Total stock follows the per-size rows whenever sizes are configured.
+        stock_quantity: sizeVariants.length > 0 ? totalStock(sizeVariants) : Number(formData.stock_quantity) || 0,
         is_active: formData.is_active,
         is_bestseller: formData.is_bestseller,
         new_arrival: formData.new_arrival,
@@ -398,6 +447,8 @@ const ProductForm = ({ product: propProduct, isEdit = false }: ProductFormProps)
         marketing_info: marketingInfo
       };
 
+      let productId = id;
+
       if (isEdit && id) {
         const { error } = await supabase
           .from('products')
@@ -409,11 +460,18 @@ const ProductForm = ({ product: propProduct, isEdit = false }: ProductFormProps)
 
         if (error) throw error;
       } else {
-        const { error } = await supabase
+        const { data: inserted, error } = await supabase
           .from('products')
-          .insert(productData);
+          .insert(productData)
+          .select('id')
+          .single();
 
         if (error) throw error;
+        productId = inserted.id;
+      }
+
+      if (productId) {
+        await saveProductSizes(productId, sizeVariants);
       }
 
       toast({
@@ -457,7 +515,7 @@ const ProductForm = ({ product: propProduct, isEdit = false }: ProductFormProps)
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Products
         </Button>
-        <h1 className="text-3xl font-bold">
+        <h1 className="text-3xl font-semibold">
           {isEdit ? 'Edit Product' : 'Add New Product'}
         </h1>
       </div>
@@ -638,6 +696,118 @@ const ProductForm = ({ product: propProduct, isEdit = false }: ProductFormProps)
                   />
                   <Label htmlFor="new_arrival">Mark as New Arrival</Label>
                 </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* PART 3: Dedicated Size & Inventory Management Section */}
+          <Card className="border-2 border-primary/20">
+            <CardHeader className="bg-muted/30">
+              <CardTitle className="flex items-center justify-between">
+                <span>Size & Inventory Management</span>
+                <Badge variant="outline" className="bg-primary/10 text-primary">Always Visible</Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4 pt-4">
+              {/* Preset Sizes */}
+              <div className="space-y-2">
+                <Label className="text-xs font-semibold uppercase text-muted-foreground">Quick Add Preset Sizes</Label>
+                <div className="flex flex-wrap gap-2">
+                  {DEFAULT_PRESET_SIZES.map((preset) => {
+                    const exists = sizeVariants.some(s => s.size === preset);
+                    return (
+                      <Button
+                        key={preset}
+                        type="button"
+                        variant={exists ? "secondary" : "outline"}
+                        size="sm"
+                        onClick={() => {
+                          if (!exists) {
+                            setSizeVariants(prev => sortSizes([...prev, { size: preset, stock: 10, sku: `${formData.sku || 'SKU'}-${preset}` }]));
+                          }
+                        }}
+                        disabled={exists}
+                        className="h-8 text-xs font-semibold"
+                      >
+                        + {preset}
+                      </Button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Custom Size Tag Input */}
+              <div className="space-y-2 pt-2">
+                <Label className="text-xs font-semibold uppercase text-muted-foreground">Add Custom Size</Label>
+                <div className="flex gap-2 max-w-sm">
+                  <Input
+                    placeholder="e.g. 38, Free Size"
+                    value={customSizeInput}
+                    onChange={(e) => setCustomSizeInput(e.target.value)}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        addCustomSize();
+                      }
+                    }}
+                    className="h-9 text-sm"
+                  />
+                  <Button type="button" size="sm" onClick={addCustomSize} className="h-9">
+                    Add Size
+                  </Button>
+                </div>
+              </div>
+
+              {/* Per-Size Inventory Table Rows */}
+              <div className="space-y-3 pt-3">
+                <div className="flex items-center justify-between">
+                  <Label className="font-semibold text-sm">Configured Sizes ({sizeVariants.length})</Label>
+                  <span className="text-xs text-muted-foreground">Set stock quantity and SKU per size</span>
+                </div>
+
+                {sizeVariants.length === 0 ? (
+                  <div className="p-4 border border-dashed rounded-lg text-center text-sm text-muted-foreground">
+                    No sizes added yet. Click a preset size above to add size inventory.
+                  </div>
+                ) : (
+                  <div className="space-y-2 max-h-80 overflow-y-auto border rounded-lg p-3 bg-background">
+                    {sizeVariants.map((item, idx) => (
+                      <div key={idx} className="flex items-center gap-3 bg-muted/30 p-2 rounded-md border border-border/40">
+                        <span className="font-normal w-14 text-center text-sm bg-primary/10 text-primary py-1 rounded">
+                          {item.size}
+                        </span>
+                        <div className="flex-1 flex items-center gap-2">
+                          <Label className="text-xs text-muted-foreground whitespace-nowrap">Stock:</Label>
+                          <Input
+                            type="number"
+                            min="0"
+                            value={item.stock}
+                            onChange={(e) => updateSizeVariant(idx, 'stock', Number(e.target.value))}
+                            className="w-24 h-8 text-sm"
+                          />
+                        </div>
+                        <div className="flex-1 flex items-center gap-2">
+                          <Label className="text-xs text-muted-foreground whitespace-nowrap">SKU:</Label>
+                          <Input
+                            placeholder="SKU-SIZE"
+                            value={item.sku}
+                            onChange={(e) => updateSizeVariant(idx, 'sku', e.target.value)}
+                            className="h-8 text-sm"
+                          />
+                        </div>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeSizeVariant(idx)}
+                          className="text-red-500 hover:text-red-700 hover:bg-red-50 h-8 w-8 p-0"
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>

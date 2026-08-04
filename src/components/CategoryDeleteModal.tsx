@@ -114,7 +114,7 @@ const CategoryDeleteModal: React.FC<CategoryDeleteModalProps> = ({
               <AlertTriangle className="w-6 h-6 text-red-600" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-gray-900">Delete Category</h2>
+              <h2 className="text-xl font-semibold text-gray-900">Delete Category</h2>
               <p className="text-sm text-gray-500">This action cannot be undone</p>
             </div>
           </div>

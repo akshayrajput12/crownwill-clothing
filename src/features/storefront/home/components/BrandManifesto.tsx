@@ -66,7 +66,7 @@ const BrandManifesto = () => {
                         {content.map((item, index) => (
                             <div
                                 key={item.id}
-                                className="h-screen flex flex-col justify-center px-8 md:px-16 lg:px-24 border-l border-[#B38B46]/10"
+                                className="h-screen flex flex-col justify-center px-8 md:px-16 lg:px-24 border-l border-brand-yellow-dark/10"
                             >
                                 <motion.div
                                     initial={{ opacity: 0, y: 50 }}
@@ -75,19 +75,19 @@ const BrandManifesto = () => {
                                     viewport={{ once: false, margin: "-20% 0px -20% 0px" }}
                                 >
                                     {/* Small Accent Line */}
-                                    <div className="w-12 h-[2px] bg-[#B38B46] mb-6" />
+                                    <div className="w-12 h-[2px] bg-brand-yellow-dark mb-6" />
 
-                                    <h2 className="text-xl md:text-2xl lg:text-3xl font-instrument font-normal text-[#FAF9F6] mb-4 tracking-wide leading-tight uppercase">
+                                    <h2 className="text-xl md:text-2xl lg:text-3xl font-instrument font-normal text-brand-white mb-4 tracking-wide leading-tight uppercase">
                                         {item.title}
                                     </h2>
 
                                     {item.subtitle && (
-                                        <p className="text-[#B38B46] font-instrument font-normal tracking-[0.2em] uppercase text-sm mb-6">
+                                        <p className="text-brand-yellow-dark font-instrument font-normal tracking-[0.2em] uppercase text-sm mb-6">
                                             {item.subtitle}
                                         </p>
                                     )}
 
-                                    <p className="text-[#D4B6A2] text-lg md:text-xl font-light leading-relaxed max-w-md">
+                                    <p className="text-brand-gray-200 text-lg md:text-xl font-light leading-relaxed max-w-md">
                                         {item.text}
                                     </p>
                                 </motion.div>

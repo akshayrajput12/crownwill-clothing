@@ -31,29 +31,29 @@ export const TestimonialsColumn = (props: {
               return (
                 <div
                   key={key}
-                  className="p-8 rounded-xl border border-[#F5E6D3] shadow-sm hover:shadow-md transition-shadow duration-300 max-w-xs w-full bg-white flex flex-col justify-between"
+                  className="p-8 rounded-xl border border-brand-offwhite shadow-sm hover:shadow-md transition-shadow duration-300 max-w-xs w-full bg-white flex flex-col justify-between"
                 >
                   <div className="relative">
                     {/* Quote Icon */}
-                    <span className="absolute -top-4 -left-2 text-6xl text-[#E6D5B8] opacity-30 font-instrument leading-none">"</span>
-                    <p className="text-[#5D4037] relative z-10 italic leading-relaxed pt-4 font-instrument font-light">{text}</p>
+                    <span className="absolute -top-4 -left-2 text-6xl text-brand-gray-200 opacity-30 font-instrument leading-none">"</span>
+                    <p className="text-brand-gray-700 relative z-10 italic leading-relaxed pt-4 font-instrument font-light">{text}</p>
                   </div>
 
-                  <div className="flex items-center gap-4 mt-8 pt-6 border-t border-[#F5E6D3]/50">
+                  <div className="flex items-center gap-4 mt-8 pt-6 border-t border-brand-offwhite/50">
                     <img
                       width={48}
                       height={48}
                       src={image}
                       alt={name}
-                      className="h-12 w-12 rounded-full object-cover border border-[#E6D5B8]"
+                      className="h-12 w-12 rounded-full object-cover border border-brand-gray-200"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
                         target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&color=fff`;
                       }}
                     />
                     <div className="flex flex-col">
-                      <div className="font-instrument font-normal text-lg text-[#2C1810]">{name}</div>
-                      <div className="text-xs uppercase tracking-wider text-[#8B2131] opacity-80 font-instrument font-normal">
+                      <div className="font-instrument font-normal text-lg text-brand-black">{name}</div>
+                      <div className="text-xs uppercase tracking-wider text-brand-black opacity-80 font-instrument font-normal">
                         {role}{company ? `, ${company}` : ''}
                       </div>
                     </div>

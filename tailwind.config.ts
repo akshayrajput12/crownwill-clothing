@@ -27,11 +27,11 @@ export default {
 		},
 		extend: {
 			fontFamily: {
-				'sans': ['DM Sans', 'sans-serif'],
-				'serif': ['Playfair Display', 'serif'],
+				'sans': ['Inter', 'system-ui', 'sans-serif'],
+				'serif': ['Poppins', 'system-ui', 'sans-serif'],
 				'mono': ['Orange Avenue', 'monospace'],
-				'inter': ['DM Sans', 'sans-serif'],
-				'instrument': ['DM Sans', 'sans-serif'],
+				'inter': ['Inter', 'system-ui', 'sans-serif'],
+				'instrument': ['Inter', 'system-ui', 'sans-serif'],
 				'bastliga': ['Orange Avenue', 'sans-serif'],
 				'kugile': ['Orange Avenue', 'sans-serif'],
 				'orange-avenue': ['Orange Avenue', 'sans-serif'],
@@ -39,6 +39,26 @@ export default {
 				'body': ['DM Sans', 'sans-serif'],
 			},
 			colors: {
+				/* Brand design-system tokens (defined in index.css :root). Use these
+				   instead of hex literals so the palette lives in one place. */
+				brand: {
+					yellow: 'rgb(var(--brand-yellow-rgb) / <alpha-value>)',
+					'yellow-dark': 'rgb(var(--brand-yellow-dark-rgb) / <alpha-value>)',
+					cream: 'rgb(var(--brand-cream-rgb) / <alpha-value>)',
+					black: 'rgb(var(--brand-black-rgb) / <alpha-value>)',
+					charcoal: 'rgb(var(--brand-charcoal-rgb) / <alpha-value>)',
+					white: 'rgb(var(--brand-white-rgb) / <alpha-value>)',
+					offwhite: 'rgb(var(--brand-offwhite-rgb) / <alpha-value>)',
+					'gray-100': 'rgb(var(--brand-gray-100-rgb) / <alpha-value>)',
+					'gray-200': 'rgb(var(--brand-gray-200-rgb) / <alpha-value>)',
+					'gray-500': 'rgb(var(--brand-gray-500-rgb) / <alpha-value>)',
+					'gray-700': 'rgb(var(--brand-gray-700-rgb) / <alpha-value>)',
+					success: 'rgb(var(--brand-success-rgb) / <alpha-value>)',
+					'success-light': 'rgb(var(--brand-success-light-rgb) / <alpha-value>)',
+					blue: 'rgb(var(--brand-blue-rgb) / <alpha-value>)',
+					teal: 'rgb(var(--brand-teal-rgb) / <alpha-value>)',
+					red: 'rgb(var(--brand-red-rgb) / <alpha-value>)',
+				},
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',
@@ -110,10 +130,6 @@ export default {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
 				sm: 'calc(var(--radius) - 4px)'
-			},
-			fontWeight: {
-				bold: '600',
-				semibold: '500',
 			},
 			keyframes: {
 				'accordion-down': {
