@@ -1,4 +1,4 @@
-// Home page for Dare To Diet - Fitness Supplements & Health Products
+// Home page for crownveil - Modern Menswear
 import Home from './Home/Home';
 
 const Index = () => {

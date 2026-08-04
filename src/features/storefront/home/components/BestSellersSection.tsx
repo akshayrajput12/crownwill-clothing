@@ -136,7 +136,7 @@ const BestSellersSection = () => {
 
   return (
     <section className="py-12 md:py-16 bg-[#F9F3EA] relative overflow-hidden">
-      {/* Background accent - Rajluxmi Theme */}
+      {/* Background accent - Crownveil Theme */}
       <div className="absolute top-0 left-0 w-full h-full bg-[#F9F3EA] -z-10"></div>
 
       <div className="max-w-[1600px] mx-auto px-6 relative z-10">

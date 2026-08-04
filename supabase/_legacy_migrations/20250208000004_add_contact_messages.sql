@@ -59,7 +59,7 @@ CREATE POLICY "Admin can update contact messages" ON public.contact_messages
 INSERT INTO public.settings (key, value, description, category, is_public) 
 VALUES (
   'admin_emails', 
-  '["admin@daretodiet.fit", "contact@daretodiet.fit"]', 
+  '["admin@crownveil.com", "contact@crownveil.com"]', 
   'List of admin email addresses for access control', 
   'security', 
   false

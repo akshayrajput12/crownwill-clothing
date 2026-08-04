@@ -124,7 +124,7 @@ const NewArrivalsSection = () => {
 
   return (
     <section className="py-12 md:py-16 bg-[#F9F3EA] relative overflow-hidden">
-      {/* Background accent - Rajluxmi Theme */}
+      {/* Background accent - Crownveil Theme */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-[#FFF8F0] rounded-full filter blur-[100px] opacity-60 pointer-events-none"></div>
 
       <div className="max-w-[1600px] mx-auto px-6 relative z-10">

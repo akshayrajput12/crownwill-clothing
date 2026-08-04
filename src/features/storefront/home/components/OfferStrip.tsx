@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Tag, Copy, Clock, ArrowRight } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import heroImage from '@/assets/coupon.png';
+import { brandImages } from '@/lib/brandImages';
 
 const OfferStrip = () => {
   const navigate = useNavigate();
@@ -91,13 +91,13 @@ const OfferStrip = () => {
             transition: { duration: 0.3 }
           }}
         >
-          {/* Background Image - using the hero image from assets */}
+          {/* Background Image - campaign shot from the Supabase instance */}
           <div className="absolute inset-0 z-0">
             <div className="absolute inset-0 bg-black/40 z-10"></div>
             <img
-              src={heroImage}
+              src={brandImages.heritagePolo}
               alt="crownveil members' offer"
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover object-[center_30%]"
             />
           </div>
 

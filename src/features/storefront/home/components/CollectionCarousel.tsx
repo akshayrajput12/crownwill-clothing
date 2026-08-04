@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
+import { collectionFallbacks } from '@/lib/brandImages';
 import {
   Carousel,
   CarouselContent,
@@ -36,13 +37,7 @@ const CollectionCarousel = () => {
   }, [api]);
 
   // Fallback imagery keeps the collection rail relevant before category images are uploaded.
-  const fallbacks = [
-    'https://images.unsplash.com/photo-1617137968427-85924c800a22?auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1610652492500-ded49ceeb378?auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1506629905607-d4055ba5d4a6?auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1516826957135-700dedea698c?auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1539533113208-f6df8cc8b543?auto=format&fit=crop&q=80',
-  ];
+  const fallbacks = collectionFallbacks;
 
   useEffect(() => {
     fetchCategories();

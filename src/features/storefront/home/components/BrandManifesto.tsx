@@ -1,7 +1,6 @@
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import hero5 from '@/assets/2.jpeg';
-import hero3 from '@/assets/3.jpeg';
+import { brandImages } from '@/lib/brandImages';
 
 const BrandManifesto = () => {
     // Scroll progress for the entire section
@@ -41,7 +40,7 @@ const BrandManifesto = () => {
                 <div className="lg:w-1/2 h-screen sticky top-0 overflow-hidden z-0">
                     <div className="absolute inset-0 bg-black/10 z-10" />
                     <img
-                        src={hero5}
+                        src={brandImages.contrastPoloNavy}
                         alt="crownveil menswear collection"
                         className="w-full h-full object-cover"
                     />
@@ -55,8 +54,8 @@ const BrandManifesto = () => {
                     {/* Fixed Background for the Right Side */}
                     <div className="absolute inset-0 z-0 overflow-hidden">
                         <img
-                            src={hero3}
-                            alt="Background Texture"
+                            src={brandImages.limitedEditionAd}
+                            alt=""
                             className="w-full h-full object-cover opacity-10 blur-sm scale-110 mix-blend-overlay"
                         />
                         <div className="absolute inset-0 bg-hero-bg/95" />

@@ -273,8 +273,9 @@ const Contact = () => {
           </CardHeader>
           <CardContent>
             <div className="aspect-video rounded-lg overflow-hidden">
+              {/* ponytail: address-query embed, so the map follows the store address in settings */}
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3465.046698160929!2d75.90044067605358!3d29.718406533943902!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3911977ef5c7c397%3A0xd93c1bbd1ea25041!2sSuper%20Sweets%20-%20A%20sweets%20shop!5e0!3m2!1sen!2sin!4v1760083220231!5m2!1sen!2sin"
+                src={`https://www.google.com/maps?q=${encodeURIComponent(contactInfo.address)}&output=embed`}
                 width="100%"
                 height="100%"
                 style={{ border: 0 }}

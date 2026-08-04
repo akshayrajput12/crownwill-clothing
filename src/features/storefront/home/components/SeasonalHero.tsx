@@ -1,22 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import hero2 from '@/assets/1.png';
-import hero3 from '@/assets/2.png';
-import hero1 from '@/assets/3.png';
-
-const sliderData = [
-  {
-    id: 1,
-    image: hero1
-  },
-  {
-    id: 2,
-    image: hero2
-  },
-  {
-    id: 3,
-    image: hero3
-  }
-];
+import { heroSlides as sliderData } from '@/lib/brandImages';
 
 const SeasonalHero = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -43,8 +26,9 @@ const SeasonalHero = () => {
       <div className="absolute inset-0 z-0">
         <img
           src={currentSlideData.image}
-          alt={`Slide ${currentSlideData.id}`}
+          alt={currentSlideData.alt}
           className="w-full h-full object-cover"
+          style={{ objectPosition: currentSlideData.position }}
           loading={currentSlide === 0 ? "eager" : "lazy"}
         />
       </div>

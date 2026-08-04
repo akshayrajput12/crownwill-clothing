@@ -4,10 +4,8 @@ import type React from "react"
 import { useState, useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom"
 import {
-  Dumbbell,
   Heart,
   Zap,
-  Apple,
   Users,
   Award,
   Calendar,
@@ -16,13 +14,11 @@ import {
   Star,
   ArrowRight,
   TrendingUp,
-  Cookie,
-  Cake,
-  IceCream,
-  Candy
+  Shirt,
+  Layers
 } from "lucide-react"
 import { motion, useScroll, useTransform, useInView, useSpring } from "framer-motion"
-import about from '../../assets/Gifting.webp'
+import { brandImages } from "@/lib/brandImages"
 
 export default function AboutUsSection() {
   const navigate = useNavigate()
@@ -69,7 +65,7 @@ export default function AboutUsSection() {
 
   const services = [
     {
-      icon: <Cookie className="w-6 h-6" />,
+      icon: <Shirt className="w-6 h-6" />,
       secondaryIcon: <Sparkles className="w-4 h-4 absolute -top-1 -right-1 text-orange-300" />,
       title: "Elevated Essentials",
       description:
@@ -93,7 +89,7 @@ export default function AboutUsSection() {
       position: "left",
     },
     {
-      icon: <Cake className="w-6 h-6" />,
+      icon: <Layers className="w-6 h-6" />,
       secondaryIcon: <Sparkles className="w-4 h-4 absolute -top-1 -right-1 text-orange-300" />,
       title: "Seasonal Capsules",
       description:
@@ -121,7 +117,7 @@ export default function AboutUsSection() {
   const stats = [
     { icon: <Award />, value: 48, label: "Signature Styles", suffix: "+" },
     { icon: <Users />, value: 200000, label: "Happy Customers", suffix: "+" },
-    { icon: <Calendar />, value: 50, label: "Years Experience", suffix: "+" },
+    { icon: <Calendar />, value: 4, label: "Seasonal Drops a Year", suffix: "" },
     { icon: <TrendingUp />, value: 100, label: "Quality Guarantee", suffix: "%" },
   ]
 
@@ -184,7 +180,7 @@ export default function AboutUsSection() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <Cookie className="w-4 h-4" />
+            <Shirt className="w-4 h-4" />
             DISCOVER OUR STORY
           </motion.span>
           {/* Improved responsive font sizing */}
@@ -199,8 +195,8 @@ export default function AboutUsSection() {
 
         {/* Improved responsive font sizing */}
         <motion.p className="text-center max-w-2xl mx-auto mb-16 text-base sm:text-lg text-gray-700" variants={itemVariants}>
-          We are a passionate team of confectioners and sweet enthusiasts dedicated to bringing you the finest sweets and desserts. 
-          With attention to detail and commitment to excellence, we craft each treat with love and the highest quality ingredients.
+          Crownveil is a menswear studio built around a sharper everyday uniform — considered fabrics, precise
+          proportions and pieces that hold their shape season after season.
         </motion.p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
@@ -233,8 +229,8 @@ export default function AboutUsSection() {
                 whileHover={{ scale: 1.03, transition: { duration: 0.3 } }}
               >
                 <img
-                  src={about}
-                  alt="Premium Sweets"
+                  src={brandImages.printedShirtOlive}
+                  alt="Crownveil printed shirt"
                   className="w-full h-full object-cover"
                 />
                 <motion.div
@@ -249,7 +245,7 @@ export default function AboutUsSection() {
                     whileTap={{ scale: 0.95 }}
                     onClick={handleShopNow}
                   >
-                    Our Sweets <ArrowRight className="w-4 h-4" />
+                    Shop the Edit <ArrowRight className="w-4 h-4" />
                   </motion.button>
                 </motion.div>
               </motion.div>
@@ -353,9 +349,9 @@ export default function AboutUsSection() {
         >
           <div className="flex-1">
             {/* Improved responsive font sizing */}
-            <h3 className="text-xl sm:text-2xl font-medium mb-2">Ready to satisfy your sweet cravings?</h3>
+            <h3 className="text-xl sm:text-2xl font-medium mb-2">Ready to build your everyday uniform?</h3>
             {/* Improved responsive font sizing */}
-            <p className="text-white/90 text-base sm:text-lg">Let's indulge in our premium collection of sweets and desserts.</p>
+            <p className="text-white/90 text-base sm:text-lg">Explore the Crownveil collection of polos, shirts and elevated essentials.</p>
           </div>
           <motion.button
             className="bg-white text-destructive hover:bg-gray-100 px-6 py-3 rounded-lg flex items-center gap-2 font-medium transition-colors"

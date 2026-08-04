@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import heroImage from '@/assets/coupon.png';
+import { brandImages } from '@/lib/brandImages';
 
 const EditorialBanner = () => {
   const navigate = useNavigate();
@@ -20,8 +20,8 @@ const EditorialBanner = () => {
       >
         <div className="relative w-full overflow-hidden">
           <img
-            src={heroImage}
-            alt="Exclusive Collection"
+            src={brandImages.heritageCampaign}
+            alt="Crownveil heritage collection"
             className="w-full h-auto object-contain transition-transform duration-1000 ease-out group-hover:scale-105"
             loading="lazy"
           />
