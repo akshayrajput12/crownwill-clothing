@@ -47,15 +47,24 @@ export interface CartItem extends Product {
 }
 
 
+/** Drives the "added to bag" confirmation card. Not persisted. */
+export interface LastAdded {
+  item: CartItem;
+  /** Bumped on every add so re-adding the same line re-triggers the card. */
+  seq: number;
+}
+
 interface Store {
   // Cart
   cartItems: CartItem[];
   isCartOpen: boolean;
-  addToCart: (product: Product) => void;
+  lastAdded: LastAdded | null;
+  addToCart: (product: Product, quantity?: number) => void;
   removeFromCart: (productId: string, size?: string) => void;
   updateQuantity: (productId: string, quantity: number, size?: string) => void;
   clearCart: () => void;
   toggleCart: () => void;
+  dismissLastAdded: () => void;
 
   // Products
   products: Product[];
@@ -70,69 +79,46 @@ interface Store {
   logout: () => void;
 }
 
-// Load cart items from localStorage on initial load
-const loadCartFromLocalStorage = (): CartItem[] => {
-  if (typeof window !== 'undefined') {
-    try {
-      const storedCart = localStorage.getItem('cartItems');
-      return storedCart ? JSON.parse(storedCart) : [];
-    } catch (error) {
-      console.error('Error loading cart from localStorage:', error);
-      return [];
-    }
-  }
-  return [];
-};
-
-// Save cart items to localStorage
-const saveCartToLocalStorage = (cartItems: CartItem[]): void => {
-  if (typeof window !== 'undefined') {
-    try {
-      localStorage.setItem('cartItems', JSON.stringify(cartItems));
-    } catch (error) {
-      console.error('Error saving cart to localStorage:', error);
-    }
-  }
-};
-
 export const useStore = create<Store>()(
   persist(
     (set, get) => ({
       // Cart state
-      cartItems: loadCartFromLocalStorage(),
+      cartItems: [],
       isCartOpen: false,
+      lastAdded: null,
 
       // Cart actions
-      addToCart: (product) => {
-        const { cartItems } = get();
+      addToCart: (product, quantity = 1) => {
+        const qty = Math.max(1, Math.round(quantity));
+        const { cartItems, lastAdded } = get();
         // Same product in a different size is its own line.
         const isSameLine = (item: CartItem) =>
           item.id === product.id && (item.size ?? '') === (product.size ?? '');
         const existingItem = cartItems.find(isSameLine);
 
-        let updatedCartItems;
-        if (existingItem) {
-          updatedCartItems = cartItems.map(item =>
-            isSameLine(item)
-              ? { ...item, quantity: item.quantity + 1 }
-              : item
-          );
-        } else {
-          updatedCartItems = [...cartItems, { ...product, quantity: 1 }];
-        }
+        const updatedCartItems = existingItem
+          ? cartItems.map((item) =>
+              isSameLine(item) ? { ...item, quantity: item.quantity + qty } : item
+            )
+          : [...cartItems, { ...product, quantity: qty }];
 
-        set({ cartItems: updatedCartItems });
-        saveCartToLocalStorage(updatedCartItems);
+        set({
+          cartItems: updatedCartItems,
+          lastAdded: {
+            item: updatedCartItems.find(isSameLine)!,
+            seq: (lastAdded?.seq ?? 0) + 1,
+          },
+        });
       },
 
       removeFromCart: (productId, size) => {
-        const updatedCartItems = get().cartItems.filter(item =>
-          size === undefined
-            ? item.id !== productId
-            : !(item.id === productId && (item.size ?? '') === size)
-        );
-        set({ cartItems: updatedCartItems });
-        saveCartToLocalStorage(updatedCartItems);
+        set({
+          cartItems: get().cartItems.filter((item) =>
+            size === undefined
+              ? item.id !== productId
+              : !(item.id === productId && (item.size ?? '') === size)
+          ),
+        });
       },
 
       updateQuantity: (productId, quantity, size) => {
@@ -141,22 +127,20 @@ export const useStore = create<Store>()(
           return;
         }
 
-        const updatedCartItems = get().cartItems.map(item =>
-          item.id === productId && (size === undefined || (item.size ?? '') === size)
-            ? { ...item, quantity }
-            : item
-        );
-
-        set({ cartItems: updatedCartItems });
-        saveCartToLocalStorage(updatedCartItems);
+        set({
+          cartItems: get().cartItems.map((item) =>
+            item.id === productId && (size === undefined || (item.size ?? '') === size)
+              ? { ...item, quantity }
+              : item
+          ),
+        });
       },
 
-      clearCart: () => {
-        set({ cartItems: [] });
-        saveCartToLocalStorage([]);
-      },
+      clearCart: () => set({ cartItems: [], lastAdded: null }),
 
       toggleCart: () => set({ isCartOpen: !get().isCartOpen }),
+
+      dismissLastAdded: () => set({ lastAdded: null }),
 
       // Products state
       products: [],

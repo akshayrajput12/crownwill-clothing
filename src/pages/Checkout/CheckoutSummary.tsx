@@ -180,7 +180,9 @@ const CheckoutSummary = ({
                             <h3 className="font-instrument font-normal tracking-wide uppercase">{item.name}</h3>
                             <p className="ml-4">{formatPrice(item.price * item.quantity)}</p>
                           </div>
-                          <p className="mt-1 text-sm text-brand-gray-700">{item.weight}</p>
+                          <p className="mt-1 text-sm text-brand-gray-700">
+                            {[item.size && `Size ${item.size}`, item.weight].filter(Boolean).join(' · ')}
+                          </p>
                         </div>
                         <div className="flex flex-1 items-end justify-between text-sm">
                           <p className="text-brand-gray-700">Qty {item.quantity}</p>

@@ -4,6 +4,7 @@ import { Star, Eye, Heart, ShoppingBag } from 'lucide-react';
 import { useStore, Product as StoreProduct } from '../store/useStore';
 import { formatPrice } from '../utils/currency';
 import { PLACEHOLDER_PRODUCT_IMAGE } from '@/lib/brandImages';
+import { parseSizes } from '@/lib/productSizes';
 
 interface Product {
   id: string;
@@ -22,6 +23,8 @@ interface Product {
   isNew?: boolean;
   new_arrival?: boolean;
   features?: string[];
+  /** Per-size inventory, when the caller fetched it (see CARD_COLUMNS). */
+  product_sizes?: Array<{ size: string; stock_quantity: number }>;
 
   // Store compatibility fields
   category?: string;
@@ -44,6 +47,9 @@ interface ProductCardProps {
  *
  * - The second product image takes over on hover (the standard apparel "flip"),
  *   falling back to a subtle zoom when only one shot exists.
+ * - Hover reveals quick add. When the product has a size grid the shopper picks the
+ *   size right there: a garment line in the cart without a size cannot be shipped, so
+ *   the card never adds one. Sizeless products keep a plain "Add to bag".
  * - Price block always reads: current, was, % off, and how much is saved.
  * - Accepts either camelCase or the raw snake_case DB row, so callers do not have
  *   to remap before rendering.
@@ -66,15 +72,19 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onViewDetail, onQuic
     : 0;
   const savings = originalPrice && originalPrice > product.price ? originalPrice - product.price : 0;
 
-  const isOutOfStock = product.stock_quantity !== undefined && product.stock_quantity <= 0;
+  const sizes = parseSizes(product.product_sizes);
+  const inStockSizes = sizes.filter((size) => size.stock > 0);
+  const isOutOfStock = sizes.length > 0
+    ? inStockSizes.length === 0
+    : product.stock_quantity !== undefined && product.stock_quantity <= 0;
 
-  const handleAddToCart = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const addLine = (size?: string) => {
     const cartProduct: StoreProduct = {
       ...product,
       originalPrice,
+      size,
       image: primaryImage,
-      category: product.category || 'General',
+      category: product.category || product.categories?.name || 'General',
       description: product.description || '',
       inStock: product.inStock ?? !isOutOfStock,
       slug: product.slug || product.sku || product.id,
@@ -84,6 +94,22 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onViewDetail, onQuic
       features: undefined,
     };
     addToCart(cartProduct);
+  };
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    // Sized product with no size chosen: send them to quick view / PDP to pick one.
+    if (sizes.length > 0) {
+      if (onQuickView) onQuickView(product);
+      else onViewDetail?.();
+      return;
+    }
+    addLine();
+  };
+
+  const handleSizeAdd = (e: React.MouseEvent, size: string) => {
+    e.stopPropagation();
+    addLine(size);
   };
 
   const handleQuickView = (e: React.MouseEvent) => {
@@ -166,6 +192,42 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onViewDetail, onQuic
     </div>
   );
 
+  /** Size chips — one tap adds that exact size to the bag. */
+  const SizeQuickAdd = ({ tone = 'dark' }: { tone?: 'dark' | 'light' }) => (
+    <div
+      className={`flex flex-wrap items-center gap-1.5 ${
+        tone === 'dark' ? 'bg-brand-black/95 backdrop-blur-sm px-3 py-3' : ''
+      }`}
+    >
+      <span
+        className={`text-[9px] uppercase tracking-[0.16em] mr-1 ${
+          tone === 'dark' ? 'text-white/60' : 'text-brand-gray-500'
+        }`}
+      >
+        Quick add
+      </span>
+      {sizes.map(({ size, stock }) => (
+        <button
+          key={size}
+          onClick={(e) => (stock > 0 ? handleSizeAdd(e, size) : e.stopPropagation())}
+          disabled={stock <= 0}
+          title={stock > 0 ? `Add size ${size}` : `Size ${size} is sold out`}
+          className={`min-w-[34px] h-8 px-2 text-[11px] font-medium rounded-[6px] transition-colors ${
+            stock <= 0
+              ? tone === 'dark'
+                ? 'text-white/25 line-through cursor-not-allowed'
+                : 'text-brand-gray-500/50 line-through cursor-not-allowed border border-brand-gray-200'
+              : tone === 'dark'
+                ? 'bg-white/10 text-brand-white hover:bg-brand-yellow hover:text-brand-black'
+                : 'border border-brand-black text-brand-black hover:bg-brand-black hover:text-brand-white'
+          }`}
+        >
+          {size}
+        </button>
+      ))}
+    </div>
+  );
+
   if (variant === 'list') {
     return (
       <motion.div
@@ -204,6 +266,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onViewDetail, onQuic
             </button>
           </div>
 
+          {sizes.length > 0 && !isOutOfStock && <SizeQuickAdd tone="light" />}
+
           <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4">
             <PriceBlock />
 
@@ -214,7 +278,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onViewDetail, onQuic
                 className="btn-label flex-1 sm:flex-none bg-brand-black text-brand-white px-6 py-3 rounded-[8px] hover:bg-brand-charcoal disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 <ShoppingBag className="w-3.5 h-3.5" />
-                {isOutOfStock ? 'Sold out' : 'Add to bag'}
+                {isOutOfStock ? 'Sold out' : sizes.length > 0 ? 'Select size' : 'Add to bag'}
               </button>
               {onQuickView && (
                 <button
@@ -269,26 +333,31 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onViewDetail, onQuic
           )}
         </div>
 
-        {/* Add to bag slides up on hover; on mobile it sits inline below instead */}
-        <div className="hidden sm:block absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out">
-          <button
-            onClick={handleAddToCart}
-            disabled={isOutOfStock}
-            className="btn-label w-full bg-brand-black text-brand-white py-3.5 flex items-center justify-center gap-2 hover:bg-brand-charcoal disabled:opacity-60 disabled:cursor-not-allowed"
-          >
-            <ShoppingBag className="w-3.5 h-3.5" />
-            {isOutOfStock ? 'Sold out' : 'Add to bag'}
-          </button>
-        </div>
+        {/* Quick add slides up on hover; on mobile it sits inline below instead */}
+        {!isOutOfStock && (
+          <div className="hidden sm:block absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out">
+            {sizes.length > 0 ? (
+              <SizeQuickAdd />
+            ) : (
+              <button
+                onClick={handleAddToCart}
+                className="btn-label w-full bg-brand-black text-brand-white py-3.5 flex items-center justify-center gap-2 hover:bg-brand-charcoal"
+              >
+                <ShoppingBag className="w-3.5 h-3.5" />
+                Add to bag
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Details */}
       <div className="pt-3.5 pb-1 flex flex-col gap-1.5">
         <h3 className="card-title line-clamp-1">{product.name}</h3>
 
-        {product.category && (
+        {(product.category || product.categories?.name) && (
           <span className="text-[10px] uppercase tracking-[0.18em] text-brand-gray-500">
-            {product.category}
+            {product.category || product.categories?.name}
           </span>
         )}
 
@@ -301,15 +370,24 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onViewDetail, onQuic
           </div>
         ) : null}
 
-        {/* Mobile add-to-bag: hover states do not exist on touch */}
-        <button
-          onClick={handleAddToCart}
-          disabled={isOutOfStock}
-          className="btn-label sm:hidden mt-2 w-full border border-brand-black text-brand-black py-2.5 rounded-[8px] flex items-center justify-center gap-2 disabled:opacity-40"
-        >
-          <ShoppingBag className="w-3.5 h-3.5" />
-          {isOutOfStock ? 'Sold out' : 'Add to bag'}
-        </button>
+        {/* Touch devices have no hover, so quick add lives inline */}
+        {isOutOfStock ? (
+          <span className="btn-label sm:hidden mt-2 w-full border border-brand-gray-200 text-brand-gray-500 py-2.5 rounded-[8px] text-center">
+            Sold out
+          </span>
+        ) : sizes.length > 0 ? (
+          <div className="sm:hidden mt-2">
+            <SizeQuickAdd tone="light" />
+          </div>
+        ) : (
+          <button
+            onClick={handleAddToCart}
+            className="btn-label sm:hidden mt-2 w-full border border-brand-black text-brand-black py-2.5 rounded-[8px] flex items-center justify-center gap-2"
+          >
+            <ShoppingBag className="w-3.5 h-3.5" />
+            Add to bag
+          </button>
+        )}
       </div>
     </motion.div>
   );

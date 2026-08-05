@@ -1,5 +1,6 @@
 import React from 'react';
 import SeasonalHero from '@/features/storefront/home/components/SeasonalHero';
+import ServicePromises from '@/features/storefront/home/components/ServicePromises';
 import UltimateSavingCombos from '@/features/storefront/home/components/UltimateSavingCombos';
 import NewArrivalsSection from '@/features/storefront/home/components/NewArrivalsSection';
 import MostWantedCategories from '@/features/storefront/home/components/MostWantedCategories';
@@ -22,34 +23,37 @@ const Home: React.FC = () => {
       {/* 1. Hero carousel */}
       <SeasonalHero />
 
-      {/* 2. Bundles */}
+      {/* 2. Shipping / payment / returns answered up front */}
+      <ServicePromises />
+
+      {/* 3. Bundles */}
       <UltimateSavingCombos />
 
-      {/* 3. New drops */}
+      {/* 4. New drops */}
       <NewArrivalsSection />
 
-      {/* 4. Category grid */}
+      {/* 5. Category grid */}
       <MostWantedCategories />
 
-      {/* 5. Brand marquee */}
+      {/* 6. Brand marquee */}
       <BrandMarquee text="Making global fashion accessible" />
 
-      {/* 6. Bestsellers */}
+      {/* 7. Bestsellers */}
       <BestSellersRail />
 
-      {/* 7. Editorial break */}
+      {/* 8. Editorial break */}
       <EditorialCampaign />
 
-      {/* 8. Coupons / standing offers */}
+      {/* 9. Coupons / standing offers */}
       <MemberOffers />
 
-      {/* 9. Reviews + ambassadors */}
+      {/* 10. Reviews + ambassadors */}
       <CrownveilstersApproved />
 
-      {/* 10. Testimonials */}
+      {/* 11. Testimonials — marquee columns */}
       <CustomerVoices />
 
-      {/* 11. Instagram */}
+      {/* 12. Instagram */}
       <SocialGallery />
 
       {/* Floating spotlight */}

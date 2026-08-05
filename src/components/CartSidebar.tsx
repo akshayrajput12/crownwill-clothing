@@ -70,9 +70,11 @@ const CartSidebar: React.FC<CartSidebarProps> = ({ isAdminRoute = false }) => {
   const deliveryFee = meetsThreshold(subtotal, settings.free_delivery_threshold) ? 0 : toNumber(settings.delivery_charge);
   const total = subtotal + tax + deliveryFee;
 
+  // The button says Checkout, so it goes to checkout. "View bag" below it covers the
+  // review step.
   const handleCheckout = () => {
     toggleCart();
-    navigate('/cart');
+    navigate('/checkout');
   };
 
   return (
@@ -221,6 +223,13 @@ const CartSidebar: React.FC<CartSidebarProps> = ({ isAdminRoute = false }) => {
                 >
                   Checkout
                 </motion.button>
+
+                <button
+                  onClick={() => { toggleCart(); navigate('/cart'); }}
+                  className="w-full border border-brand-gray-200 text-brand-black py-3 rounded-sm uppercase tracking-[0.1em] text-sm hover:bg-brand-cream transition-colors"
+                >
+                  View bag
+                </button>
               </div>
             )}
           </motion.div>

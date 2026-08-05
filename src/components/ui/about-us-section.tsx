@@ -66,7 +66,7 @@ export default function AboutUsSection() {
   const services = [
     {
       icon: <Shirt className="w-6 h-6" />,
-      secondaryIcon: <Sparkles className="w-4 h-4 absolute -top-1 -right-1 text-orange-300" />,
+      secondaryIcon: <Sparkles className="w-4 h-4 absolute -top-1 -right-1 text-brand-yellow" />,
       title: "Elevated Essentials",
       description:
         "A refined collection of everyday clothing, designed with clear proportions and a relaxed point of view.",
@@ -74,7 +74,7 @@ export default function AboutUsSection() {
     },
     {
       icon: <Heart className="w-6 h-6" />,
-      secondaryIcon: <CheckCircle className="w-4 h-4 absolute -top-1 -right-1 text-orange-300" />,
+      secondaryIcon: <CheckCircle className="w-4 h-4 absolute -top-1 -right-1 text-brand-yellow" />,
       title: "Considered Fabrics",
       description:
         "We choose dependable fabrics for their hand feel, longevity and ability to wear well over time.",
@@ -82,7 +82,7 @@ export default function AboutUsSection() {
     },
     {
       icon: <Zap className="w-6 h-6" />,
-      secondaryIcon: <Star className="w-4 h-4 absolute -top-1 -right-1 text-orange-300" />,
+      secondaryIcon: <Star className="w-4 h-4 absolute -top-1 -right-1 text-brand-yellow" />,
       title: "Built for Repeat Wear",
       description:
         "Each style is developed to move easily from everyday plans to more considered occasions.",
@@ -90,7 +90,7 @@ export default function AboutUsSection() {
     },
     {
       icon: <Layers className="w-6 h-6" />,
-      secondaryIcon: <Sparkles className="w-4 h-4 absolute -top-1 -right-1 text-orange-300" />,
+      secondaryIcon: <Sparkles className="w-4 h-4 absolute -top-1 -right-1 text-brand-yellow" />,
       title: "Seasonal Capsules",
       description:
         "New seasonal capsules bring considered layers and fresh textures to the core wardrobe.",
@@ -98,7 +98,7 @@ export default function AboutUsSection() {
     },
     {
       icon: <Users className="w-6 h-6" />,
-      secondaryIcon: <CheckCircle className="w-4 h-4 absolute -top-1 -right-1 text-orange-300" />,
+      secondaryIcon: <CheckCircle className="w-4 h-4 absolute -top-1 -right-1 text-brand-yellow" />,
       title: "A Shared Uniform",
       description:
         "We are a community for people who value fewer, better pieces and personal style without excess.",
@@ -106,7 +106,7 @@ export default function AboutUsSection() {
     },
     {
       icon: <Award className="w-6 h-6" />,
-      secondaryIcon: <Star className="w-4 h-4 absolute -top-1 -right-1 text-orange-300" />,
+      secondaryIcon: <Star className="w-4 h-4 absolute -top-1 -right-1 text-brand-yellow" />,
       title: "Made With Intention",
       description:
         "The details matter: thoughtful construction, easy care and a finish that feels quietly elevated.",
@@ -129,7 +129,7 @@ export default function AboutUsSection() {
     <section
       id="about-section"
       ref={sectionRef}
-      className="w-full py-24 px-4 bg-gradient-to-b from-white to-orange-50 text-gray-900 overflow-hidden relative"
+      className="w-full brand-section-padding px-4 bg-gradient-to-b from-brand-white to-brand-offwhite text-brand-black overflow-hidden relative"
     >
       {/* Decorative background elements */}
       <motion.div
@@ -175,7 +175,7 @@ export default function AboutUsSection() {
       >
         <motion.div className="flex flex-col items-center mb-6" variants={itemVariants}>
           <motion.span
-            className="text-orange-500 font-medium mb-2 flex items-center gap-2"
+            className="eyebrow mb-2 flex items-center gap-2"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
@@ -184,7 +184,7 @@ export default function AboutUsSection() {
             DISCOVER OUR STORY
           </motion.span>
           {/* Improved responsive font sizing */}
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-light mb-4 text-center">About Us</h2>
+          <h2 className="section-title mb-4 text-center">About Us</h2>
           <motion.div
             className="w-24 h-1 bg-primary"
             initial={{ width: 0 }}
@@ -240,7 +240,7 @@ export default function AboutUsSection() {
                   transition={{ duration: 0.8, delay: 0.9 }}
                 >
                   <motion.button
-                    className="bg-gradient-to-r from-primary to-[hsl(0_84%_60%)] text-white px-4 py-2 rounded-full flex items-center gap-2 text-sm font-medium"
+                    className="btn-label bg-brand-yellow text-brand-black px-5 py-2.5 rounded-full flex items-center gap-2"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={handleShopNow}
@@ -342,7 +342,7 @@ export default function AboutUsSection() {
 
         {/* CTA Section */}
         <motion.div
-          className="mt-20 bg-gradient-to-r from-[hsl(25_95%_48%)] to-[hsl(0_84%_55%)] text-white p-8 rounded-xl flex flex-col md:flex-row items-center justify-between gap-6"
+          className="mt-20 bg-brand-black text-brand-white p-8 sm:p-10 rounded-[16px] flex flex-col md:flex-row items-center justify-between gap-6"
           initial={{ opacity: 0, y: 30 }}
           animate={isStatsInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
           transition={{ duration: 0.8, delay: 0.5 }}
@@ -354,7 +354,7 @@ export default function AboutUsSection() {
             <p className="text-white/90 text-base sm:text-lg">Explore the Crownveil collection of polos, shirts and elevated essentials.</p>
           </div>
           <motion.button
-            className="bg-white text-destructive hover:bg-gray-100 px-6 py-3 rounded-lg flex items-center gap-2 font-medium transition-colors"
+            className="btn-label bg-brand-yellow text-brand-black hover:bg-brand-yellow-dark px-7 py-3.5 rounded-[8px] flex items-center gap-2 transition-colors"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={handleShopNow}
@@ -457,7 +457,7 @@ function StatCounter({ icon, value, label, suffix, delay }: StatCounterProps) {
 
   return (
     <motion.div
-      className="bg-white/50 backdrop-blur-sm p-6 rounded-xl flex flex-col items-center text-center group hover:bg-white transition-colors duration-300 border border-orange-100"
+      className="bg-white/50 backdrop-blur-sm p-6 rounded-xl flex flex-col items-center text-center group hover:bg-white transition-colors duration-300 border border-brand-gray-200"
       variants={{
         hidden: { opacity: 0, y: 20 },
         visible: {
@@ -469,7 +469,7 @@ function StatCounter({ icon, value, label, suffix, delay }: StatCounterProps) {
       whileHover={{ y: -5, transition: { duration: 0.2 } }}
     >
       <motion.div
-        className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-4 text-orange-500 group-hover:bg-primary/20 transition-colors duration-300"
+        className="w-14 h-14 rounded-full bg-brand-cream flex items-center justify-center mb-4 text-brand-black group-hover:bg-brand-yellow transition-colors duration-300"
         whileHover={{ rotate: 360, transition: { duration: 0.8 } }}
       >
         {icon}

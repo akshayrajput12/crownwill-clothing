@@ -1,5 +1,8 @@
-import { useQuery } from '@tanstack/react-query';
+import { useEffect, useId, useRef } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { buildOutfit, OutfitCandidate, OutfitPick } from '@/lib/outfit';
+import { isCouponLive } from '@/lib/coupons';
 
 /**
  * Storefront read model. Every list the home page and PDP need lives here so it is
@@ -9,7 +12,66 @@ import { supabase } from '@/integrations/supabase/client';
  * Column lists are explicit (never `select('*')`) so the wire payload stays small.
  */
 
-const CARD_COLUMNS = 'id,name,price,original_price,images,sku,category_id,is_bestseller,new_arrival,created_at';
+/**
+ * Card payload. Includes `product_sizes` so a grid tile can offer size-accurate quick
+ * add — an apparel cart line without a size is not fulfillable.
+ */
+const CARD_COLUMNS_BASE =
+  'id,name,description,price,original_price,images,sku,category_id,stock_quantity,is_bestseller,new_arrival,created_at,categories(name)';
+export const CARD_COLUMNS = `${CARD_COLUMNS_BASE},product_sizes(size,stock_quantity)`;
+
+/**
+ * `product_sizes` arrives in a migration. Until it is applied the join 400s, so the
+ * first failure flips the whole session to the sizeless column list (same approach as
+ * `lib/productSearch`) instead of every query paying for a retry.
+ */
+let sizesJoinAvailable = true;
+
+/** Column list to select for product cards right now. */
+export function cardColumns(): string {
+  return sizesJoinAvailable ? CARD_COLUMNS : CARD_COLUMNS_BASE;
+}
+
+/** True when the failure was the missing join — caller may retry once, sizeless. */
+export function noteSizesJoinError(error: { code?: string; message?: string } | null): boolean {
+  if (!sizesJoinAvailable || !error) return false;
+  const missing =
+    error.code === 'PGRST200' ||
+    error.code === 'PGRST205' ||
+    error.code === '42P01' ||
+    /product_sizes/i.test(error.message ?? '');
+  if (missing) sizesJoinAvailable = false;
+  return missing;
+}
+
+async function selectCards<T>(
+  run: (columns: string) => PromiseLike<{ data: unknown; error: { code?: string; message?: string } | null }>
+): Promise<T[]> {
+  const first = await run(cardColumns());
+  if (!first.error) return (first.data ?? []) as T[];
+  if (!noteSizesJoinError(first.error)) throw first.error;
+
+  const retry = await run(CARD_COLUMNS_BASE);
+  if (retry.error) throw retry.error;
+  return (retry.data ?? []) as T[];
+}
+
+export interface ProductCardRow {
+  id: string;
+  name: string;
+  description: string | null;
+  price: number;
+  original_price: number | null;
+  images: string[] | null;
+  sku: string | null;
+  category_id: string | null;
+  stock_quantity: number | null;
+  is_bestseller: boolean | null;
+  new_arrival: boolean | null;
+  created_at: string | null;
+  categories: { name: string } | null;
+  product_sizes?: Array<{ size: string; stock_quantity: number }>;
+}
 
 export const queryKeys = {
   categories: ['categories'] as const,
@@ -18,6 +80,9 @@ export const queryKeys = {
   reviews: (page: number) => ['reviews', page] as const,
   product: (slug?: string) => ['product', slug] as const,
   relatedProducts: (categoryId?: string, excludeId?: string) => ['products', 'related', categoryId, excludeId] as const,
+  outfit: (productId?: string) => ['products', 'outfit', productId] as const,
+  productCoupons: (productId?: string) => ['coupons', 'product', productId] as const,
+  productReviews: (productId?: string) => ['reviews', 'product', productId] as const,
 };
 
 /** Categories drive the navbar, the category grid and the combo rail. Rarely change. */
@@ -42,16 +107,15 @@ export function useNewDrops(limit = 12) {
   return useQuery({
     queryKey: queryKeys.newDrops(limit),
     staleTime: 2 * 60 * 1000,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('products')
-        .select(CARD_COLUMNS)
-        .eq('is_active', true)
-        .order('created_at', { ascending: false })
-        .limit(limit);
-      if (error) throw error;
-      return data ?? [];
-    },
+    queryFn: () =>
+      selectCards<ProductCardRow>((columns) =>
+        supabase
+          .from('products')
+          .select(columns)
+          .eq('is_active', true)
+          .order('created_at', { ascending: false })
+          .limit(limit)
+      ),
   });
 }
 
@@ -222,33 +286,74 @@ export function useProductDetail(slug?: string) {
   });
 }
 
-/** Complementary pieces: same category first, then anything else active. */
+/** "Similar products": same category, newest first, widening only if the category is thin. */
 export function useRelatedProducts(categoryId?: string, excludeId?: string, limit = 8) {
   return useQuery({
     queryKey: queryKeys.relatedProducts(categoryId, excludeId),
     enabled: !!excludeId,
     staleTime: 5 * 60 * 1000,
     queryFn: async () => {
-      let query = supabase
-        .from('products')
-        .select(CARD_COLUMNS)
-        .eq('is_active', true)
-        .neq('id', excludeId!)
-        .limit(limit);
-      if (categoryId) query = query.eq('category_id', categoryId);
+      const inCategory = await selectCards<ProductCardRow>((columns) => {
+        const query = supabase
+          .from('products')
+          .select(columns)
+          .eq('is_active', true)
+          .neq('id', excludeId!)
+          .order('created_at', { ascending: false })
+          .limit(limit);
+        return categoryId ? query.eq('category_id', categoryId) : query;
+      });
+      if (inCategory.length > 0) return inCategory;
 
-      const { data, error } = await query;
-      if (error) throw error;
-      if ((data ?? []).length > 0) return data ?? [];
+      // Nothing else in this category — widen so the rail is never empty.
+      return selectCards<ProductCardRow>((columns) =>
+        supabase
+          .from('products')
+          .select(columns)
+          .eq('is_active', true)
+          .neq('id', excludeId!)
+          .order('created_at', { ascending: false })
+          .limit(limit)
+      );
+    },
+  });
+}
 
-      // Nothing else in this category — widen so the rails are never empty.
-      const { data: fallback } = await supabase
-        .from('products')
-        .select(CARD_COLUMNS)
-        .eq('is_active', true)
-        .neq('id', excludeId!)
-        .limit(limit);
-      return fallback ?? [];
+/**
+ * Complete-the-outfit rail.
+ *
+ * Deliberately queries *away* from the anchor's own category — an outfit needs a
+ * different wardrobe slot. The pool is capped and the ranking runs client-side in
+ * `buildOutfit`, so there is one round trip and the scoring stays testable.
+ */
+export function useCompleteTheOutfit(anchor?: OutfitCandidate | null, limit = 4) {
+  return useQuery({
+    queryKey: queryKeys.outfit(anchor?.id),
+    enabled: !!anchor?.id,
+    staleTime: 5 * 60 * 1000,
+    queryFn: async (): Promise<Array<OutfitPick<ProductCardRow>>> => {
+      const pool = await selectCards<ProductCardRow>((columns) => {
+        const query = supabase
+          .from('products')
+          .select(columns)
+          .eq('is_active', true)
+          .neq('id', anchor!.id)
+          .order('is_bestseller', { ascending: false })
+          .limit(60);
+        // Same category can never complete a look, so do not even fetch it.
+        return anchor!.categoryId ? query.neq('category_id', anchor!.categoryId) : query;
+      });
+
+      const candidates = pool.map((row) => ({
+        ...row,
+        categoryId: row.category_id,
+        categoryName: row.categories?.name ?? null,
+        inStock: (row.stock_quantity ?? 0) > 0 || (row.product_sizes ?? []).some((s) => s.stock_quantity > 0),
+        isBestseller: !!row.is_bestseller,
+        isNewArrival: !!row.new_arrival,
+      }));
+
+      return buildOutfit(anchor!, candidates, limit);
     },
   });
 }
@@ -258,17 +363,16 @@ export function useBestSellers(limit = 8) {
   return useQuery({
     queryKey: ['products', 'bestsellers', limit] as const,
     staleTime: 5 * 60 * 1000,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('products')
-        .select(CARD_COLUMNS)
-        .eq('is_active', true)
-        .eq('is_bestseller', true)
-        .order('created_at', { ascending: false })
-        .limit(limit);
-      if (error) throw error;
-      return data ?? [];
-    },
+    queryFn: () =>
+      selectCards<ProductCardRow>((columns) =>
+        supabase
+          .from('products')
+          .select(columns)
+          .eq('is_active', true)
+          .eq('is_bestseller', true)
+          .order('created_at', { ascending: false })
+          .limit(limit)
+      ),
   });
 }
 
@@ -279,10 +383,18 @@ export interface StoreCoupon {
   discount_type: string | null;
   discount_value: number | null;
   min_order_amount: number | null;
+  max_discount_amount: number | null;
+  valid_from: string | null;
   valid_until: string | null;
+  usage_limit: number | null;
+  used_count: number | null;
+  is_active: boolean | null;
 }
 
-/** Live coupons — active and not yet expired. */
+const COUPON_COLUMNS =
+  'id,code,description,discount_type,discount_value,min_order_amount,max_discount_amount,valid_from,valid_until,usage_limit,used_count,is_active';
+
+/** Live coupons — active, in-window and not exhausted. */
 export function useCoupons(limit = 4) {
   return useQuery({
     queryKey: ['coupons', limit] as const,
@@ -290,15 +402,144 @@ export function useCoupons(limit = 4) {
     queryFn: async (): Promise<StoreCoupon[]> => {
       const { data, error } = await supabase
         .from('coupons')
-        .select('id,code,description,discount_type,discount_value,min_order_amount,valid_until')
+        .select(COUPON_COLUMNS)
         .eq('is_active', true)
         .or(`valid_until.is.null,valid_until.gte.${new Date().toISOString()}`)
         .order('created_at', { ascending: false })
-        .limit(limit);
+        .limit(limit * 3);
       if (error) throw error;
-      return (data ?? []) as unknown as StoreCoupon[];
+      // Usage limits are not expressible as a PostgREST filter (column vs column), so
+      // the exhausted ones are dropped here.
+      return ((data ?? []) as unknown as StoreCoupon[]).filter((c) => isCouponLive(c)).slice(0, limit);
     },
   });
+}
+
+/**
+ * Offers to show on a product page: codes the admin assigned to this product
+ * (product_coupons) plus store-wide codes, deduped. Replaces the hardcoded
+ * "Get Flat 5% OFF / BYNG5" card the PDP used to print for every product.
+ */
+export function useProductCoupons(productId?: string, limit = 3) {
+  return useQuery({
+    queryKey: queryKeys.productCoupons(productId),
+    enabled: !!productId,
+    staleTime: 5 * 60 * 1000,
+    queryFn: async (): Promise<StoreCoupon[]> => {
+      const [assigned, storewide] = await Promise.all([
+        supabase
+          .from('product_coupons')
+          .select(`coupons(${COUPON_COLUMNS})`)
+          .eq('product_id', productId!),
+        supabase
+          .from('coupons')
+          .select(COUPON_COLUMNS)
+          .eq('is_active', true)
+          .order('created_at', { ascending: false })
+          .limit(limit * 3),
+      ]);
+
+      const fromAssignment = ((assigned.data ?? []) as Array<{ coupons: StoreCoupon | null }>)
+        .map((row) => row.coupons)
+        .filter((coupon): coupon is StoreCoupon => !!coupon);
+
+      const seen = new Set<string>();
+      // Product-specific codes first: they are the more relevant offer.
+      return [...fromAssignment, ...((storewide.data ?? []) as unknown as StoreCoupon[])]
+        .filter((coupon) => isCouponLive(coupon))
+        .filter((coupon) => (seen.has(coupon.id) ? false : seen.add(coupon.id)))
+        .slice(0, limit);
+    },
+  });
+}
+
+export interface ProductReview {
+  id: string;
+  rating: number;
+  comment: string | null;
+  name: string;
+  createdAt: string | null;
+}
+
+/** Real reviews for the PDP — the page used to load ratings only and show no words. */
+export function useProductReviews(productId?: string, limit = 6) {
+  return useQuery({
+    queryKey: queryKeys.productReviews(productId),
+    enabled: !!productId,
+    staleTime: 5 * 60 * 1000,
+    queryFn: async (): Promise<ProductReview[]> => {
+      const { data, error } = await supabase
+        .from('reviews')
+        .select('id,rating,comment,created_at,profiles(full_name)')
+        .eq('product_id', productId!)
+        .not('comment', 'is', null)
+        .order('created_at', { ascending: false })
+        .limit(limit);
+      if (error) throw error;
+
+      type Row = {
+        id: string;
+        rating: number;
+        comment: string | null;
+        created_at: string | null;
+        profiles: { full_name: string | null } | null;
+      };
+
+      return ((data ?? []) as unknown as Row[]).map((row) => ({
+        id: row.id,
+        rating: row.rating,
+        comment: row.comment,
+        name: row.profiles?.full_name || 'Verified Buyer',
+        createdAt: row.created_at,
+      }));
+    },
+  });
+}
+
+/** Tables whose changes should be reflected in the storefront without a reload. */
+const REALTIME_TABLES = ['products', 'product_sizes', 'coupons', 'product_coupons', 'categories', 'testimonials', 'reviews'] as const;
+
+/**
+ * Live storefront. Postgres changes on catalogue tables invalidate the cached queries,
+ * so a price edit, a stock change or a new coupon in admin shows up on open tabs
+ * instead of waiting for the stale window.
+ *
+ * Bursts are collapsed into one invalidation — a bulk admin save fires a change per row.
+ *
+ * ponytail: invalidates by table→key prefix, not per-row patching. Move to targeted
+ * `setQueryData` only if refetch volume ever becomes a problem.
+ */
+export function useStorefrontRealtime(onChange?: () => void) {
+  const queryClient = useQueryClient();
+  // Kept in a ref so an inline callback does not re-subscribe the websocket every render.
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
+  // One topic per mount: the app root and the listing page both subscribe, and reusing a
+  // topic name would have them fight over the same channel.
+  const topic = useId();
+
+  useEffect(() => {
+    let debounce: number | undefined;
+
+    const channel = supabase.channel(`storefront-changes:${topic}`);
+
+    for (const table of REALTIME_TABLES) {
+      channel.on('postgres_changes', { event: '*', schema: 'public', table }, () => {
+        window.clearTimeout(debounce);
+        debounce = window.setTimeout(() => {
+          queryClient.invalidateQueries();
+          onChangeRef.current?.();
+        }, 400);
+      });
+    }
+
+    channel.subscribe();
+
+    return () => {
+      window.clearTimeout(debounce);
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient, topic]);
 }
 
 export interface StoreTestimonial {

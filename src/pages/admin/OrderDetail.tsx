@@ -16,6 +16,8 @@ interface OrderItem {
   image: string;
   price: number;
   quantity: number;
+  /** Selected garment size, when the product has a size grid. */
+  size?: string | null;
   weight: string;
 }
 
@@ -351,7 +353,9 @@ const AdminOrderDetail = () => {
                     />
                     <div className="flex-1">
                       <h3 className="font-medium">{item.name}</h3>
-                      <p className="text-sm text-muted-foreground">{item.weight}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {[item.size && `Size ${item.size}`, item.weight].filter(Boolean).join(' · ')}
+                      </p>
                     </div>
                     <div className="text-right">
                       <p className="font-medium">₹{item.price} × {item.quantity}</p>

@@ -1,24 +1,51 @@
 import React from 'react';
-import { Star, Quote } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { TestimonialsColumn } from '@/components/ui/testimonials-columns-1';
 import { useTestimonials } from '@/hooks/queries';
 
 /**
- * Testimonials, managed in admin (Testimonials table). Renders nothing when the
- * table is empty — an empty praise section is worse than no praise section.
+ * Testimonials, managed in admin (Testimonials table).
+ *
+ * Three columns marquee vertically at different speeds behind a top/bottom fade — the
+ * motion treatment this section shipped with. Renders nothing when the table is empty:
+ * an empty praise section is worse than no praise section.
  */
 const CustomerVoices: React.FC = () => {
-  const { data: testimonials = [], isLoading } = useTestimonials(6);
+  const { data: testimonials = [], isLoading } = useTestimonials(9);
 
   if (!isLoading && testimonials.length === 0) return null;
 
+  // Deal the rows across as many columns as there is content for, so two testimonials
+  // do not leave one column empty and the wall lopsided.
+  const columnCount = testimonials.length >= 6 ? 3 : testimonials.length >= 3 ? 2 : 1;
+  const columns: typeof testimonials[] = Array.from({ length: columnCount }, () => []);
+  testimonials.forEach((item, index) => columns[index % columnCount].push(item));
+
+  const DURATIONS = [25, 35, 30];
+
   return (
-    <section className="bg-brand-white brand-section-padding">
-      <div className="brand-container">
-        <div className="text-center mb-12 space-y-3">
-          <p className="eyebrow">Testimonials</p>
-          <h2 className="section-title">What Our Customers Say</h2>
-          <p className="section-subtitle">Unedited words from people wearing Crownveil.</p>
-        </div>
+    <section className="relative overflow-hidden bg-brand-offwhite brand-section-padding">
+      {/* Warm neutral background accent */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-brand-cream rounded-full blur-[120px] opacity-40 pointer-events-none" />
+
+      <div className="brand-container relative z-10">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+          className="text-center max-w-2xl mx-auto mb-12 space-y-3"
+        >
+          <div className="flex items-center justify-center gap-3">
+            <span className="w-8 h-px bg-brand-black" />
+            <p className="eyebrow">Testimonials</p>
+            <span className="w-8 h-px bg-brand-black" />
+          </div>
+          <h2 className="section-title">Worn &amp; Well Said</h2>
+          <p className="section-subtitle">
+            Unedited words from people wearing Crownveil.
+          </p>
+        </motion.div>
 
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -27,52 +54,14 @@ const CustomerVoices: React.FC = () => {
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {testimonials.map((item) => (
-              <figure
-                key={item.id}
-                className="relative rounded-[16px] border border-brand-gray-200 bg-brand-offwhite/60 p-7 flex flex-col gap-5"
-              >
-                <Quote className="w-6 h-6 text-brand-yellow" />
-
-                <blockquote className="text-[14px] text-brand-gray-700 leading-[1.75] flex-1">
-                  {item.text}
-                </blockquote>
-
-                {item.rating ? (
-                  <div className="flex items-center gap-1 text-brand-yellow">
-                    {Array.from({ length: Math.min(5, Math.max(0, item.rating)) }).map((_, i) => (
-                      <Star key={i} className="w-3.5 h-3.5 fill-current" />
-                    ))}
-                  </div>
-                ) : null}
-
-                <figcaption className="flex items-center gap-3 pt-1 border-t border-brand-gray-200">
-                  <div className="w-9 h-9 rounded-full overflow-hidden bg-brand-gray-100 flex items-center justify-center flex-shrink-0 mt-4">
-                    {item.image ? (
-                      <img
-                        src={item.image}
-                        alt=""
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                        decoding="async"
-                      />
-                    ) : (
-                      <span className="text-[12px] font-medium text-brand-gray-500">
-                        {item.name.charAt(0).toUpperCase()}
-                      </span>
-                    )}
-                  </div>
-                  <div className="mt-4">
-                    <p className="text-[13px] font-medium text-brand-black">{item.name}</p>
-                    {(item.role || item.company) && (
-                      <p className="text-[11px] text-brand-gray-500">
-                        {[item.role, item.company].filter(Boolean).join(' · ')}
-                      </p>
-                    )}
-                  </div>
-                </figcaption>
-              </figure>
+          <div className="flex justify-center gap-4 md:gap-6 [mask-image:linear-gradient(to_bottom,transparent,black_18%,black_82%,transparent)] max-h-[680px] overflow-hidden">
+            {columns.map((column, index) => (
+              <TestimonialsColumn
+                key={index}
+                testimonials={column}
+                duration={DURATIONS[index] ?? 30}
+                className={index === 1 ? 'hidden md:block' : index === 2 ? 'hidden lg:block' : undefined}
+              />
             ))}
           </div>
         )}

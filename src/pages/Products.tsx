@@ -8,6 +8,8 @@ import { Input } from '@/components/ui/input';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { applyProductSearch, noteSearchError } from '@/lib/productSearch';
+import { cardColumns, noteSizesJoinError, useStorefrontRealtime } from '@/hooks/queries';
+import QuickViewModal from '@/components/QuickViewModal';
 import { scrollToTopInstant } from '@/utils/scrollToTop';
 import { Button } from '@/components/ui/button';
 
@@ -22,6 +24,7 @@ const Products = () => {
   const [loading, setLoading] = useState(true);
   const [totalProducts, setTotalProducts] = useState(0);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
+  const [quickViewProduct, setQuickViewProduct] = useState<any>(null);
   const [filters, setFilters] = useState<ProductFilters>({
     categories: [],
     priceRange: [0, 10000],
@@ -54,6 +57,8 @@ const Products = () => {
     scrollToTopInstant();
     const categoryParam = searchParams.get('category');
     const sortParam = searchParams.get('sort');
+    // Deep links from search ("/products?search=linen shirt") must actually filter.
+    setSearchTerm(searchParams.get('search') ?? searchParams.get('q') ?? '');
 
     const newFilters: Partial<ProductFilters> = {};
     let shouldUpdateFilters = false;
@@ -163,17 +168,11 @@ const Products = () => {
         setTotalProducts(count || 0);
       }
 
-      // Now fetch the paginated data
+      // Now fetch the paginated data. `cardColumns()` carries the per-size inventory the
+      // grid needs for size-accurate quick add.
       let query = supabase
         .from('products')
-        .select(`
-          id,name,description,price,original_price,images,sku,category_id,
-          stock_quantity,is_bestseller,new_arrival,created_at,features,
-          categories (
-            id,
-            name
-          )
-        `)
+        .select(cardColumns())
         .eq('is_active', true)
         .range((pageNum - 1) * 10, pageNum * 10 - 1);
 
@@ -214,8 +213,9 @@ const Products = () => {
       const { data, error } = await query;
 
       if (error) {
-        // Search index not deployed yet: switch to the LIKE path and retry once.
-        if (noteSearchError(error)) {
+        // Search index or product_sizes join not deployed yet: switch to the fallback
+        // and retry once.
+        if (noteSearchError(error) || noteSizesJoinError(error)) {
           setLoading(false);
           setIsLoadingMore(false);
           return fetchProducts(pageNum);
@@ -254,6 +254,14 @@ const Products = () => {
   };
 
   const sortedProducts = products;
+
+  // Live catalogue: a price, stock or availability change in admin lands here without a
+  // reload.
+  // ponytail: refreshes the first page only — re-fetching an infinitely scrolled tail on
+  // every row change is a lot of queries for a rare event.
+  useStorefrontRealtime(() => {
+    if (page === 1) fetchProducts(1);
+  });
 
   const loadMore = useCallback(() => {
     if (hasMore && !isLoadingMore) {
@@ -346,6 +354,12 @@ const Products = () => {
               </Button>
 
               <div className="flex justify-end w-full lg:w-auto items-center gap-4">
+                {!loading && (
+                  <span className="text-[10px] uppercase tracking-[0.2em] text-brand-gray-500 font-medium mr-auto lg:mr-4 font-inter">
+                    {totalProducts} {totalProducts === 1 ? 'piece' : 'pieces'}
+                    {searchTerm ? ` for “${searchTerm}”` : ''}
+                  </span>
+                )}
                 <span className="text-[10px] uppercase tracking-[0.2em] text-brand-charcoal font-medium hidden sm:block font-inter">View Options</span>
                 <div className="flex items-center gap-2">
                   <button
@@ -411,6 +425,7 @@ const Products = () => {
                           category: product.categories?.name || product.category?.name || 'General'
                         }}
                         onViewDetail={() => navigate(`/product/${product.sku || product.id}`)}
+                        onQuickView={(p) => setQuickViewProduct(p)}
                         variant={gridCols === 1 ? 'list' : 'grid'}
                       />
                     </motion.div>
@@ -432,16 +447,37 @@ const Products = () => {
                 <p className="text-gray-500">Try adjusting your filters or search terms.</p>
                 <Button
                   variant="link"
-                  onClick={() => { setSelectedCategory('All'); setSearchTerm(''); }}
+                  onClick={() => {
+                    // Clearing has to drop the filters too, or the empty grid stays empty.
+                    setSelectedCategory('All');
+                    setSearchTerm('');
+                    setSearchParams({});
+                    setFilters({
+                      categories: [],
+                      priceRange: [0, 10000],
+                      features: [],
+                      rating: 0,
+                      inStock: false,
+                      isBestseller: false,
+                      isNewArrival: false,
+                      sortBy: 'name',
+                    });
+                  }}
                   className="mt-4 text-primary"
                 >
-                  Clear Search
+                  Clear filters
                 </Button>
               </div>
             )}
           </div>
         </div>
       </div>
+
+      <QuickViewModal
+        product={quickViewProduct}
+        isOpen={!!quickViewProduct}
+        onClose={() => setQuickViewProduct(null)}
+      />
     </div>
   );
 };

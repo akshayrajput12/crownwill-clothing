@@ -18,6 +18,7 @@ import { useToast } from '@/hooks/use-toast';
 import { validateContactInfo, validateAddressDetails, validatePaymentMethod } from '@/utils/validation';
 import { useSettings } from '@/hooks/useSettings';
 import { toNumber, formatCurrency, calculatePercentage, meetsThreshold } from '@/utils/settingsHelpers';
+import { isCouponLive, validateCoupon } from '@/lib/coupons';
 
 // Import the new components
 import CheckoutContactInfo from './Checkout/CheckoutContactInfo';
@@ -33,7 +34,6 @@ const Checkout = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [couponCode, setCouponCode] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState<any>(null);
-  const [discount, setDiscount] = useState(0);
   const [paymentMethod, setPaymentMethod] = useState('online');
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [availableCoupons, setAvailableCoupons] = useState<any[]>([]);
@@ -206,19 +206,23 @@ const Checkout = () => {
             max_discount_amount,
             is_active,
             valid_from,
-            valid_until
+            valid_until,
+            usage_limit,
+            used_count
           )
         `)
         .in('product_id', productIds);
 
       if (pcError) throw pcError;
 
-      const productSpecificCoupons = productCoupons
-        ?.map(pc => pc.coupons)
-        .filter(c => c !== null && c.is_active && new Date(c.valid_until) > new Date())
+      // Live means active, inside its validity window and not exhausted — a null
+      // `valid_until` is an open-ended coupon, not an expired one.
+      const productSpecificCoupons = (productCoupons ?? [])
+        .map(pc => pc.coupons)
+        .filter((c): c is NonNullable<typeof c> => c !== null && isCouponLive(c))
         .filter((coupon, index, self) =>
           index === self.findIndex(c => c.id === coupon.id)
-        ) || [];
+        );
 
       setAvailableCoupons(productSpecificCoupons);
     } catch (error) {
@@ -233,62 +237,58 @@ const Checkout = () => {
   const estimatedDeliveryTime = `${settings.delivery_time_estimate || '3-5 business days'}`;
 
   const codFee = paymentMethod === 'cod' ? toNumber(settings.cod_charge) : 0;
+
+  // Discount is derived, never stored: the cart sidebar is mounted app-wide, so the
+  // subtotal can move while checkout is open and a stale stored amount would let a
+  // coupon over-discount the order. A coupon only ever reduces the goods subtotal.
+  const couponCheck = appliedCoupon
+    ? validateCoupon(appliedCoupon, subtotal, new Date(), settings.currency_symbol)
+    : null;
+  const discount = couponCheck?.ok ? couponCheck.discount : 0;
+
   const total = subtotal + tax + deliveryFee + codFee - discount;
 
   const isMinOrderMet = subtotal >= toNumber(settings.min_order_amount);
   const minOrderShortfall = Math.max(0, toNumber(settings.min_order_amount) - subtotal);
 
+  /**
+   * Applies a code. Every rule — active, validity window, usage limit, minimum order —
+   * is enforced by `validateCoupon`, which is also what the order submit re-checks.
+   */
   const applyCoupon = async () => {
+    const code = couponCode.trim().toUpperCase();
+    if (!code) return;
+
     try {
       const { data, error } = await supabase
         .from('coupons')
         .select('*')
-        .eq('code', couponCode.toUpperCase())
-        .eq('is_active', true)
-        .single();
+        .eq('code', code)
+        .maybeSingle();
 
       if (error || !data) {
         toast({
           title: "Invalid coupon",
-          description: "Please check your coupon code.",
+          description: "We could not find that code. Please check and try again.",
           variant: "destructive",
         });
         return;
       }
 
-      if (data.min_order_amount && subtotal < data.min_order_amount) {
+      const result = validateCoupon(data, subtotal, new Date(), settings.currency_symbol);
+      if (!result.ok) {
         toast({
-          title: "Minimum order not met",
-          description: `Minimum order of ${settings.currency_symbol}${data.min_order_amount} required for this coupon.`,
+          title: "Coupon not applied",
+          description: result.message,
           variant: "destructive",
         });
         return;
       }
 
-      if (data.usage_limit && data.used_count >= data.usage_limit) {
-        toast({
-          title: "Coupon expired",
-          description: "This coupon has reached its usage limit.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      let discountAmount = 0;
-      if (data.discount_type === 'percentage') {
-        discountAmount = (subtotal * data.discount_value) / 100;
-        if (data.max_discount_amount) {
-          discountAmount = Math.min(discountAmount, data.max_discount_amount);
-        }
-      } else {
-        discountAmount = data.discount_value;
-      }
-
-      setDiscount(discountAmount);
       setAppliedCoupon(data);
       toast({
         title: "Coupon applied!",
-        description: `You saved ${settings.currency_symbol}${discountAmount.toFixed(2)} on your order.`,
+        description: `You saved ${formatCurrency(result.discount, settings.currency_symbol)} on your order.`,
       });
     } catch (error) {
       console.error('Error applying coupon:', error);
@@ -301,7 +301,6 @@ const Checkout = () => {
   };
 
   const removeCoupon = () => {
-    setDiscount(0);
     setAppliedCoupon(null);
     setCouponCode('');
     toast({
@@ -437,10 +436,45 @@ const Checkout = () => {
       }
     }
 
+    // Re-check the coupon against the live row and the final subtotal before it is
+    // written onto an order: it may have expired or hit its usage limit while the
+    // shopper was filling the form.
+    if (appliedCoupon) {
+      const { data: freshCoupon } = await supabase
+        .from('coupons')
+        .select('*')
+        .eq('id', appliedCoupon.id)
+        .maybeSingle();
+
+      const recheck = validateCoupon(freshCoupon ?? appliedCoupon, subtotal, new Date(), settings.currency_symbol);
+      if (!recheck.ok) {
+        setAppliedCoupon(null);
+        toast({
+          title: "Coupon no longer valid",
+          description: `${recheck.message} Your total has been updated — please review and place the order again.`,
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
     setIsProcessingPayment(true);
 
     try {
       const orderNumber = `SS${Date.now()}${Math.floor(Math.random() * 1000)}`;
+
+      // One mapping for every payment path: `size` must reach the order or the warehouse
+      // cannot pick the right garment.
+      const orderItems = cartItems.map(item => ({
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        quantity: item.quantity,
+        size: item.size ?? null,
+        weight: item.weight,
+        image: item.image,
+        category: item.category || 'bulk',
+      }));
 
       const completeAddress = `${addressDetails.plotNumber}, ${addressDetails.buildingName ? addressDetails.buildingName + ', ' : ''}${addressDetails.street}, ${addressDetails.landmark ? 'Near ' + addressDetails.landmark + ', ' : ''}${addressDetails.city}, ${addressDetails.state} - ${addressDetails.pincode}`;
 
@@ -457,15 +491,7 @@ const Checkout = () => {
           latitude: null,
           longitude: null
         } as any,
-        items: cartItems.map(item => ({
-          id: item.id,
-          name: item.name,
-          price: item.price,
-          quantity: item.quantity,
-          weight: item.weight,
-          image: item.image,
-          category: item.category || 'bulk'
-        })) as any,
+        items: orderItems as any,
         subtotal: subtotal,
         tax: tax,
         delivery_fee: deliveryFee,
@@ -497,9 +523,12 @@ const Checkout = () => {
         }
 
         if (appliedCoupon) {
+          // ponytail: read-modify-write on used_count. Two simultaneous redemptions of the
+          // last available use can both land. Move to an RPC with
+          // `used_count = used_count + 1` if a coupon ever needs a hard cap.
           await supabase
             .from('coupons')
-            .update({ used_count: appliedCoupon.used_count + 1 })
+            .update({ used_count: (appliedCoupon.used_count ?? 0) + 1 })
             .eq('id', appliedCoupon.id);
         }
 
@@ -507,15 +536,7 @@ const Checkout = () => {
           const guestOrder = {
             orderNumber: orderNumber,
             customerInfo: customerInfo,
-            items: cartItems.map(item => ({
-              id: item.id,
-              name: item.name,
-              price: item.price,
-              quantity: item.quantity,
-              weight: item.weight,
-              image: item.image,
-              category: item.category || 'bulk'
-            })),
+            items: orderItems,
             subtotal: subtotal,
             tax: tax,
             deliveryFee: deliveryFee,
@@ -596,7 +617,8 @@ const Checkout = () => {
               if (appliedCoupon) {
                 await supabase
                   .from('coupons')
-                  .update({ used_count: appliedCoupon.used_count + 1 })
+                  // ponytail: same read-modify-write caveat as the COD path above.
+                  .update({ used_count: (appliedCoupon.used_count ?? 0) + 1 })
                   .eq('id', appliedCoupon.id);
               }
 
@@ -604,15 +626,7 @@ const Checkout = () => {
                 const guestOrder = {
                   orderNumber: orderNumber,
                   customerInfo: customerInfo,
-                  items: cartItems.map(item => ({
-                    id: item.id,
-                    name: item.name,
-                    price: item.price,
-                    quantity: item.quantity,
-                    weight: item.weight,
-                    image: item.image,
-                    category: item.category || 'bulk'
-                  })),
+                  items: orderItems,
                   subtotal: subtotal,
                   tax: tax,
                   deliveryFee: deliveryFee,
@@ -850,7 +864,8 @@ const Checkout = () => {
                           <div className="flex-1 min-w-0">
                             <h5 className="font-normal text-sm truncate text-brand-black font-inter uppercase tracking-wide">{item.name}</h5>
                             <p className="text-xs text-brand-gray-700 font-inter">
-                              {item.weight} × {item.quantity}
+                              {[item.size && `Size ${item.size}`, item.weight].filter(Boolean).join(' · ')}
+                              {' × '}{item.quantity}
                             </p>
                           </div>
                           <div className="text-sm font-normal text-brand-black font-inter">
@@ -916,15 +931,26 @@ const Checkout = () => {
                     </Label>
 
                     {appliedCoupon ? (
-                      <div className="flex items-center justify-between p-3 bg-brand-success-light border border-brand-success-light rounded-sm">
+                      <div
+                        className={`flex items-center justify-between p-3 border rounded-sm ${
+                          discount > 0
+                            ? 'bg-brand-success-light border-brand-success-light'
+                            : 'bg-brand-offwhite border-brand-cream'
+                        }`}
+                      >
                         <div className="flex items-center space-x-2">
-                          <Tag className="h-4 w-4 text-brand-success" />
+                          <Tag className={`h-4 w-4 ${discount > 0 ? 'text-brand-success' : 'text-brand-yellow-dark'}`} />
                           <div>
                             <span className="text-sm font-medium text-brand-black">
-                              {appliedCoupon.code} Applied
+                              {appliedCoupon.code} {discount > 0 ? 'Applied' : 'Not Applied'}
                             </span>
-                            <p className="text-xs text-brand-success">
-                              {appliedCoupon.description}
+                            {/* When the bag changes under an applied coupon, say why it stopped counting. */}
+                            <p className={`text-xs ${discount > 0 ? 'text-brand-success' : 'text-brand-yellow-dark'}`}>
+                              {discount > 0
+                                ? appliedCoupon.description || `You save ${formatPrice(discount)}`
+                                : couponCheck && !couponCheck.ok
+                                  ? couponCheck.message
+                                  : 'This code does not apply to your current bag.'}
                             </p>
                           </div>
                         </div>

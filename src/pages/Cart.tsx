@@ -258,16 +258,25 @@ const Cart = () => {
                   </div>
                 )}
 
-                <Button
-                  asChild
-                  className="w-full bg-brand-black hover:bg-brand-charcoal text-white h-12 text-base uppercase tracking-widest font-normal shadow-md hover:shadow-lg transition-all font-instrument"
-                  size="lg"
-                  disabled={!isMinOrderMet}
-                >
-                  <Link to="/checkout">
-                    {isMinOrderMet ? 'Proceed to Checkout' : 'Add More Items'}
-                  </Link>
-                </Button>
+                {/* `disabled` does nothing on an <a>, so a blocked checkout must not render
+                    a link at all — it used to navigate straight past the minimum order. */}
+                {isMinOrderMet ? (
+                  <Button
+                    asChild
+                    className="w-full bg-brand-black hover:bg-brand-charcoal text-white h-12 text-base uppercase tracking-widest font-normal shadow-md hover:shadow-lg transition-all font-instrument"
+                    size="lg"
+                  >
+                    <Link to="/checkout">Proceed to Checkout</Link>
+                  </Button>
+                ) : (
+                  <Button
+                    disabled
+                    className="w-full bg-brand-black text-white h-12 text-base uppercase tracking-widest font-normal font-instrument"
+                    size="lg"
+                  >
+                    Add More Items
+                  </Button>
+                )}
 
                 <Button asChild variant="outline" className="w-full border-brand-gray-200 text-brand-gray-700 hover:bg-brand-cream hover:text-brand-black">
                   <Link to="/products">
@@ -295,15 +304,21 @@ const Cart = () => {
                 <p className="text-xs text-brand-gray-700 uppercase tracking-wide font-instrument">Total</p>
                 <p className="font-instrument font-normal text-xl text-brand-black">{formatPrice(total)}</p>
               </div>
-              <Button
-                asChild
-                className="bg-brand-black hover:bg-brand-charcoal text-white px-8 uppercase tracking-widest text-sm font-normal font-instrument"
-                disabled={!isMinOrderMet}
-              >
-                <Link to="/checkout">
-                  {isMinOrderMet ? 'Checkout' : 'Add Items'}
-                </Link>
-              </Button>
+              {isMinOrderMet ? (
+                <Button
+                  asChild
+                  className="bg-brand-black hover:bg-brand-charcoal text-white px-8 uppercase tracking-widest text-sm font-normal font-instrument"
+                >
+                  <Link to="/checkout">Checkout</Link>
+                </Button>
+              ) : (
+                <Button
+                  disabled
+                  className="bg-brand-black text-white px-8 uppercase tracking-widest text-sm font-normal font-instrument"
+                >
+                  Add Items
+                </Button>
+              )}
             </div>
           </div>
         </div>

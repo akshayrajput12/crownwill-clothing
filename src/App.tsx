@@ -5,6 +5,8 @@ import ScrollToTop from '@/components/ScrollToTop';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import CartSidebar from '@/components/CartSidebar';
+import AddedToCartPopup from '@/components/AddedToCartPopup';
+import { useStorefrontRealtime } from '@/hooks/queries';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { PageLoader } from '@/components/LoadingSpinner';
 import { Toaster } from "@/components/ui/toaster";
@@ -66,6 +68,10 @@ const AppContent = () => {
   const { user, loading } = useAuth();
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith('/admin');
+
+  // Catalogue, coupon and testimonial edits invalidate the cached storefront queries, so
+  // open tabs stay current without a refresh.
+  useStorefrontRealtime();
 
   if (loading) {
     return <PageLoader text="Loading crownveil..." />;
@@ -149,6 +155,7 @@ const AppContent = () => {
           </Suspense>
           <Footer isAdminRoute={isAdminRoute} />
           <CartSidebar isAdminRoute={isAdminRoute} />
+          <AddedToCartPopup isAdminRoute={isAdminRoute} />
           <FloatingWhatsApp />
           <Toaster />
           <Sonner />

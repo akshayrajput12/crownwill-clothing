@@ -464,7 +464,7 @@ export function generateInvoiceHTML(data: InvoiceData): string {
                 <thead>
                     <tr>
                         <th>Item</th>
-                        <th>Weight/Qty</th>
+                        <th>Size / Weight</th>
                         <th class="text-center">Quantity</th>
                         <th class="text-right">Unit Price</th>
                         <th class="text-right">Total</th>
@@ -477,7 +477,7 @@ export function generateInvoiceHTML(data: InvoiceData): string {
                                 <strong>${item.name}</strong>
                                 ${item.category ? `<br><small style="color: #666;">${item.category}</small>` : ''}
                             </td>
-                            <td>${item.weight || item.pieces || 'N/A'}</td>
+                            <td>${item.size ? `Size ${item.size}` : (item.weight || item.pieces || 'N/A')}</td>
                             <td class="text-center">${item.quantity}</td>
                             <td class="text-right">${store_info.currency_symbol}${item.price.toFixed(2)}</td>
                             <td class="text-right"><strong>${store_info.currency_symbol}${(item.price * item.quantity).toFixed(2)}</strong></td>

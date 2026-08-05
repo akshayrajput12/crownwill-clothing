@@ -14,6 +14,8 @@ interface OrderItem {
   image: string;
   price: number;
   quantity: number;
+  /** Selected garment size, when the product has a size grid. */
+  size?: string | null;
   weight: string;
   category: string;
 }
@@ -121,14 +123,14 @@ const GuestOrderPopup: React.FC<GuestOrderPopupProps> = ({ isOpen, onClose, orde
     // Items Table
     const tableData = orderData.items.map(item => [
       item.name,
-      item.weight,
+      item.size || item.weight || '-',
       item.quantity.toString(),
       `₹${item.price.toFixed(2)}`,
       `₹${(item.price * item.quantity).toFixed(2)}`
     ]);
 
     (doc as any).autoTable({
-      head: [['Item', 'Weight', 'Qty', 'Price', 'Total']],
+      head: [['Item', 'Size', 'Qty', 'Price', 'Total']],
       body: tableData,
       startY: 180,
       theme: 'striped',
@@ -335,7 +337,9 @@ const GuestOrderPopup: React.FC<GuestOrderPopupProps> = ({ isOpen, onClose, orde
                     />
                     <div className="flex-1">
                       <h3 className="font-medium">{item.name}</h3>
-                      <p className="text-sm text-gray-600">{item.weight}</p>
+                      <p className="text-sm text-gray-600">
+                        {[item.size && `Size ${item.size}`, item.weight].filter(Boolean).join(' · ')}
+                      </p>
                       <p className="text-xs text-gray-500 capitalize">{item.category}</p>
                     </div>
                     <div className="text-right">

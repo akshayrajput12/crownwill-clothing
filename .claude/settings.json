@@ -32,7 +32,8 @@
       "Bash(\"/c/Program Files/Google/Chrome/Application/chrome.exe\" --headless=new --disable-gpu --hide-scrollbars --virtual-time-budget=9000 --window-size=1440,2400 --screenshot=home-desktop.png \"http://localhost:4323/\")",
       "Bash('/c/Program Files/Google/Chrome/Application/chrome.exe' --headless=new --disable-gpu --hide-scrollbars --virtual-time-budget=9000 --window-size=1440,2600 '--screenshot=C:\\\\Users\\\\Akshay Pratap Singh\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\d--raj-luxmi-main\\\\31db50d3-5ee6-4558-831d-15b1e26fab43\\\\scratchpad\\\\shots\\\\home-desktop.png' http://localhost:4323/)",
       "Read(//c/Users/Akshay Pratap Singh/AppData/Local/Temp/claude/d--raj-luxmi-main/31db50d3-5ee6-4558-831d-15b1e26fab43/scratchpad/shots//**)",
-      "Read(//c/Users/Akshay Pratap Singh/AppData/Local/Temp/claude/d--raj-luxmi-main/31db50d3-5ee6-4558-831d-15b1e26fab43/scratchpad/shots/**)"
+      "Read(//c/Users/Akshay Pratap Singh/AppData/Local/Temp/claude/d--raj-luxmi-main/31db50d3-5ee6-4558-831d-15b1e26fab43/scratchpad/shots/**)",
+      "Bash(node -e \"console.log\\(process.features.typescript ?? 'no ts flag'\\)\")"
     ],
     "additionalDirectories": [
       "C:\\Users\\AKSHAY~1\\AppData\\Local\\Temp\\claude\\d--raj-luxmi-main\\31db50d3-5ee6-4558-831d-15b1e26fab43\\scratchpad"
