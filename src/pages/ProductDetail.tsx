@@ -1,5 +1,6 @@
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useMemo, useState, useEffect } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
   Star, Heart, ChevronRight, Truck, CheckCircle2, Shield,
   ChevronDown, Tag, Copy, Check, BadgeIndianRupee, RefreshCcw, ShoppingBag
@@ -22,6 +23,12 @@ import { outfitTotals } from '@/lib/outfit';
 import { marketingImages, PLACEHOLDER_PRODUCT_IMAGE } from '@/lib/brandImages';
 import { formatPrice } from '@/utils/currency';
 import { scrollToTopInstant } from '@/utils/scrollToTop';
+
+/** Shared entrance for the buy-panel blocks, driven by the column's stagger. */
+const fadeUp = {
+  hidden: { opacity: 0, y: 14 },
+  shown: { opacity: 1, y: 0, transition: { duration: 0.45, ease: [0.4, 0, 0.2, 1] as const } },
+};
 
 const ProductDetail: React.FC = () => {
   const { slug } = useParams();
@@ -88,7 +95,7 @@ const ProductDetail: React.FC = () => {
   if (!product) {
     return (
       <div className="max-w-[1280px] mx-auto px-4 py-20 text-center">
-        <h2 className="text-2xl font-semibold uppercase mb-4">Product Not Found</h2>
+        <h2 className="text-2xl font-medium uppercase mb-4">Product Not Found</h2>
         <Button onClick={() => navigate('/products')}>Back to Products</Button>
       </div>
     );
@@ -226,35 +233,55 @@ const ProductDetail: React.FC = () => {
             </div>
 
             {/* Main Image Container */}
-            <div className="relative flex-1 aspect-[3/4] sm:aspect-[4/5] rounded-[12px] overflow-hidden bg-brand-offwhite order-1 sm:order-2">
-              <img
-                src={images[selectedImageIndex]}
-                alt={product.name}
-                className="w-full h-full object-cover"
-                loading="eager"
-              />
+            <div className="relative flex-1 aspect-[3/4] sm:aspect-[4/5] rounded-[20px] overflow-hidden bg-brand-offwhite order-1 sm:order-2">
+              {/* Cross-fade between shots instead of a hard swap */}
+              <AnimatePresence mode="wait">
+                <motion.img
+                  key={selectedImageIndex}
+                  src={images[selectedImageIndex]}
+                  alt={product.name}
+                  className="absolute inset-0 w-full h-full object-cover"
+                  initial={{ opacity: 0, scale: 1.03 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+                  loading="eager"
+                />
+              </AnimatePresence>
 
               {discountPercent > 0 && (
-                <span className="absolute top-4 left-4 bg-brand-yellow text-brand-black px-3 py-1 text-[10px] uppercase tracking-[0.16em] font-medium">
+                <motion.span
+                  initial={{ opacity: 0, y: -8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.15 }}
+                  className="absolute top-4 left-4 z-10 bg-brand-black/90 backdrop-blur-sm text-brand-white px-3.5 py-1.5 rounded-full text-[10px] uppercase tracking-[0.18em]"
+                >
                   {discountPercent}% off
-                </span>
+                </motion.span>
               )}
 
-              <button
+              <motion.button
+                whileTap={{ scale: 0.88 }}
                 onClick={() => setIsWishlisted(!isWishlisted)}
-                className="absolute top-4 right-4 w-10 h-10 rounded-full bg-brand-white shadow-md flex items-center justify-center text-brand-black hover:scale-110 transition-transform"
+                className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-brand-white/95 backdrop-blur-sm shadow-md flex items-center justify-center text-brand-black hover:scale-110 transition-transform"
                 aria-label="Wishlist"
               >
-                <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-brand-red text-brand-red' : ''}`} />
-              </button>
+                <Heart className={`w-5 h-5 transition-colors ${isWishlisted ? 'fill-brand-red text-brand-red' : ''}`} />
+              </motion.button>
             </div>
           </div>
 
-          {/* Right Column — Product Info */}
-          <div className="space-y-6">
+          {/* Right Column — Product Info. Children stagger in on mount, so the panel
+              assembles rather than appearing all at once. */}
+          <motion.div
+            className="space-y-6"
+            initial="hidden"
+            animate="shown"
+            variants={{ shown: { transition: { staggerChildren: 0.06, delayChildren: 0.05 } } }}
+          >
 
             {/* Rating */}
-            <div className="flex items-center justify-between">
+            <motion.div variants={fadeUp} className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 {reviewCount > 0 ? (
                   <>
@@ -275,24 +302,24 @@ const ProductDetail: React.FC = () => {
               <span className="text-[10px] uppercase tracking-[0.2em] text-brand-gray-500">
                 {categoryName}
               </span>
-            </div>
+            </motion.div>
 
             {/* Title */}
-            <h1 className="text-[24px] sm:text-[28px] font-semibold text-brand-black leading-tight">
+            <motion.h1 variants={fadeUp} className="text-[26px] sm:text-[34px] lg:text-[38px] font-normal tracking-[-0.02em] text-brand-black leading-tight">
               {product.name}
-            </h1>
+            </motion.h1>
 
             {/* Price Row */}
-            <div className="space-y-1.5">
+            <motion.div variants={fadeUp} className="space-y-1.5">
               <div className="flex flex-wrap items-center gap-3">
-                <span className="text-[24px] font-semibold text-brand-black">{formatPrice(product.price)}</span>
+                <span className="text-[26px] sm:text-[30px] font-normal text-brand-black tracking-[-0.01em]">{formatPrice(product.price)}</span>
                 {product.original_price && product.original_price > product.price && (
                   <span className="text-[16px] text-brand-gray-500 line-through">
                     {formatPrice(product.original_price)}
                   </span>
                 )}
                 {discountPercent > 0 && (
-                  <span className="bg-brand-success-light text-brand-success text-[12px] font-semibold px-2.5 py-1 rounded-[4px]">
+                  <span className="bg-brand-success-light text-brand-success text-[12px] font-medium px-2.5 py-1 rounded-[4px]">
                     {discountPercent}% OFF
                   </span>
                 )}
@@ -302,12 +329,12 @@ const ProductDetail: React.FC = () => {
                   You save {formatPrice(savings)} on this piece
                 </p>
               )}
-            </div>
+            </motion.div>
 
             {/* Live offers — codes the admin is actually running */}
             {coupons.length > 0 && (
               <div className="space-y-2">
-                <h4 className="text-[12px] font-semibold uppercase tracking-[0.12em] text-brand-black">
+                <h4 className="text-[12px] font-medium uppercase tracking-[0.12em] text-brand-black">
                   Offers available
                 </h4>
                 {coupons.map((coupon) => (
@@ -318,7 +345,7 @@ const ProductDetail: React.FC = () => {
                     <div className="flex items-center gap-3 min-w-0">
                       <Tag className="w-4 h-4 text-brand-black flex-shrink-0" />
                       <div className="min-w-0">
-                        <p className="text-[13px] font-semibold text-brand-black truncate">
+                        <p className="text-[13px] font-medium text-brand-black truncate">
                           {describeCoupon(coupon, settings.currency_symbol)}
                         </p>
                         <p className="text-[11px] text-brand-gray-500">
@@ -333,7 +360,7 @@ const ProductDetail: React.FC = () => {
                     </div>
                     <button
                       onClick={() => copyCode(coupon.code)}
-                      className="flex items-center gap-1.5 bg-brand-black text-brand-yellow font-semibold text-[11px] px-3 py-2 rounded flex-shrink-0 hover:bg-brand-charcoal transition-colors"
+                      className="flex items-center gap-1.5 bg-brand-black text-brand-yellow font-medium text-[11px] px-3 py-2 rounded flex-shrink-0 hover:bg-brand-charcoal transition-colors"
                     >
                       {copiedCode === coupon.code ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
                       {coupon.code}
@@ -347,18 +374,19 @@ const ProductDetail: React.FC = () => {
             {hasSizeGrid ? (
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <label className="text-[14px] font-semibold uppercase text-brand-black">Select Size</label>
+                  <label className="text-[14px] font-medium uppercase text-brand-black">Select Size</label>
                   {lowStock && (
-                    <span className="text-[12px] font-semibold text-brand-red">
+                    <span className="text-[12px] font-medium text-brand-red">
                       Only {selectedStock} left in {selectedSize}
                     </span>
                   )}
                 </div>
 
-                <div className="flex flex-wrap items-center gap-3">
+                <div className="flex flex-wrap items-center gap-2.5">
                   {sizeRows.map(({ size, stock }) => (
-                    <button
+                    <motion.button
                       key={size}
+                      whileTap={stock > 0 ? { scale: 0.94 } : undefined}
                       onClick={() => {
                         setSelectedSize(size);
                         setSizeError(false);
@@ -366,24 +394,33 @@ const ProductDetail: React.FC = () => {
                       disabled={stock <= 0}
                       aria-pressed={selectedSize === size}
                       title={stock > 0 ? `Size ${size}` : `Size ${size} is out of stock`}
-                      className={`min-w-[48px] h-12 px-3 rounded-[8px] font-semibold text-[14px] transition-all ${
+                      className={`relative min-w-[52px] h-12 px-4 rounded-full text-[14px] transition-colors ${
                         selectedSize === size
                           ? 'bg-brand-black text-brand-white'
                           : stock > 0
-                            ? 'bg-brand-gray-100 text-brand-black hover:bg-brand-gray-200'
-                            : 'bg-brand-gray-100 text-brand-gray-500 line-through cursor-not-allowed'
+                            ? 'border border-brand-gray-200 text-brand-black hover:border-brand-black'
+                            : 'border border-brand-gray-200 text-brand-gray-500 line-through cursor-not-allowed opacity-60'
                       }`}
                     >
                       {size}
-                    </button>
+                    </motion.button>
                   ))}
                 </div>
 
-                {sizeError && (
-                  <p className="text-[13px] font-semibold text-brand-red">Please select a size to continue.</p>
-                )}
+                <AnimatePresence>
+                  {sizeError && (
+                    <motion.p
+                      initial={{ opacity: 0, y: -4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0 }}
+                      className="text-[13px] text-brand-red"
+                    >
+                      Please select a size to continue.
+                    </motion.p>
+                  )}
+                </AnimatePresence>
                 {!inStock && (
-                  <p className="text-[13px] font-semibold text-brand-red">
+                  <p className="text-[13px] font-medium text-brand-red">
                     Every size is sold out right now — check back shortly.
                   </p>
                 )}
@@ -444,7 +481,7 @@ const ProductDetail: React.FC = () => {
                 {product.description}
               </p>
             )}
-          </div>
+          </motion.div>
         </div>
 
         {/* Complete the outfit — complementary wardrobe slots, not more of the same */}
@@ -462,7 +499,7 @@ const ProductDetail: React.FC = () => {
                   <p className="text-[11px] uppercase tracking-[0.16em] text-brand-gray-500">
                     {lookTotals.pieces}-piece look
                   </p>
-                  <p className="text-[18px] font-semibold text-brand-black">{formatPrice(lookTotals.total)}</p>
+                  <p className="text-[18px] font-medium text-brand-black">{formatPrice(lookTotals.total)}</p>
                   {lookTotals.saving > 0 && (
                     <p className="text-[12px] text-brand-success">Saves {formatPrice(lookTotals.saving)}</p>
                   )}
@@ -509,7 +546,7 @@ const ProductDetail: React.FC = () => {
               <div className="border-b border-brand-gray-200 pb-4">
                 <button
                   onClick={() => setOpenAccordion(openAccordion === 'details' ? null : 'details')}
-                  className="flex items-center justify-between w-full text-left font-semibold text-[18px] uppercase text-brand-black"
+                  className="flex items-center justify-between w-full text-left font-medium text-[18px] uppercase text-brand-black"
                 >
                   <span>Product Specifications &amp; Details</span>
                   <ChevronDown className={`w-5 h-5 transition-transform ${openAccordion === 'details' ? 'rotate-180' : ''}`} />
@@ -519,7 +556,7 @@ const ProductDetail: React.FC = () => {
                   <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-4 text-[14px] text-brand-gray-700">
                     {specEntries.map(([label, value]) => (
                       <div key={label}>
-                        <span className="font-semibold text-brand-black">{label}:</span> {value}
+                        <span className="font-medium text-brand-black">{label}:</span> {value}
                       </div>
                     ))}
                   </div>
@@ -567,17 +604,17 @@ const ProductDetail: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 bg-brand-offwhite rounded-[16px] p-6 text-center">
             <div className="flex flex-col items-center gap-2">
               <Shield className="w-8 h-8 text-brand-black" />
-              <h4 className="font-semibold text-[15px] uppercase text-brand-black">Genuine Product</h4>
+              <h4 className="font-medium text-[15px] uppercase text-brand-black">Genuine Product</h4>
               <p className="text-[12px] text-brand-gray-500">Sold directly by Crownveil</p>
             </div>
             <div className="flex flex-col items-center gap-2">
               <RefreshCcw className="w-8 h-8 text-brand-black" />
-              <h4 className="font-semibold text-[15px] uppercase text-brand-black">Easy Exchange</h4>
+              <h4 className="font-medium text-[15px] uppercase text-brand-black">Easy Exchange</h4>
               <p className="text-[12px] text-brand-gray-500">Swap sizes without the hassle</p>
             </div>
             <div className="flex flex-col items-center gap-2">
               <Truck className="w-8 h-8 text-brand-black" />
-              <h4 className="font-semibold text-[15px] uppercase text-brand-black">
+              <h4 className="font-medium text-[15px] uppercase text-brand-black">
                 {settings.cod_enabled ? 'Pay on Delivery' : 'Secure Checkout'}
               </h4>
               <p className="text-[12px] text-brand-gray-500">
@@ -616,7 +653,7 @@ const ProductDetail: React.FC = () => {
       {/* Mobile sticky buy bar — the desktop CTA scrolls away on phones */}
       <div className="lg:hidden sticky bottom-0 left-0 right-0 z-40 bg-brand-white border-t border-brand-gray-200 px-4 py-3 flex items-center gap-3 shadow-[0_-6px_20px_rgba(0,0,0,0.08)]">
         <div className="min-w-0">
-          <p className="text-[15px] font-semibold text-brand-black leading-none">{formatPrice(product.price)}</p>
+          <p className="text-[15px] font-medium text-brand-black leading-none">{formatPrice(product.price)}</p>
           {hasSizeGrid && (
             <p className="text-[11px] text-brand-gray-500 mt-1">
               {selectedSize ? `Size ${selectedSize}` : 'Select a size'}

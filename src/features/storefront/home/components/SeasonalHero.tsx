@@ -7,12 +7,30 @@ const SeasonalHero: React.FC = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const navigate = useNavigate();
 
+  /**
+   * Only the current slide and the one after it get a `src`, and a frame keeps its src
+   * once it has had one. With six slides, loading every hero-width frame up front would
+   * cost several megabytes before the shopper has scrolled at all.
+   */
+  const [primed, setPrimed] = useState<Set<number>>(() => new Set([0, 1 % slides.length]));
+
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
     }, 5000);
     return () => clearInterval(timer);
   }, []);
+
+  useEffect(() => {
+    setPrimed((prev) => {
+      const next = (currentSlide + 1) % slides.length;
+      if (prev.has(currentSlide) && prev.has(next)) return prev;
+      const updated = new Set(prev);
+      updated.add(currentSlide);
+      updated.add(next);
+      return updated;
+    });
+  }, [currentSlide]);
 
   const slide = slides[currentSlide];
 
@@ -28,14 +46,17 @@ const SeasonalHero: React.FC = () => {
             }`}
             style={{ willChange: 'transform, opacity' }}
           >
-            <img
-              src={s.image}
-              alt={s.headline}
-              className="w-full h-full object-cover"
-              style={{ objectPosition: s.position }}
-              loading={idx === 0 ? 'eager' : 'lazy'}
-              decoding="async"
-            />
+            {primed.has(idx) && (
+              <img
+                src={s.image}
+                alt={s.headline}
+                className="w-full h-full object-cover"
+                style={{ objectPosition: s.position }}
+                loading={idx === 0 ? 'eager' : 'lazy'}
+                fetchPriority={idx === 0 ? 'high' : 'auto'}
+                decoding="async"
+              />
+            )}
             {/* Gradient Overlay for Text Readability */}
             <div className="absolute inset-0 bg-gradient-to-r from-brand-black/80 via-brand-black/40 to-transparent" />
           </div>

@@ -63,7 +63,9 @@ const FeaturedProductWidget: React.FC = () => {
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
         aria-label="Featured product"
-        className="fixed bottom-4 left-4 sm:bottom-6 sm:left-6 z-40 w-[240px] sm:w-[280px] bg-brand-white border border-brand-gray-200 rounded-[16px] shadow-[0_12px_40px_rgba(0,0,0,0.14)] overflow-hidden"
+        /* Mobile: a slim pill that clears the sticky bottom bars and leaves room for the
+           WhatsApp button on the opposite side. Desktop: the full card. */
+        className="fixed bottom-24 left-4 right-auto max-w-[calc(100vw-6.5rem)] w-[230px] sm:bottom-6 sm:left-6 sm:w-[280px] sm:max-w-none z-40 bg-brand-white border border-brand-gray-200 rounded-[14px] sm:rounded-[16px] shadow-[0_12px_40px_rgba(0,0,0,0.14)] overflow-hidden"
       >
         {/* Rotation progress */}
         {spotlight.length > 1 && (
@@ -89,7 +91,7 @@ const FeaturedProductWidget: React.FC = () => {
         <button onClick={() => setQuickViewProduct(product)} className="w-full text-left group">
           <div className="flex items-stretch">
             {/* Thumbnail */}
-            <div className="relative w-[88px] sm:w-[96px] flex-shrink-0 bg-brand-offwhite overflow-hidden">
+            <div className="relative w-[68px] sm:w-[96px] flex-shrink-0 bg-brand-offwhite overflow-hidden">
               <AnimatePresence mode="wait">
                 <motion.img
                   key={product.id}
@@ -107,24 +109,29 @@ const FeaturedProductWidget: React.FC = () => {
             </div>
 
             {/* Copy */}
-            <div className="flex-1 p-3.5 pt-5 flex flex-col gap-1.5 min-w-0">
-              <span className="text-[9px] uppercase tracking-[0.22em] text-brand-gray-500">
+            <div className="flex-1 px-3 py-2.5 pt-4 sm:p-3.5 sm:pt-5 flex flex-col gap-1 sm:gap-1.5 min-w-0">
+              <span className="text-[9px] uppercase tracking-[0.22em] text-brand-gray-500 truncate">
                 {current.label}
               </span>
 
-              <h4 className="card-title text-[13px] line-clamp-2 leading-snug">{product.name}</h4>
+              <h4 className="card-title text-[12px] sm:text-[13px] line-clamp-1 sm:line-clamp-2 leading-snug">
+                {product.name}
+              </h4>
 
               <div className="flex flex-wrap items-baseline gap-x-2">
-                <span className="text-[14px] font-medium text-brand-black">{formatPrice(product.price)}</span>
+                <span className="text-[13px] sm:text-[14px] font-medium text-brand-black">
+                  {formatPrice(product.price)}
+                </span>
                 {discount > 0 && (
                   <>
-                    <span className="price-was text-[11px]">{formatPrice(product.original_price)}</span>
-                    <span className="price-off text-[11px]">{discount}% off</span>
+                    {/* The struck-through price is the first thing to go when space is tight */}
+                    <span className="price-was text-[11px] hidden sm:inline">{formatPrice(product.original_price)}</span>
+                    <span className="price-off text-[10px] sm:text-[11px]">{discount}% off</span>
                   </>
                 )}
               </div>
 
-              <span className="mt-1 inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.18em] text-brand-black/70 group-hover:text-brand-black">
+              <span className="mt-1 hidden sm:inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.18em] text-brand-black/70 group-hover:text-brand-black">
                 <Eye className="w-3 h-3" /> Quick view
               </span>
             </div>
@@ -133,7 +140,7 @@ const FeaturedProductWidget: React.FC = () => {
 
         {/* Dots */}
         {spotlight.length > 1 && (
-          <div className="flex items-center justify-center gap-1.5 pb-2.5">
+          <div className="hidden sm:flex items-center justify-center gap-1.5 pb-2.5">
             {spotlight.map((_, dot) => (
               <button
                 key={dot}

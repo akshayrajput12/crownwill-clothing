@@ -36,9 +36,24 @@ export const brandImages = {
 /** Last-resort tile art when a product or category has no image at all. */
 export const PLACEHOLDER_PRODUCT_IMAGE = brandImages.contrastPoloBeige;
 
+/** Hero-width free stock frame. Unsplash serves WebP/AVIF where `auto=format` is honoured. */
+const heroStock = (id: string) =>
+  `https://images.unsplash.com/${id}?auto=format&fit=crop&w=1600&q=72`;
+
 /**
  * Home hero slides. Copy is per-slide because each one sells a different story;
  * `position` anchors the crop, since some shots are portrait.
+ */
+/**
+ * Hero carousel.
+ *
+ * Every slide's photograph shows the garment its copy is selling — a headline about
+ * linen over a shot of linen. `position` is the object-position for that specific frame
+ * so the subject survives the crop at every viewport height.
+ *
+ * The three brand slides keep their original price claims. Slides added on top use
+ * non-numeric offer copy, because a "FLAT AT ₹X" line is a promise the catalogue has to
+ * be able to keep.
  */
 export const heroSlides = [
   {
@@ -48,16 +63,17 @@ export const heroSlides = [
     subheadline: 'For Men Who Wear Comfort',
     offer: 'FLAT AT ₹799',
     cta: 'SHOP NOW',
-    link: '/products?sort=newest',
+    link: '/products?search=linen',
   },
   {
-    image: brandImages.limitedEditionAd,
-    position: 'center 15%',
-    headline: 'THE LIMITED EDIT',
-    subheadline: 'Heritage Prints, Modern Cuts',
+    // Navy contrast polo on a model — the collar is the point, so sit high in the frame.
+    image: brandImages.contrastPoloNavy,
+    position: 'center 20%',
+    headline: 'THE POLO EDIT',
+    subheadline: 'Collared, Considered, Everyday',
     offer: 'UPTO 50% OFF',
-    cta: 'SHOP THE EDIT',
-    link: '/products?sort=bestseller',
+    cta: 'SHOP POLOS',
+    link: '/products?search=polo',
   },
   {
     image: marketingImages.heroPyjamaPants,
@@ -66,7 +82,37 @@ export const heroSlides = [
     subheadline: 'Maximum Airiness, Ultimate Style',
     offer: 'PICK ANY 2',
     cta: 'EXPLORE COMBOS',
-    link: '/products',
+    link: '/products?search=pyjama',
+  },
+  {
+    // Four friends on a hillside in tees — the weekend, not the product shot.
+    image: heroStock('photo-1490578474895-699cd4e2cf59'),
+    position: 'center 45%',
+    headline: 'BUILT FOR THE WEEKEND',
+    subheadline: 'Tees That Go Everywhere',
+    offer: 'NEW SEASON',
+    cta: 'SHOP TEES',
+    link: '/products?search=t-shirt',
+  },
+  {
+    // Street shot: sweatshirt over distressed denim.
+    image: heroStock('photo-1516826957135-700dedea698c'),
+    position: 'center 30%',
+    headline: 'DENIM, DONE RIGHT',
+    subheadline: 'Street-Ready Layers',
+    offer: 'JUST DROPPED',
+    cta: 'SHOP DENIM',
+    link: '/products?search=jean',
+  },
+  {
+    // Olive heavyweight tee, moody outdoor light.
+    image: heroStock('photo-1519058082700-08a0b56da9b4'),
+    position: 'center 25%',
+    headline: 'THE HEAVYWEIGHT TEE',
+    subheadline: 'Garment Dyed, Built To Last',
+    offer: 'SHOP THE EDIT',
+    cta: 'VIEW ALL',
+    link: '/products?sort=newest',
   },
 ];
 

@@ -57,7 +57,15 @@ interface ProductCardProps {
 const ProductCard: React.FC<ProductCardProps> = ({ product, onViewDetail, onQuickView, variant = 'grid' }) => {
   const addToCart = useStore((state) => state.addToCart);
   const [isHovered, setIsHovered] = useState(false);
+  // The alternate shot is only mounted once a pointer has actually been over the card.
+  // On touch, where hover never fires, that halves the image bytes for the whole grid.
+  const [everHovered, setEverHovered] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
+
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+    setEverHovered(true);
+  };
 
   const gallery = (product.images ?? []).filter(Boolean);
   const primaryImage = gallery[0] || product.image || PLACEHOLDER_PRODUCT_IMAGE;
@@ -137,7 +145,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onViewDetail, onQuic
         loading="lazy"
         decoding="async"
       />
-      {secondaryImage && (
+      {secondaryImage && everHovered && (
         <motion.img
           src={secondaryImage}
           alt={`${product.name} — alternate view`}
@@ -195,12 +203,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onViewDetail, onQuic
   /** Size chips — one tap adds that exact size to the bag. */
   const SizeQuickAdd = ({ tone = 'dark' }: { tone?: 'dark' | 'light' }) => (
     <div
-      className={`flex flex-wrap items-center gap-1.5 ${
+      /* One scrolling row rather than wrapping: a product with eight sizes would
+         otherwise stack three rows and make the grid ragged. */
+      className={`flex flex-nowrap items-center gap-1.5 overflow-x-auto no-scrollbar ${
         tone === 'dark' ? 'bg-brand-black/95 backdrop-blur-sm px-3 py-3' : ''
       }`}
     >
       <span
-        className={`text-[9px] uppercase tracking-[0.16em] mr-1 ${
+        className={`text-[9px] uppercase tracking-[0.16em] mr-1 flex-shrink-0 ${
           tone === 'dark' ? 'text-white/60' : 'text-brand-gray-500'
         }`}
       >
@@ -212,7 +222,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onViewDetail, onQuic
           onClick={(e) => (stock > 0 ? handleSizeAdd(e, size) : e.stopPropagation())}
           disabled={stock <= 0}
           title={stock > 0 ? `Add size ${size}` : `Size ${size} is sold out`}
-          className={`min-w-[34px] h-8 px-2 text-[11px] font-medium rounded-[6px] transition-colors ${
+          className={`min-w-[34px] h-8 px-2 text-[11px] font-medium rounded-[6px] flex-shrink-0 transition-colors ${
             stock <= 0
               ? tone === 'dark'
                 ? 'text-white/25 line-through cursor-not-allowed'
@@ -233,7 +243,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onViewDetail, onQuic
       <motion.div
         className="premium-card group cursor-pointer overflow-hidden relative flex flex-col sm:flex-row"
         onClick={onViewDetail}
-        onMouseEnter={() => setIsHovered(true)}
+        onMouseEnter={handleMouseEnter}
         onMouseLeave={() => setIsHovered(false)}
       >
         <div className="relative w-full sm:w-48 aspect-[4/5] sm:aspect-auto sm:h-56 bg-brand-offwhite overflow-hidden flex-shrink-0">
@@ -300,7 +310,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onViewDetail, onQuic
     <motion.div
       className="group cursor-pointer relative flex flex-col"
       onClick={onViewDetail}
-      onMouseEnter={() => setIsHovered(true)}
+      onMouseEnter={handleMouseEnter}
       onMouseLeave={() => setIsHovered(false)}
       role="article"
       aria-label={product.name}

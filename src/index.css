@@ -271,3 +271,15 @@ a, button, input, select, textarea, [role="button"], .brand-interactive {
   .premium-card { border: 1px solid var(--brand-gray-200); background: var(--brand-white); border-radius: 12px; box-shadow: var(--shadow-soft); transition: transform .25s cubic-bezier(.4,0,.2,1), box-shadow .25s ease; }
   .premium-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-medium); }
 }
+
+@layer utilities {
+  /* Used by the size quick-add row and the quick-view thumbnail strip: they scroll
+     horizontally, but a visible scrollbar inside a product card is noise. */
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}

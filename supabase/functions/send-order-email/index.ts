@@ -97,6 +97,51 @@ const STATUS_COPY: Record<string, { subject: string; heading: string; body: stri
   },
 };
 
+/* ------------------------------------------------------------------ template ---- */
+
+const GOLD = "#C9A227";
+const INK = "#171310";
+const PAPER = "#FAF8F4";
+const LINE = "#EAE4DA";
+const MUTED = "#8A8079";
+
+/** Absolute base for images and links — relative paths do nothing inside an inbox. */
+const siteUrl = (Deno.env.get("STORE_SITE_URL") || "https://crownveil.com").replace(/\/$/, "");
+
+const STATUS_STEPS = ["placed", "confirmed", "processing", "shipped", "delivered"];
+const STEP_LABELS: Record<string, string> = {
+  placed: "Placed",
+  confirmed: "Confirmed",
+  processing: "Packed",
+  shipped: "Shipped",
+  delivered: "Delivered",
+};
+
+/**
+ * Progress rail for status emails. Tables and background colours only — inboxes do not
+ * run flexbox, and Outlook ignores most of CSS besides.
+ */
+function renderTimeline(status: string): string {
+  const current = STATUS_STEPS.indexOf(status);
+  if (current < 0) return "";
+
+  const cells = STATUS_STEPS.map((step, index) => {
+    const done = index <= current;
+    return `
+      <td align="center" width="20%" style="padding:0 2px;">
+        <div style="height:4px;border-radius:2px;background:${done ? GOLD : LINE};margin-bottom:8px;"></div>
+        <div style="font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:${done ? INK : MUTED};">
+          ${escapeHtml(STEP_LABELS[step])}
+        </div>
+      </td>`;
+  }).join("");
+
+  return `
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 28px;">
+      <tr>${cells}</tr>
+    </table>`;
+}
+
 /** One email shell so confirmation, invoice and status mails all look like the same store. */
 function renderEmail(options: {
   storeName: string;
@@ -106,103 +151,190 @@ function renderEmail(options: {
   items: OrderItem[];
   currency: string;
   showItems: boolean;
+  showTimeline?: boolean;
   footerNote?: string;
 }) {
-  const { storeName, heading, intro, order, items, currency, showItems, footerNote } = options;
+  const { storeName, heading, intro, order, items, currency, showItems, showTimeline, footerNote } = options;
   const address = order.address_details ?? {};
   const customer = order.customer_info ?? {};
+  const status = String(order.order_status ?? "placed").toLowerCase();
 
+  // Item rows carry the product shot — an order confirmation without pictures of what
+  // you bought reads like a bank statement.
   const itemRows = items
-    .map((item) => {
+    .map((item, index) => {
       const variant = [item.size ? `Size ${item.size}` : null, item.weight || null]
         .filter(Boolean)
-        .join(" · ");
+        .join("&nbsp;&middot;&nbsp;");
+      const thumb = (item as any).image;
       return `
         <tr>
-          <td style="padding:12px 0;border-bottom:1px solid #eeeeee;">
-            <div style="font-size:14px;color:#111111;">${escapeHtml(item.name)}</div>
-            ${variant ? `<div style="font-size:12px;color:#777777;margin-top:2px;">${escapeHtml(variant)}</div>` : ""}
-          </td>
-          <td style="padding:12px 0;border-bottom:1px solid #eeeeee;text-align:center;font-size:14px;color:#555555;">
-            ${escapeHtml(item.quantity ?? 1)}
-          </td>
-          <td style="padding:12px 0;border-bottom:1px solid #eeeeee;text-align:right;font-size:14px;color:#111111;">
-            ${money(Number(item.price ?? 0) * Number(item.quantity ?? 1), currency)}
+          <td style="padding:14px 0;${index ? `border-top:1px solid ${LINE};` : ""}">
+            <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+              <tr>
+                <td width="64" valign="top" style="padding-right:14px;">
+                  ${thumb
+                    ? `<img src="${escapeHtml(thumb)}" width="64" alt="" style="display:block;width:64px;height:80px;object-fit:cover;border-radius:8px;background:${PAPER};" />`
+                    : `<div style="width:64px;height:80px;border-radius:8px;background:${PAPER};"></div>`}
+                </td>
+                <td valign="top">
+                  <div style="font-size:14px;line-height:1.4;color:${INK};">${escapeHtml(item.name)}</div>
+                  ${variant ? `<div style="font-size:12px;color:${MUTED};margin-top:4px;">${variant}</div>` : ""}
+                  <div style="font-size:12px;color:${MUTED};margin-top:4px;">Qty ${escapeHtml(item.quantity ?? 1)}</div>
+                </td>
+                <td valign="top" align="right" style="font-size:14px;color:${INK};white-space:nowrap;padding-left:12px;">
+                  ${money(Number(item.price ?? 0) * Number(item.quantity ?? 1), currency)}
+                </td>
+              </tr>
+            </table>
           </td>
         </tr>`;
     })
     .join("");
 
-  const summaryRow = (label: string, value: string, strong = false) => `
-    <tr>
-      <td style="padding:4px 0;font-size:${strong ? "15px" : "13px"};color:${strong ? "#111111" : "#666666"};${strong ? "font-weight:600;padding-top:12px;border-top:1px solid #eeeeee;" : ""}">${escapeHtml(label)}</td>
-      <td style="padding:4px 0;text-align:right;font-size:${strong ? "15px" : "13px"};color:#111111;${strong ? "font-weight:600;padding-top:12px;border-top:1px solid #eeeeee;" : ""}">${value}</td>
-    </tr>`;
+  const summaryRow = (label: string, value: string, tone: "muted" | "total" | "save" = "muted") => {
+    const colour = tone === "save" ? "#2E7D32" : tone === "total" ? INK : MUTED;
+    const size = tone === "total" ? "16px" : "13px";
+    const weight = tone === "total" ? "500" : "400";
+    const border = tone === "total" ? `border-top:1px solid ${LINE};padding-top:14px;` : "";
+    return `
+      <tr>
+        <td style="padding:5px 0;${border}font-size:${size};color:${colour};font-weight:${weight};">${escapeHtml(label)}</td>
+        <td align="right" style="padding:5px 0;${border}font-size:${size};color:${tone === "save" ? "#2E7D32" : INK};font-weight:${weight};">${value}</td>
+      </tr>`;
+  };
 
   const completeAddress = address.complete_address
     ?? [address.plotNumber, address.buildingName, address.street, address.city, address.state, address.pincode]
       .filter(Boolean)
       .join(", ");
 
-  return `<!DOCTYPE html>
-<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${escapeHtml(heading)}</title></head>
-<body style="margin:0;padding:0;background:#f6f6f4;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f6f6f4;padding:24px 12px;">
-    <tr><td align="center">
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border:1px solid #eceae5;">
+  const placedOn = new Date(order.created_at ?? Date.now()).toLocaleDateString("en-IN", {
+    day: "numeric", month: "long", year: "numeric",
+  });
 
-        <tr><td style="background:#111111;padding:28px 32px;">
-          <div style="font-size:20px;letter-spacing:0.18em;text-transform:uppercase;color:#ffffff;">${escapeHtml(storeName)}</div>
+  return `<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>${escapeHtml(heading)}</title>
+</head>
+<body style="margin:0;padding:0;background:${PAPER};-webkit-font-smoothing:antialiased;font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,Helvetica,Arial,sans-serif;">
+
+  <!-- Inbox preview line, hidden in the body -->
+  <div style="display:none;max-height:0;overflow:hidden;opacity:0;">
+    ${escapeHtml(intro)} &mdash; ${escapeHtml(order.order_number)}
+  </div>
+
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${PAPER};padding:32px 12px;">
+    <tr><td align="center">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background:#FFFFFF;border:1px solid ${LINE};border-radius:16px;overflow:hidden;">
+
+        <!-- Masthead -->
+        <tr><td align="center" style="background:${INK};padding:30px 32px 26px;">
+          <img src="${siteUrl}/assets/logo-full.png" width="132" alt="${escapeHtml(storeName)}"
+               style="display:block;width:132px;height:auto;margin:0 auto;" />
         </td></tr>
 
-        <tr><td style="padding:32px;">
-          <h1 style="margin:0 0 8px;font-size:22px;font-weight:600;color:#111111;">${escapeHtml(heading)}</h1>
-          <p style="margin:0 0 20px;font-size:14px;line-height:1.6;color:#555555;">${escapeHtml(intro)}</p>
+        <!-- Gold rule -->
+        <tr><td style="height:3px;background:${GOLD};font-size:0;line-height:0;">&nbsp;</td></tr>
 
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#faf9f7;padding:16px;margin-bottom:24px;">
-            <tr><td style="font-size:12px;color:#777777;text-transform:uppercase;letter-spacing:0.12em;">Order number</td></tr>
-            <tr><td style="font-size:16px;color:#111111;font-weight:600;padding-top:4px;">${escapeHtml(order.order_number)}</td></tr>
-            <tr><td style="font-size:12px;color:#777777;padding-top:10px;">
-              Placed ${escapeHtml(new Date(order.created_at ?? Date.now()).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" }))}
-              &nbsp;·&nbsp; ${escapeHtml(String(order.payment_method ?? "").toUpperCase())}
-              &nbsp;·&nbsp; ${escapeHtml(order.payment_status === "paid" ? "Paid" : "Payment pending")}
-            </td></tr>
-          </table>
+        <!-- Headline -->
+        <tr><td style="padding:36px 32px 0;">
+          <h1 style="margin:0 0 10px;font-size:24px;font-weight:500;letter-spacing:-0.01em;color:${INK};">
+            ${escapeHtml(heading)}
+          </h1>
+          <p style="margin:0;font-size:15px;line-height:1.65;color:#5C544E;">${escapeHtml(intro)}</p>
+        </td></tr>
 
-          ${showItems ? `
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
+        <!-- Order meta -->
+        <tr><td style="padding:24px 32px 0;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+                 style="background:${PAPER};border-radius:12px;">
             <tr>
-              <th align="left" style="font-size:11px;text-transform:uppercase;letter-spacing:0.12em;color:#999999;padding-bottom:8px;border-bottom:1px solid #eeeeee;">Item</th>
-              <th align="center" style="font-size:11px;text-transform:uppercase;letter-spacing:0.12em;color:#999999;padding-bottom:8px;border-bottom:1px solid #eeeeee;">Qty</th>
-              <th align="right" style="font-size:11px;text-transform:uppercase;letter-spacing:0.12em;color:#999999;padding-bottom:8px;border-bottom:1px solid #eeeeee;">Total</th>
+              <td style="padding:16px 18px;">
+                <div style="font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:${MUTED};">Order</div>
+                <div style="font-size:17px;color:${INK};margin-top:3px;letter-spacing:0.02em;">${escapeHtml(order.order_number)}</div>
+              </td>
+              <td align="right" style="padding:16px 18px;">
+                <div style="font-size:12px;color:${MUTED};">${escapeHtml(placedOn)}</div>
+                <div style="font-size:12px;color:${MUTED};margin-top:3px;">
+                  ${escapeHtml(String(order.payment_method ?? "").toUpperCase())}
+                  &nbsp;&middot;&nbsp;
+                  <span style="color:${order.payment_status === "paid" ? "#2E7D32" : "#B26A00"};">
+                    ${order.payment_status === "paid" ? "Paid" : "Payment on delivery"}
+                  </span>
+                </div>
+              </td>
             </tr>
-            ${itemRows}
           </table>
+        </td></tr>
 
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+        ${showTimeline ? `<tr><td style="padding:28px 32px 0;">${renderTimeline(status)}</td></tr>` : ""}
+
+        ${showItems ? `
+        <!-- Items -->
+        <tr><td style="padding:28px 32px 0;">
+          <div style="font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:${MUTED};padding-bottom:6px;">
+            Your order
+          </div>
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${itemRows}</table>
+        </td></tr>
+
+        <!-- Totals -->
+        <tr><td style="padding:20px 32px 0;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+                 style="border-top:1px solid ${LINE};padding-top:8px;">
             ${summaryRow("Subtotal", money(order.subtotal, currency))}
             ${Number(order.tax ?? 0) > 0 ? summaryRow("Tax", money(order.tax, currency)) : ""}
             ${summaryRow("Delivery", Number(order.delivery_fee ?? 0) === 0 ? "Free" : money(order.delivery_fee, currency))}
-            ${Number(order.cod_fee ?? 0) > 0 ? summaryRow("Cash on delivery fee", money(order.cod_fee, currency)) : ""}
-            ${Number(order.discount ?? 0) > 0 ? summaryRow(`Discount${order.coupon_code ? ` (${order.coupon_code})` : ""}`, `- ${money(order.discount, currency)}`) : ""}
-            ${summaryRow("Total", money(order.total, currency), true)}
+            ${Number(order.cod_fee ?? 0) > 0 ? summaryRow("Cash on delivery", money(order.cod_fee, currency)) : ""}
+            ${Number(order.discount ?? 0) > 0
+              ? summaryRow(`Discount${order.coupon_code ? ` · ${order.coupon_code}` : ""}`, `− ${money(order.discount, currency)}`, "save")
+              : ""}
+            ${summaryRow("Total", money(order.total, currency), "total")}
           </table>
-          ` : ""}
+        </td></tr>` : ""}
 
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #eeeeee;padding-top:16px;">
-            <tr><td style="font-size:11px;text-transform:uppercase;letter-spacing:0.12em;color:#999999;padding-top:16px;">Delivering to</td></tr>
-            <tr><td style="font-size:14px;color:#111111;padding-top:6px;">${escapeHtml(customer.name)}</td></tr>
-            <tr><td style="font-size:13px;color:#666666;line-height:1.6;padding-top:2px;">${escapeHtml(completeAddress)}</td></tr>
-            ${customer.phone ? `<tr><td style="font-size:13px;color:#666666;padding-top:2px;">${escapeHtml(customer.phone)}</td></tr>` : ""}
-            ${order.estimated_delivery_time ? `<tr><td style="font-size:13px;color:#666666;padding-top:8px;">Estimated delivery: ${escapeHtml(order.estimated_delivery_time)}</td></tr>` : ""}
+        <!-- Delivery -->
+        <tr><td style="padding:28px 32px 0;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+                 style="border:1px solid ${LINE};border-radius:12px;">
+            <tr><td style="padding:18px;">
+              <div style="font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:${MUTED};">Delivering to</div>
+              <div style="font-size:14px;color:${INK};margin-top:8px;">${escapeHtml(customer.name)}</div>
+              <div style="font-size:13px;color:#5C544E;line-height:1.6;margin-top:4px;">${escapeHtml(completeAddress)}</div>
+              ${customer.phone ? `<div style="font-size:13px;color:${MUTED};margin-top:4px;">${escapeHtml(customer.phone)}</div>` : ""}
+              ${order.estimated_delivery_time
+                ? `<div style="font-size:13px;color:${INK};margin-top:10px;">Estimated arrival: ${escapeHtml(order.estimated_delivery_time)}</div>`
+                : ""}
+            </td></tr>
           </table>
         </td></tr>
 
-        <tr><td style="background:#faf9f7;padding:20px 32px;">
-          <p style="margin:0;font-size:12px;line-height:1.6;color:#888888;">
-            ${escapeHtml(footerNote ?? `Questions about this order? Reply to this email and we will help.`)}
-          </p>
+        <!-- CTA -->
+        <tr><td align="center" style="padding:30px 32px 4px;">
+          <table role="presentation" cellpadding="0" cellspacing="0">
+            <tr><td align="center" style="background:${INK};border-radius:8px;">
+              <a href="${siteUrl}/products"
+                 style="display:inline-block;padding:14px 34px;font-size:12px;letter-spacing:0.16em;text-transform:uppercase;color:#FFFFFF;text-decoration:none;">
+                Continue shopping
+              </a>
+            </td></tr>
+          </table>
+        </td></tr>
+
+        <!-- Footer -->
+        <tr><td style="padding:28px 32px 32px;">
+          <div style="border-top:1px solid ${LINE};padding-top:20px;">
+            <p style="margin:0 0 6px;font-size:12px;line-height:1.7;color:${MUTED};">
+              ${escapeHtml(footerNote ?? "Questions about this order? Just reply to this email and we will help.")}
+            </p>
+            <p style="margin:0;font-size:11px;color:#B4ABA3;">
+              ${escapeHtml(storeName)} &middot; This email was sent about order ${escapeHtml(order.order_number)}.
+            </p>
+          </div>
         </td></tr>
 
       </table>
@@ -333,6 +465,8 @@ serve(async (req) => {
       currency,
       // A status nudge does not need the whole bill repeated; confirmations and invoices do.
       showItems: type !== "status",
+      // The progress rail only means something on a status update.
+      showTimeline: type === "status",
       footerNote: settings.store_email
         ? `Questions about this order? Write to ${settings.store_email}.`
         : undefined,

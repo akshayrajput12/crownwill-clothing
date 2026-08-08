@@ -147,7 +147,13 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, isOpen, onClos
             role="dialog"
             aria-modal="true"
             aria-label={product.name}
-            className="relative bg-brand-white w-full sm:max-w-4xl max-h-[92vh] sm:max-h-[86vh] rounded-t-[20px] sm:rounded-[16px] shadow-[0_30px_80px_rgba(0,0,0,0.35)] overflow-hidden flex flex-col sm:grid sm:grid-cols-2"
+            /* Flex at every breakpoint, never grid. A grid row sizes to its content, so a
+               column set to h-full could grow past the dialog's max-height and get clipped
+               — which is what cut the buy bar off. Flex children with min-h-0 shrink to
+               the capped height instead and scroll inside it.
+               Mobile: fixed-height bottom sheet. Desktop: height follows the content up to
+               86vh, so short products get a short dialog rather than a wall of whitespace. */
+            className="relative bg-brand-white w-full h-[90vh] sm:h-auto sm:max-h-[86vh] sm:max-w-4xl rounded-t-[20px] sm:rounded-[16px] shadow-[0_30px_80px_rgba(0,0,0,0.35)] overflow-hidden flex flex-col sm:flex-row sm:items-stretch"
             initial={{ opacity: 0, y: 40, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 30, scale: 0.98 }}
@@ -156,15 +162,20 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, isOpen, onClos
             <button
               onClick={onClose}
               aria-label="Close quick view"
-              className="absolute top-3 right-3 z-20 p-2 bg-brand-white/95 text-brand-black hover:bg-brand-black hover:text-brand-white rounded-full shadow-md transition-colors"
+              className="absolute top-3 right-3 z-30 p-2 bg-brand-white/95 text-brand-black hover:bg-brand-black hover:text-brand-white rounded-full shadow-md transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
 
-            {/* Visuals */}
-            <div className="relative bg-brand-offwhite flex-shrink-0">
+            {/* Sheet grab handle — mobile only */}
+            <div className="sm:hidden absolute top-2 left-1/2 -translate-x-1/2 z-30 w-10 h-1 rounded-full bg-brand-white/70" />
+
+            {/* Visuals — half the dialog on desktop, stretched to whatever height the
+                details column settles on. The min-height stops a sparse product from
+                producing a letterbox sliver. */}
+            <div className="relative bg-brand-offwhite flex-shrink-0 sm:w-1/2 sm:min-h-[460px]">
               <div
-                className="relative aspect-[4/5] sm:h-full sm:aspect-auto overflow-hidden"
+                className="relative h-[34vh] sm:absolute sm:inset-0 sm:h-full overflow-hidden"
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
               >
@@ -198,7 +209,7 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, isOpen, onClos
                         key={`${img}-${idx}`}
                         onClick={() => setSelectedImageIndex(idx)}
                         aria-label={`View image ${idx + 1}`}
-                        className={`w-12 h-14 flex-shrink-0 rounded-[6px] overflow-hidden border-2 transition-all ${
+                        className={`w-9 h-11 sm:w-12 sm:h-14 flex-shrink-0 rounded-[6px] overflow-hidden border-2 transition-all ${
                           selectedImageIndex === idx
                             ? 'border-brand-white shadow-md'
                             : 'border-white/40 opacity-70 hover:opacity-100'
@@ -212,9 +223,11 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, isOpen, onClos
               </div>
             </div>
 
-            {/* Details */}
-            <div className="flex flex-col overflow-y-auto">
-              <div className="p-6 sm:p-8 space-y-5">
+            {/* Details. `min-h-0` is what lets this column shrink to the dialog's capped
+                height so the scroll area actually scrolls, instead of growing and pushing
+                the buy bar out of the clipped container. */}
+            <div className="flex-1 min-h-0 flex flex-col sm:w-1/2">
+              <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-5 sm:p-8 space-y-4 sm:space-y-5">
                 <div className="space-y-2">
                   <div className="flex items-center gap-3">
                     <span className="text-[10px] uppercase tracking-[0.2em] text-brand-gray-500">
@@ -228,13 +241,13 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, isOpen, onClos
                     ) : null}
                   </div>
 
-                  <h2 className="text-[20px] sm:text-[24px] font-semibold text-brand-black leading-tight">
+                  <h2 className="text-[21px] sm:text-[26px] font-normal tracking-[-0.01em] text-brand-black leading-tight">
                     {product.name}
                   </h2>
                 </div>
 
                 <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                  <span className="text-[24px] font-semibold text-brand-black">{formatPrice(product.price)}</span>
+                  <span className="text-[24px] font-normal text-brand-black">{formatPrice(product.price)}</span>
                   {originalPrice && originalPrice > product.price && (
                     <span className="text-[15px] text-brand-gray-500 line-through">{formatPrice(originalPrice)}</span>
                   )}
@@ -255,7 +268,7 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, isOpen, onClos
                 {sizes.length > 0 ? (
                   <div className="space-y-2.5">
                     <div className="flex items-center justify-between">
-                      <span className="text-[12px] font-semibold uppercase tracking-[0.12em] text-brand-black">
+                      <span className="text-[12px] font-medium uppercase tracking-[0.12em] text-brand-black">
                         Select size
                       </span>
                       {lowStock && (
@@ -277,12 +290,14 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, isOpen, onClos
                           disabled={stock <= 0}
                           aria-pressed={selectedSize === size}
                           title={stock > 0 ? `Size ${size}` : `Size ${size} is sold out`}
-                          className={`min-w-[46px] h-11 px-3 text-[13px] font-semibold rounded-[8px] transition-all ${
+                          /* Same pill treatment as the product page, so the two never look
+                             like different stores. */
+                          className={`min-w-[50px] h-11 px-4 text-[13px] rounded-full transition-colors ${
                             selectedSize === size
                               ? 'bg-brand-black text-brand-white'
                               : stock > 0
-                                ? 'bg-brand-gray-100 text-brand-black hover:bg-brand-gray-200'
-                                : 'bg-brand-gray-100 text-brand-gray-500 line-through cursor-not-allowed'
+                                ? 'border border-brand-gray-200 text-brand-black hover:border-brand-black'
+                                : 'border border-brand-gray-200 text-brand-gray-500 line-through cursor-not-allowed opacity-60'
                           }`}
                         >
                           {size}
@@ -306,7 +321,7 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, isOpen, onClos
 
                 {/* Quantity */}
                 <div className="flex items-center gap-4">
-                  <span className="text-[12px] font-semibold uppercase tracking-[0.12em] text-brand-black">
+                  <span className="text-[12px] font-medium uppercase tracking-[0.12em] text-brand-black">
                     Quantity
                   </span>
                   <div className="flex items-center border border-brand-gray-200 rounded-[8px]">
@@ -318,7 +333,7 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, isOpen, onClos
                     >
                       <Minus className="w-3.5 h-3.5" />
                     </button>
-                    <span className="w-10 text-center text-[14px] font-semibold text-brand-black">{quantity}</span>
+                    <span className="w-10 text-center text-[14px] font-medium text-brand-black">{quantity}</span>
                     <button
                       onClick={() => changeQuantity(1)}
                       disabled={quantity >= quantityCeiling}
@@ -340,8 +355,8 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, isOpen, onClos
                 </div>
               </div>
 
-              {/* Sticky actions */}
-              <div className="mt-auto border-t border-brand-gray-200 bg-brand-white p-4 sm:p-6 space-y-2.5 sticky bottom-0">
+              {/* Buy bar — outside the scroll area, so it is always reachable */}
+              <div className="flex-shrink-0 border-t border-brand-gray-200 bg-brand-white p-4 sm:p-6 space-y-2.5">
                 <button
                   onClick={handleAddToCart}
                   disabled={isOutOfStock}
