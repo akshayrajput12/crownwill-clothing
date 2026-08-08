@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Package, Truck, CheckCircle, Clock, MapPin, User, CreditCard, Phone, Mail, Download, FileText } from 'lucide-react';
+import { ArrowLeft, Package, Truck, CheckCircle, Clock, MapPin, User, CreditCard, Phone, Mail, Download, FileText, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { downloadInvoice, validateInvoiceData } from '@/utils/invoiceGenerator';
+import { sendOrderEmail } from '@/utils/orderEmail';
 
 interface OrderItem {
   id: string;
@@ -63,6 +64,7 @@ const AdminOrderDetail = () => {
   const [order, setOrder] = useState<OrderDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentStatus, setCurrentStatus] = useState<string>('');
+  const [emailingInvoice, setEmailingInvoice] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -185,9 +187,16 @@ const AdminOrderDetail = () => {
       if (error) throw error;
 
       setCurrentStatus(newStatus);
+
+      // Tell the customer. The status wording lives in the edge function so every
+      // channel says the same thing.
+      const emailed = order ? await sendOrderEmail(order.id, 'status') : { sent: false };
+
       toast({
         title: "Success",
-        description: "Order status updated successfully",
+        description: emailed.sent
+          ? "Status updated and the customer has been emailed."
+          : "Status updated. The customer email could not be sent.",
       });
     } catch (error: any) {
       toast({
@@ -196,6 +205,22 @@ const AdminOrderDetail = () => {
         variant: "destructive",
       });
     }
+  };
+
+  /** Sends the invoice to the email on the order — useful when a customer loses it. */
+  const handleEmailInvoice = async () => {
+    if (!order) return;
+    setEmailingInvoice(true);
+    const result = await sendOrderEmail(order.id, 'invoice');
+    setEmailingInvoice(false);
+
+    toast({
+      title: result.sent ? 'Invoice emailed' : 'Could not send invoice',
+      description: result.sent
+        ? `Sent to ${order.customerEmail}.`
+        : result.error ?? 'Check that the email function is deployed and configured.',
+      variant: result.sent ? undefined : 'destructive',
+    });
   };
 
   const handleDownloadInvoice = async () => {
@@ -314,7 +339,7 @@ const AdminOrderDetail = () => {
           </div>
         </div>
 
-        <div className="flex items-center space-x-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <Button
             onClick={handleDownloadInvoice}
             variant="outline"
@@ -324,6 +349,18 @@ const AdminOrderDetail = () => {
             <Download className="h-4 w-4" />
             <span className="hidden sm:inline">Download Invoice</span>
             <span className="sm:hidden">Invoice</span>
+          </Button>
+
+          <Button
+            onClick={handleEmailInvoice}
+            variant="outline"
+            size="sm"
+            disabled={emailingInvoice}
+            className="flex items-center gap-2"
+          >
+            {emailingInvoice ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
+            <span className="hidden sm:inline">Email Invoice</span>
+            <span className="sm:hidden">Email</span>
           </Button>
 
           <Badge className={getStatusColor(currentStatus)}>

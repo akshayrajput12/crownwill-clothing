@@ -124,7 +124,8 @@ const SocialGallery = () => {
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-brand-cream rounded-full filter blur-[100px] opacity-60 pointer-events-none -translate-y-1/2 translate-x-1/2"></div>
       <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-brand-gray-200 rounded-full filter blur-[100px] opacity-30 pointer-events-none translate-y-1/2 -translate-x-1/2"></div>
 
-      <div className="max-w-[1600px] mx-auto px-6 relative z-10">
+      {/* brand-container so the gutters line up with every other section on a phone */}
+      <div className="brand-container relative z-10">
         <motion.div
           className="text-center mb-12"
           initial={{ opacity: 0, y: 30 }}
@@ -168,7 +169,7 @@ const SocialGallery = () => {
                     whileHover={{ y: -8 }}
                   >
                     <div className="relative group">
-                      <div className="h-[450px] overflow-hidden bg-gray-50 flex items-center justify-center">
+                      <div className="h-[360px] sm:h-[450px] overflow-hidden bg-gray-50 flex items-center justify-center">
                         <div dangerouslySetInnerHTML={{ __html: post.embed_html }} className="w-full h-full flex items-center justify-center [&>iframe]:!w-full [&>iframe]:!h-full [&>iframe]:!border-0" />
                         {/* Overlay for interaction hint */}
                         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300 pointer-events-none" />

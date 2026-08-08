@@ -49,7 +49,9 @@ const FloatingWhatsApp = () => {
 
   return (
     <div 
-      className={`fixed bottom-6 right-6 z-50 transition-all duration-500 ease-in-out transform ${
+      // Sits above the sticky bottom bars phones get on the product, cart and checkout
+      // pages — at bottom-6 it covered the Add to Cart / Checkout button.
+      className={`fixed bottom-24 right-4 sm:bottom-6 sm:right-6 z-50 transition-all duration-500 ease-in-out transform ${
         isVisible ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'
       }`}
     >

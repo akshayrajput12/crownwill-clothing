@@ -64,8 +64,10 @@ export default {
 				ring: 'hsl(var(--ring))',
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
-				"hero-bg": 'hsl(var(--hero-bg))',
-				"footer-bg": 'hsl(var(--footer-bg))',
+				// Removed: hero-bg / footer-bg pointed at --hero-bg and --footer-bg, which are
+				// not defined anywhere. `bg-hero-bg` therefore produced no background at all,
+				// which is how BrandManifesto ended up as white text on white. Use the
+				// brand-* tokens below, which are real.
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
 					foreground: 'hsl(var(--primary-foreground))',

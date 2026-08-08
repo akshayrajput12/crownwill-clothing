@@ -119,6 +119,27 @@ export function useNewDrops(limit = 12) {
   });
 }
 
+/**
+ * Lower-cased names of every active product, for keyword matching on the client (the
+ * curated category tiles). Names only, so the payload stays tiny, and cached for half an
+ * hour since it only changes when the catalogue does.
+ */
+export function useCatalogueKeywords() {
+  return useQuery({
+    queryKey: ['catalogue-keywords'] as const,
+    staleTime: 30 * 60 * 1000,
+    queryFn: async (): Promise<string[]> => {
+      const { data, error } = await supabase
+        .from('products')
+        .select('name')
+        .eq('is_active', true)
+        .limit(500);
+      if (error) throw error;
+      return (data ?? []).map((row) => (row.name ?? '').toLowerCase());
+    },
+  });
+}
+
 export interface Combo {
   categoryId: string;
   name: string;

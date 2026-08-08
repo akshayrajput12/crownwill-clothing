@@ -5,8 +5,11 @@ import UltimateSavingCombos from '@/features/storefront/home/components/Ultimate
 import NewArrivalsSection from '@/features/storefront/home/components/NewArrivalsSection';
 import MostWantedCategories from '@/features/storefront/home/components/MostWantedCategories';
 import BrandMarquee from '@/features/storefront/home/components/BrandMarquee';
+import EditorialBanner from '@/features/storefront/home/components/EditorialBanner';
 import BestSellersRail from '@/features/storefront/home/components/BestSellersRail';
+import StoreProof from '@/features/storefront/home/components/StoreProof';
 import EditorialCampaign from '@/features/storefront/home/components/EditorialCampaign';
+import BrandManifesto from '@/features/storefront/home/components/BrandManifesto';
 import MemberOffers from '@/features/storefront/home/components/MemberOffers';
 import CrownveilstersApproved from '@/features/storefront/home/components/CrownveilstersApproved';
 import CustomerVoices from '@/features/storefront/home/components/CustomerVoices';
@@ -35,25 +38,34 @@ const Home: React.FC = () => {
       {/* 5. Category grid */}
       <MostWantedCategories />
 
-      {/* 6. Brand marquee */}
+      {/* 6. Full-bleed campaign asset */}
+      <EditorialBanner />
+
+      {/* 7. Brand marquee */}
       <BrandMarquee text="Making global fashion accessible" />
 
-      {/* 7. Bestsellers */}
+      {/* 8. Bestsellers */}
       <BestSellersRail />
 
-      {/* 8. Editorial break */}
+      {/* 9. The numbers, straight from the database */}
+      <StoreProof />
+
+      {/* 10. Editorial break */}
       <EditorialCampaign />
 
-      {/* 9. Coupons / standing offers */}
+      {/* 11. Brand story — sticky imagery on desktop, stacked on mobile */}
+      <BrandManifesto />
+
+      {/* 12. Coupons / standing offers */}
       <MemberOffers />
 
-      {/* 10. Reviews + ambassadors */}
+      {/* 13. Reviews + ambassadors */}
       <CrownveilstersApproved />
 
-      {/* 11. Testimonials — marquee columns */}
+      {/* 14. Testimonials — marquee columns */}
       <CustomerVoices />
 
-      {/* 12. Instagram */}
+      {/* 15. Instagram */}
       <SocialGallery />
 
       {/* Floating spotlight */}

@@ -49,7 +49,9 @@ const AddedToCartPopup: React.FC<{ isAdminRoute?: boolean }> = ({ isAdminRoute =
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 16, scale: 0.98 }}
           transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}
-          className="fixed z-[70] bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:bottom-6 sm:w-[360px]"
+          // Stacks clear of the page's sticky bottom bar and the WhatsApp button rather
+          // than landing on top of either.
+          className="fixed z-[70] bottom-40 left-4 right-4 sm:left-auto sm:right-6 sm:bottom-24 sm:w-[360px]"
         >
           <div className="bg-brand-white border border-brand-gray-200 rounded-[14px] shadow-[0_18px_50px_rgba(0,0,0,0.18)] overflow-hidden">
             {/* Header */}

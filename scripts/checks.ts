@@ -10,6 +10,16 @@ import assert from 'node:assert/strict';
 
 import { buildOutfit, classifySlot, outfitTotals, priceAffinity } from '../src/lib/outfit';
 import { couponDiscount, describeCoupon, isCouponLive, validateCoupon } from '../src/lib/coupons';
+import {
+  distributeStock,
+  generateSku,
+  matchColumn,
+  parseBoolean,
+  parseNumber,
+  parseSheet,
+  parseSizeSpec,
+  specsOf,
+} from '../src/lib/productImport';
 
 /* ---------------------------------------------------------------- outfit ---- */
 
@@ -122,5 +132,87 @@ assert.equal(isCouponLive({ ...live, usage_limit: 1, used_count: 1 }, now), fals
 assert.equal(describeCoupon(live), '10% off, up to ₹500');
 assert.equal(describeCoupon({ code: 'F', discount_type: 'fixed', discount_value: 300 }), '₹300 off');
 assert.equal(describeCoupon({ code: 'D', description: 'Launch offer' }), 'Launch offer');
+
+/* -------------------------------------------------------- excel import ---- */
+
+assert.equal(matchColumn('Product Name'), 'name');
+assert.equal(matchColumn('  product name  '), 'name', 'header matching ignores case and spacing');
+assert.equal(matchColumn('MRP'), 'originalPrice', 'aliases map onto the canonical field');
+assert.equal(matchColumn('Colour'), 'colour');
+assert.equal(matchColumn('Color'), 'colour', 'both spellings land on one field');
+assert.equal(matchColumn('Random Notes'), null, 'unknown columns are ignored, not guessed');
+
+assert.equal(parseNumber('₹1,299'), 1299, 'currency symbols and separators are stripped');
+assert.equal(parseNumber(1299), 1299);
+assert.equal(parseNumber(''), null);
+assert.equal(parseNumber('not a price'), null);
+
+assert.equal(parseBoolean('Yes'), true);
+assert.equal(parseBoolean('NO'), false);
+assert.equal(parseBoolean(''), undefined, 'blank must stay undefined so defaults apply');
+
+assert.deepEqual(distributeStock(10, 3), [4, 3, 3], 'remainder goes to the earliest sizes');
+assert.deepEqual(distributeStock(9, 3), [3, 3, 3]);
+assert.deepEqual(distributeStock(0, 3), [0, 0, 0]);
+assert.deepEqual(distributeStock(5, 0), []);
+
+assert.deepEqual(parseSizeSpec('S:10, M:15, L:5'), [
+  { size: 'S', stock: 10 },
+  { size: 'M', stock: 15 },
+  { size: 'L', stock: 5 },
+]);
+assert.deepEqual(
+  parseSizeSpec('s, m, l', 10),
+  [{ size: 'S', stock: 4 }, { size: 'M', stock: 3 }, { size: 'L', stock: 3 }],
+  'bare sizes split the row total, so no stock is invented'
+);
+assert.deepEqual(parseSizeSpec('', 10), []);
+
+const sheet = parseSheet([
+  {
+    'Product Name': 'Heavyweight Tee',
+    Category: 'T-Shirts',
+    SKU: 'CV-TEE-1',
+    'Selling Price': '₹1,299',
+    MRP: '1999',
+    Sizes: 'S:2, M:3',
+    Stock: '99',
+    'Image URLs': 'https://a.test/1.jpg, https://a.test/2.jpg',
+    Active: 'Yes',
+  },
+  { 'Product Name': '', Category: '', 'Selling Price': '' },            // blank → dropped
+  { 'Product Name': 'No Price Item', Category: 'Shirts' },              // missing price → error
+  { 'Product Name': 'Dup', Category: 'Shirts', SKU: 'cv-tee-1', 'Selling Price': '500' },
+]);
+
+assert.equal(sheet.rows.length, 3, 'fully blank rows are dropped, not reported as errors');
+assert.equal(sheet.validCount, 1);
+assert.equal(sheet.errorCount, 2);
+assert.deepEqual(sheet.categories, ['T-Shirts', 'Shirts'], 'categories are deduped in first-seen order');
+
+const first = sheet.rows[0];
+assert.equal(first.rowNumber, 2, 'row numbers match what the admin sees in Excel');
+assert.equal(first.product.price, 1299);
+assert.equal(first.product.stock, 5, 'per-size counts win over the Stock column');
+assert.ok(first.warnings.some((w) => w.includes('Stock set to 5')));
+assert.equal(first.product.images.length, 2);
+
+assert.ok(sheet.rows[1].errors.some((e) => e.includes('Selling Price')));
+assert.ok(sheet.rows[2].errors.some((e) => e.includes('Duplicate SKU')), 'duplicate SKUs are caught case-insensitively');
+
+assert.deepEqual(
+  specsOf({ ...first.product, fabric: '100% Cotton', fit: '', colour: 'Black', origin: '' }),
+  { fabric: '100% Cotton', colour: 'Black' },
+  'blank spec cells are left out rather than written as empty strings'
+);
+
+const taken = new Set<string>();
+const generated = generateSku({ ...first.product, name: 'Heavyweight Tee', category: 'T Shirts' }, taken);
+assert.equal(generated, 'TS-HEAVYWEIGHT-TEE');
+assert.equal(
+  generateSku({ ...first.product, name: 'Heavyweight Tee', category: 'T Shirts' }, taken),
+  'TS-HEAVYWEIGHT-TEE-2',
+  'a generated SKU never collides with one already handed out'
+);
 
 console.log('✓ all storefront logic checks passed');

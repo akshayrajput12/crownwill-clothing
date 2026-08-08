@@ -1,13 +1,33 @@
 import React from 'react';
+import { ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useCategories } from '@/hooks/queries';
-import { fallbackTileImage } from '@/lib/brandImages';
+import { useCategories, useCatalogueKeywords } from '@/hooks/queries';
+import { brandImages, marketingImages, fallbackTileImage } from '@/lib/brandImages';
 
 /**
- * Category grid. Tiles come from the live category list (one cached query shared
- * with the navbar), so renaming or re-imaging a category in admin updates the grid.
- * The two price-promo tiles are marketing, not categories, so they stay static.
+ * Category grid.
+ *
+ * Three kinds of tile, in this order:
+ *  - live categories from the DB (renaming or re-imaging one in admin updates the grid),
+ *  - curated menswear tiles below, shot on the brand's own campaign art, and
+ *  - the two price-promo tiles, which are marketing rather than categories.
+ *
+ * A curated tile only renders when the catalogue actually carries something matching its
+ * keywords, and drops out if the admin creates a real category with the same name. So the
+ * grid fills out as the catalogue grows and no tile ever leads to an empty results page.
  */
+
+/** Curated tiles. `keywords` are matched against live product names. */
+const curatedTiles = [
+  { title: 'Polos', keywords: ['polo'], image: brandImages.contrastPoloNavy },
+  { title: 'Linen Shirts', keywords: ['linen'], image: marketingImages.heroLinenShirts },
+  { title: 'Oxford Shirts', keywords: ['oxford'], image: brandImages.oxfordShirtBlue },
+  { title: 'Printed Shirts', keywords: ['print'], image: brandImages.printedShirtOlive },
+  { title: 'T-Shirts', keywords: ['t-shirt', 'tshirt', 'tee'], image: marketingImages.categoryShirts },
+  { title: 'Pyjama Pants', keywords: ['pyjama', 'pajama'], image: marketingImages.heroPyjamaPants },
+  { title: 'Trousers & Chinos', keywords: ['trouser', 'chino', 'pant'], image: marketingImages.pdpLifestyle },
+  { title: 'Overshirts & Layers', keywords: ['overshirt', 'shacket', 'jacket'], image: brandImages.heritagePolo },
+];
 
 const promoTiles = [
   { title: 'Everything Under ₹799', link: '/products?max_price=799', slot: 5 },
@@ -19,6 +39,9 @@ type Tile = { kind: 'category' | 'promo'; title: string; link: string; image?: s
 const MostWantedCategories: React.FC = () => {
   const navigate = useNavigate();
   const { data: categories = [], isLoading } = useCategories();
+  const { data: productNames = [] } = useCatalogueKeywords();
+
+  const liveNames = new Set(categories.map((cat) => cat.name.trim().toLowerCase()));
 
   const categoryTiles: Tile[] = categories.map((cat) => ({
     kind: 'category',
@@ -26,6 +49,21 @@ const MostWantedCategories: React.FC = () => {
     link: `/products?category=${encodeURIComponent(cat.name)}`,
     image: cat.image_url || fallbackTileImage(cat.name),
   }));
+
+  // Curated tiles search the catalogue instead of filtering by category id, because the
+  // pieces they describe may not have a category row of their own yet.
+  for (const tile of curatedTiles) {
+    if (liveNames.has(tile.title.toLowerCase())) continue;
+    const matches = productNames.some((name) => tile.keywords.some((word) => name.includes(word)));
+    if (!matches) continue;
+
+    categoryTiles.push({
+      kind: 'category',
+      title: tile.title,
+      link: `/products?search=${encodeURIComponent(tile.keywords[0])}`,
+      image: tile.image,
+    });
+  }
 
   // Interleave the promo tiles at their slots; anything past the end of the category
   // list is appended, so a small catalogue still shows both offer tiles.
@@ -93,14 +131,21 @@ const MostWantedCategories: React.FC = () => {
                       <img
                         src={tile.image}
                         alt={tile.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        className="w-full h-full object-cover group-hover:scale-[1.07] transition-transform duration-500 ease-out"
                         loading="lazy"
                         decoding="async"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-brand-black/80 via-transparent to-transparent" />
-                      <span className="absolute bottom-3 left-3 right-3 text-brand-white text-[12px] sm:text-[13px] font-medium uppercase tracking-[0.16em] drop-shadow">
-                        {tile.title}
-                      </span>
+                      <div className="absolute inset-0 bg-gradient-to-t from-brand-black/85 via-brand-black/15 to-transparent" />
+
+                      <div className="absolute bottom-3 left-3 right-3">
+                        <span className="block text-brand-white text-[12px] sm:text-[13px] font-medium uppercase tracking-[0.16em] drop-shadow">
+                          {tile.title}
+                        </span>
+                        {/* Hover CTA slides in under the label on pointer devices */}
+                        <span className="hidden sm:flex items-center gap-1 text-brand-yellow text-[10px] uppercase tracking-[0.18em] mt-1 opacity-0 -translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
+                          Shop now <ArrowRight className="w-3 h-3" />
+                        </span>
+                      </div>
                     </>
                   )}
                 </div>

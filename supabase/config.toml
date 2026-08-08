@@ -86,5 +86,10 @@ enable_confirmations = false
 [functions.create-razorpay-order]
 verify_jwt = true
 
+# Guests must be able to receive their own order confirmation, so this function does its
+# own authorisation instead of requiring a JWT at the edge (see its header comment).
+[functions.send-order-email]
+verify_jwt = false
+
 [functions.verify-razorpay-payment]
 verify_jwt = true

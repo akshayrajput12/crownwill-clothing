@@ -33,11 +33,13 @@ const BrandManifesto = () => {
     ];
 
     return (
-        <section ref={targetRef} className="relative bg-hero-bg">
+        <section ref={targetRef} className="relative bg-brand-black">
             <div className="flex flex-col lg:flex-row">
 
-                {/* Left Side - Sticky Image (The Process/Craft) */}
-                <div className="lg:w-1/2 h-screen sticky top-0 overflow-hidden z-0">
+                {/* Left Side — sticky on desktop only. On a phone the column stacks, so a
+                    sticky full-height image plus three full-height panels would cost four
+                    screens of scrolling to read one brand story. */}
+                <div className="relative lg:sticky lg:top-0 lg:w-1/2 h-[45vh] lg:h-screen overflow-hidden z-0">
                     <div className="absolute inset-0 bg-black/10 z-10" />
                     <img
                         src={brandImages.contrastPoloNavy}
@@ -49,7 +51,7 @@ const BrandManifesto = () => {
                 </div>
 
                 {/* Right Side - Scrollable Text with Background */}
-                <div className="lg:w-1/2 relative bg-hero-bg">
+                <div className="lg:w-1/2 relative bg-brand-black">
 
                     {/* Fixed Background for the Right Side */}
                     <div className="absolute inset-0 z-0 overflow-hidden">
@@ -58,7 +60,7 @@ const BrandManifesto = () => {
                             alt=""
                             className="w-full h-full object-cover opacity-10 blur-sm scale-110 mix-blend-overlay"
                         />
-                        <div className="absolute inset-0 bg-hero-bg/95" />
+                        <div className="absolute inset-0 bg-brand-black/95" />
                     </div>
 
                     {/* Scrollable Text Columns */}
@@ -66,7 +68,7 @@ const BrandManifesto = () => {
                         {content.map((item, index) => (
                             <div
                                 key={item.id}
-                                className="h-screen flex flex-col justify-center px-8 md:px-16 lg:px-24 border-l border-brand-yellow-dark/10"
+                                className="min-h-[52vh] lg:h-screen flex flex-col justify-center px-6 py-12 md:px-16 lg:px-24 lg:py-0 border-t lg:border-t-0 lg:border-l border-brand-yellow-dark/10"
                             >
                                 <motion.div
                                     initial={{ opacity: 0, y: 50 }}

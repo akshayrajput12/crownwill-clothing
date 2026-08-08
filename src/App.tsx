@@ -31,6 +31,7 @@ const AdminLayout = lazy(() => import('@/pages/admin/AdminLayout'));
 const Dashboard = lazy(() => import('@/pages/admin/Dashboard'));
 const AdminProducts = lazy(() => import('@/pages/admin/Products'));
 const ProductForm = lazy(() => import('@/pages/admin/ProductForm'));
+const ProductImport = lazy(() => import('@/pages/admin/ProductImport'));
 const Categories = lazy(() => import('@/pages/admin/Categories'));
 const CategoryForm = lazy(() => import('@/pages/admin/CategoryForm'));
 const Orders = lazy(() => import('@/pages/admin/Orders'));
@@ -132,6 +133,7 @@ const AppContent = () => {
               <Route index element={<Dashboard />} />
               <Route path="products" element={<AdminProducts />} />
               <Route path="products/add" element={<ProductForm />} />
+              <Route path="products/import" element={<ProductImport />} />
               <Route path="products/edit/:id" element={<ProductForm isEdit={true} />} />
               <Route path="categories" element={<Categories />} />
               <Route path="categories/add" element={<CategoryForm />} />

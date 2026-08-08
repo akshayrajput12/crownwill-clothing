@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Package, Truck, CheckCircle, Clock, MapPin, User, CreditCard, Phone, Mail, Calendar, IndianRupee } from 'lucide-react';
+import { ArrowLeft, Package, Truck, CheckCircle, Clock, MapPin, User, CreditCard, Phone, Mail, Calendar, IndianRupee, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -8,6 +8,7 @@ import { Separator } from '@/components/ui/separator';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { sendOrderEmail } from '@/utils/orderEmail';
 
 interface OrderItem {
   id: string;
@@ -37,6 +38,8 @@ interface OrderDetail {
   status: string;
   paymentStatus: string;
   paymentMethod: string;
+  /** Stored on the order at checkout; the page renders it when present. */
+  estimatedDeliveryTime?: string;
   shippingAddress: {
     completeAddress: string;
     mapAddress?: string;
@@ -65,12 +68,29 @@ const UserOrderDetail = () => {
   const { user } = useAuth();
   const [order, setOrder] = useState<OrderDetail | null>(null);
   const [loading, setLoading] = useState(true);
+  const [emailingInvoice, setEmailingInvoice] = useState(false);
 
   useEffect(() => {
     if (id && user) {
       fetchOrderDetail();
     }
   }, [id, user]);
+
+  /** Re-sends the invoice to the address on the order. */
+  const handleEmailInvoice = async () => {
+    if (!order) return;
+    setEmailingInvoice(true);
+    const result = await sendOrderEmail(order.orderNumber, 'invoice');
+    setEmailingInvoice(false);
+
+    toast({
+      title: result.sent ? 'Invoice sent' : 'Could not send the invoice',
+      description: result.sent
+        ? 'Check your inbox — it is on its way.'
+        : result.error ?? 'Please try again in a moment.',
+      variant: result.sent ? undefined : 'destructive',
+    });
+  };
 
   const fetchOrderDetail = async () => {
     try {
@@ -119,6 +139,7 @@ const UserOrderDetail = () => {
           status: data.order_status,
           paymentStatus: data.payment_status,
           paymentMethod: data.payment_method,
+          estimatedDeliveryTime: data.estimated_delivery_time ?? undefined,
           shippingAddress: {
             completeAddress: addressDetails?.complete_address || '',
             mapAddress: addressDetails?.map_address || deliveryLocation?.address || '',
@@ -219,21 +240,29 @@ const UserOrderDetail = () => {
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <Button variant="ghost" onClick={() => navigate('/profile?tab=orders')}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Orders
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex items-start gap-2 sm:gap-4">
+            <Button variant="ghost" size="sm" onClick={() => navigate('/profile?tab=orders')} className="mt-1">
+              <ArrowLeft className="h-4 w-4 sm:mr-2" />
+              <span className="hidden sm:inline">Back to Orders</span>
             </Button>
             <div>
-              <h1 className="text-3xl font-semibold">Order #{order.orderNumber}</h1>
-              <p className="text-muted-foreground">
+              <h1 className="text-xl sm:text-3xl font-semibold break-all">Order #{order.orderNumber}</h1>
+              <p className="text-sm text-muted-foreground">
                 Placed on {formatDate(order.orderDate)}
               </p>
             </div>
           </div>
-          
-          <div className="flex items-center space-x-3">
+
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            <Button variant="outline" size="sm" onClick={handleEmailInvoice} disabled={emailingInvoice}>
+              {emailingInvoice ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <Mail className="h-4 w-4 mr-2" />
+              )}
+              Email invoice
+            </Button>
             <Badge className={getStatusColor(order.status)}>
               {order.status}
             </Badge>

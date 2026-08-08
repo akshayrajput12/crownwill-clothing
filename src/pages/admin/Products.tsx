@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Search, Filter, Edit, Trash2, Eye } from 'lucide-react';
+import { Plus, Search, Filter, Edit, Trash2, Eye, FileSpreadsheet } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -172,20 +172,29 @@ const AdminProducts = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-semibold">Products</h1>
-        <div className="flex gap-2">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+        <h1 className="text-2xl sm:text-3xl font-semibold">Products</h1>
+        <div className="flex flex-wrap gap-2">
           {selectedProducts.length > 0 && (
             <Button
               variant="destructive"
               onClick={handleBulkDelete}
               disabled={isDeleting}
+              className="flex-1 sm:flex-none"
             >
               <Trash2 className="w-4 h-4 mr-2" />
               Delete Selected ({selectedProducts.length})
             </Button>
           )}
-          <Button onClick={() => navigate('/admin/products/add')}>
+          <Button
+            variant="outline"
+            onClick={() => navigate('/admin/products/import')}
+            className="flex-1 sm:flex-none"
+          >
+            <FileSpreadsheet className="w-4 h-4 mr-2" />
+            Add via Excel
+          </Button>
+          <Button onClick={() => navigate('/admin/products/add')} className="flex-1 sm:flex-none">
             <Plus className="w-4 h-4 mr-2" />
             Add Product
           </Button>

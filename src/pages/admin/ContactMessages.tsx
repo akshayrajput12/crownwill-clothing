@@ -61,7 +61,9 @@ const AdminContactMessages = () => {
       const { data, error } = await query;
 
       if (error) throw error;
-      setMessages(data || []);
+      // `status`/`priority` are plain text columns in Postgres, so the generated row type
+      // is `string` while the UI narrows them to its own unions.
+      setMessages((data || []) as unknown as ContactMessage[]);
     } catch (error) {
       console.error('Error fetching contact messages:', error);
       toast({
