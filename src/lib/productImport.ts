@@ -36,6 +36,10 @@ export interface ImportedProduct {
   fabric: string;
   fit: string;
   colour: string;
+  pattern: string;
+  sleeve: string;
+  neck: string;
+  occasion: string;
   origin: string;
   bestseller: boolean;
   newArrival: boolean;
@@ -135,6 +139,30 @@ export const TEMPLATE_COLUMNS: TemplateColumn[] = [
     example: 'Off White',
   },
   {
+    key: 'pattern',
+    header: 'Pattern',
+    help: 'Listed under Product Specifications, e.g. Solid, Printed, Striped.',
+    example: 'Cutwork',
+  },
+  {
+    key: 'sleeve',
+    header: 'Sleeve',
+    help: 'Listed under Product Specifications, e.g. Half Sleeve, Full Sleeve.',
+    example: 'Half Sleeve',
+  },
+  {
+    key: 'neck',
+    header: 'Collar / Neck',
+    help: 'Listed under Product Specifications, e.g. Cuban Collar, Round Neck.',
+    example: 'Cuban Collar',
+  },
+  {
+    key: 'occasion',
+    header: 'Occasion',
+    help: 'Listed under Product Specifications, e.g. Casual Wear, Resort Wear.',
+    example: 'Casual Wear',
+  },
+  {
     key: 'origin',
     header: 'Country of Origin',
     help: 'Listed under Product Specifications.',
@@ -200,6 +228,10 @@ const HEADER_ALIASES: Record<string, keyof ImportedProduct> = {
   material: 'fabric',
   colour: 'colour',
   color: 'colour',
+  collar: 'neck',
+  neck: 'neck',
+  collarneck: 'neck',
+  sleevelength: 'sleeve',
   countryoforigin: 'origin',
   isactive: 'active',
   published: 'active',
@@ -343,6 +375,10 @@ export function parseRow(raw: Record<string, unknown>, rowNumber: number): Parse
       fabric: text(cell.fabric),
       fit: text(cell.fit),
       colour: text(cell.colour),
+      pattern: text(cell.pattern),
+      sleeve: text(cell.sleeve),
+      neck: text(cell.neck),
+      occasion: text(cell.occasion),
       origin: text(cell.origin),
       bestseller: parseBoolean(cell.bestseller) ?? false,
       newArrival: parseBoolean(cell.newArrival) ?? false,
@@ -394,6 +430,10 @@ export function specsOf(product: ImportedProduct): Record<string, string> {
   if (product.fabric) specs.fabric = product.fabric;
   if (product.fit) specs.fit = product.fit;
   if (product.colour) specs.colour = product.colour;
+  if (product.pattern) specs.pattern = product.pattern;
+  if (product.sleeve) specs.sleeve = product.sleeve;
+  if (product.neck) specs.collar = product.neck;
+  if (product.occasion) specs.occasion = product.occasion;
   if (product.origin) specs.origin = product.origin;
   return specs;
 }

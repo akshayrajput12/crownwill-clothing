@@ -2,7 +2,7 @@ import React from 'react';
 import { ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCategories, useCatalogueKeywords } from '@/hooks/queries';
-import { brandImages, marketingImages, fallbackTileImage } from '@/lib/brandImages';
+import { brandImages, marketingImages, stockCategoryImages, fallbackTileImage } from '@/lib/brandImages';
 
 /**
  * Category grid.
@@ -17,15 +17,25 @@ import { brandImages, marketingImages, fallbackTileImage } from '@/lib/brandImag
  * grid fills out as the catalogue grows and no tile ever leads to an empty results page.
  */
 
-/** Curated tiles. `keywords` are matched against live product names. */
+/**
+ * Curated tiles — a full 2×6 grid whether or not the admin has created categories yet.
+ *
+ * Brand campaign art is used wherever it exists; the rest use free stock photography
+ * that was checked shot-by-shot (see `stockCategoryImages`). `keywords` are matched
+ * against live product names to decide where the tile points.
+ */
 const curatedTiles = [
   { title: 'Polos', keywords: ['polo'], image: brandImages.contrastPoloNavy },
+  { title: 'Shirts', keywords: ['shirt'], image: stockCategoryImages.shirts },
   { title: 'Linen Shirts', keywords: ['linen'], image: marketingImages.heroLinenShirts },
   { title: 'Oxford Shirts', keywords: ['oxford'], image: brandImages.oxfordShirtBlue },
   { title: 'Printed Shirts', keywords: ['print'], image: brandImages.printedShirtOlive },
-  { title: 'T-Shirts', keywords: ['t-shirt', 'tshirt', 'tee'], image: marketingImages.categoryShirts },
-  { title: 'Pyjama Pants', keywords: ['pyjama', 'pajama'], image: marketingImages.heroPyjamaPants },
-  { title: 'Trousers & Chinos', keywords: ['trouser', 'chino', 'pant'], image: marketingImages.pdpLifestyle },
+  { title: 'T-Shirts', keywords: ['t-shirt', 'tshirt', 'tee'], image: stockCategoryImages.tshirts },
+  { title: 'Sweatshirts', keywords: ['sweatshirt', 'hoodie', 'sweater'], image: stockCategoryImages.sweatshirts },
+  { title: 'Trousers', keywords: ['trouser', 'chino'], image: stockCategoryImages.trousers },
+  { title: 'Joggers', keywords: ['jogger', 'track'], image: stockCategoryImages.joggers },
+  { title: 'Jeans', keywords: ['jean', 'denim'], image: stockCategoryImages.jeans },
+  { title: 'Pyjamas', keywords: ['pyjama', 'pajama'], image: marketingImages.heroPyjamaPants },
   { title: 'Overshirts & Layers', keywords: ['overshirt', 'shacket', 'jacket'], image: brandImages.heritagePolo },
 ];
 
@@ -51,16 +61,17 @@ const MostWantedCategories: React.FC = () => {
   }));
 
   // Curated tiles search the catalogue instead of filtering by category id, because the
-  // pieces they describe may not have a category row of their own yet.
+  // pieces they describe may not have a category row of their own yet. A tile whose
+  // keyword matches nothing still renders — the grid stays full — but it points at the
+  // full catalogue rather than a search that would land on "no products found".
   for (const tile of curatedTiles) {
     if (liveNames.has(tile.title.toLowerCase())) continue;
     const matches = productNames.some((name) => tile.keywords.some((word) => name.includes(word)));
-    if (!matches) continue;
 
     categoryTiles.push({
       kind: 'category',
       title: tile.title,
-      link: `/products?search=${encodeURIComponent(tile.keywords[0])}`,
+      link: matches ? `/products?search=${encodeURIComponent(tile.keywords[0])}` : '/products',
       image: tile.image,
     });
   }

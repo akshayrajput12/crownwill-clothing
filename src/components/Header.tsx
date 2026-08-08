@@ -71,15 +71,17 @@ const Header: React.FC<HeaderProps> = ({ isAdminRoute = false }) => {
       <div className="w-full bg-brand-white border-b border-brand-gray-200 backdrop-blur-md sticky top-0 z-40 transition-all duration-200">
         <div className="max-w-[1280px] mx-auto px-4 flex items-center justify-between h-[64px] md:h-[72px]">
 
-          {/* Left: Brand Logo */}
-          <Link to="/" className="flex items-center gap-2 group">
-            {/* Yellow Circle Icon with Mountain Motif */}
-            <div className="w-9 h-9 rounded-full bg-brand-yellow flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
-              <svg className="w-5 h-5 text-brand-black" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2L2 19h20L12 2zm0 4l6 11H6l6-11z" />
-              </svg>
-            </div>
-            {/* Bold Black Wordmark */}
+          {/* Left: Brand Logo — the real crown/CV mark, cut out of public/logo.png so it
+              sits on the white navbar without its original dark tile. */}
+          <Link to="/" className="flex items-center gap-2.5 group" aria-label="Crownveil — home">
+            <img
+              src="/assets/logo-mark.png"
+              alt=""
+              width={173}
+              height={184}
+              className="h-8 md:h-10 w-auto group-hover:scale-105 transition-transform"
+              decoding="async"
+            />
             <span className="crownveil-wordmark text-[19px] md:text-[22px]">
               Crownveil
             </span>
@@ -258,11 +260,7 @@ const Header: React.FC<HeaderProps> = ({ isAdminRoute = false }) => {
             >
               <div className="flex items-center justify-between pb-4 border-b border-brand-gray-200">
                 <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-full bg-brand-yellow flex items-center justify-center">
-                    <svg className="w-4 h-4 text-brand-black" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 2L2 19h20L12 2zm0 4l6 11H6l6-11z" />
-                    </svg>
-                  </div>
+                  <img src="/assets/logo-mark.png" alt="" className="h-7 w-auto" decoding="async" />
                   <span className="crownveil-wordmark text-[17px]">Crownveil</span>
                 </div>
                 <button onClick={() => setIsMobileMenuOpen(false)} className="text-brand-black">

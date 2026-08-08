@@ -201,10 +201,22 @@ assert.ok(sheet.rows[1].errors.some((e) => e.includes('Selling Price')));
 assert.ok(sheet.rows[2].errors.some((e) => e.includes('Duplicate SKU')), 'duplicate SKUs are caught case-insensitively');
 
 assert.deepEqual(
-  specsOf({ ...first.product, fabric: '100% Cotton', fit: '', colour: 'Black', origin: '' }),
-  { fabric: '100% Cotton', colour: 'Black' },
+  specsOf({
+    ...first.product,
+    fabric: '100% Cotton',
+    fit: '',
+    colour: 'Black',
+    pattern: '',
+    sleeve: 'Half Sleeve',
+    neck: 'Cuban Collar',
+    occasion: '',
+    origin: '',
+  }),
+  { fabric: '100% Cotton', colour: 'Black', sleeve: 'Half Sleeve', collar: 'Cuban Collar' },
   'blank spec cells are left out rather than written as empty strings'
 );
+assert.equal(matchColumn('Collar / Neck'), 'neck');
+assert.equal(matchColumn('Sleeve Length'), 'sleeve', 'a longer real-world header still maps');
 
 const taken = new Set<string>();
 const generated = generateSku({ ...first.product, name: 'Heavyweight Tee', category: 'T Shirts' }, taken);

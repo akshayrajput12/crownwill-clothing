@@ -62,8 +62,17 @@ const Footer: React.FC<FooterProps> = ({ isAdminRoute = false }) => {
         {/* Brand line */}
         <div className="pb-10 border-b border-white/10 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
           <div className="space-y-3">
-            <Link to="/" className="crownveil-wordmark text-brand-white text-[22px] block">
-              Crownveil
+            {/* The full lockup, which was drawn for a dark ground, gets to be itself here. */}
+            <Link to="/" className="inline-block" aria-label="Crownveil — home">
+              <img
+                src="/assets/logo-full.png"
+                alt="Crownveil"
+                width={307}
+                height={236}
+                className="h-14 w-auto"
+                loading="lazy"
+                decoding="async"
+              />
             </Link>
             <p className="text-[14px] text-white/60 max-w-md leading-relaxed">
               Elevated menswear essentials — considered fabrics, precise proportions and

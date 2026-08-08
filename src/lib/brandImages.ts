@@ -80,6 +80,35 @@ export const collectionFallbacks = [
   marketingImages.categoryShirts,
 ];
 
+/**
+ * Free stock photography for the category tiles the brand has no shot of yet.
+ *
+ * These are Unsplash photo ids (free licence, no attribution required). `auto=format`
+ * makes Unsplash serve WebP/AVIF to browsers that accept it, and the width parameter
+ * keeps the tile download small.
+ *
+ * Every id below was fetched and eyeballed before being used, so each one really shows
+ * the menswear it is labelled with. Replace them with your own product photography as
+ * it becomes available — an uploaded category image always wins over these.
+ */
+const unsplash = (id: string, width = 800) =>
+  `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${width}&q=75`;
+
+export const stockCategoryImages = {
+  /** White crew-neck tee on a male model. */
+  tshirts: unsplash('photo-1521572163474-6864f9cf17ab'),
+  /** Three folded dress shirts, flat lay on wood. */
+  shirts: unsplash('photo-1602810318383-e386cc2a3ccf'),
+  /** Khaki cuffed joggers with white sneakers. */
+  joggers: unsplash('photo-1473966968600-fa801b869a1a'),
+  /** White crew sweatshirt, flat lay. */
+  sweatshirts: unsplash('photo-1620799140408-edc6dcb6d633'),
+  /** Male model in light distressed denim, street setting. */
+  jeans: unsplash('photo-1516826957135-700dedea698c'),
+  /** Male model in tailored black trousers. */
+  trousers: unsplash('photo-1584865288642-42078afe6942'),
+} as const;
+
 /** Deterministic fallback so a given tile keeps the same art between renders. */
 export function fallbackTileImage(seed: string | number) {
   const n = typeof seed === 'number'
