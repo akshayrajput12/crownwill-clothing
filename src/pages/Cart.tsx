@@ -36,7 +36,8 @@ const Cart = () => {
   }
 
   const subtotal = cartItems.reduce((sum, item) => sum + (toNumber(item.price) * toNumber(item.quantity)), 0);
-  const tax = calculatePercentage(subtotal, settings.tax_rate);
+  // Listed prices already include tax — nothing is added on top.
+  const tax = 0;
 
   // Delivery fee calculation based on settings
   const deliveryFee = meetsThreshold(subtotal, settings.free_delivery_threshold) ? 0 : toNumber(settings.delivery_charge);
@@ -199,11 +200,6 @@ const Cart = () => {
                   </div>
 
                   <div className="flex justify-between text-brand-gray-700">
-                    <span>Tax ({toNumber(settings.tax_rate).toFixed(0)}%)</span>
-                    <span className="font-normal text-brand-black font-instrument">{formatPrice(tax)}</span>
-                  </div>
-
-                  <div className="flex justify-between text-brand-gray-700">
                     <span>Delivery Fee</span>
                     <span className="font-normal text-brand-black font-instrument">
                       {deliveryFee === 0 ? (
@@ -241,8 +237,8 @@ const Cart = () => {
                     <span>Total</span>
                     <span className="text-brand-black">{formatPrice(total)}</span>
                   </div>
-                  <p className="text-xs text-brand-gray-700 mt-2 italic text-right">
-                    Calculated at checkout based on location
+                  <p className="text-xs text-brand-gray-500 mt-2 text-right">
+                    Inclusive of all taxes
                   </p>
                 </div>
 

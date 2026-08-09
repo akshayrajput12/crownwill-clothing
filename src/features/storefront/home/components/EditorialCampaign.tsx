@@ -22,7 +22,7 @@ const EditorialCampaign: React.FC = () => {
             </h2>
             <p className="text-[14px] sm:text-[15px] text-brand-gray-700 leading-[1.8] max-w-md">
               Jaipur-inspired artwork on breathable cotton, finished with the details that
-              survive a hundred washes. Made in limited runs — once a print is gone, it stays gone.
+              survive a hundred washes. Made in limited runs, so once a print is gone, it stays gone.
             </p>
             <button
               onClick={() => navigate('/products?sort=newest')}

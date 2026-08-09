@@ -500,11 +500,12 @@ export function generateInvoiceHTML(data: InvoiceData): string {
                     <span>${store_info.currency_symbol}${pricing.subtotal.toFixed(2)}</span>
                 </div>
                 
+                ${pricing.tax > 0 ? `
                 <div class="pricing-row">
                     <span>Tax (GST):</span>
                     <span>${store_info.currency_symbol}${pricing.tax.toFixed(2)}</span>
-                </div>
-                
+                </div>` : ''}
+
                 <div class="pricing-row">
                     <span>Delivery Fee:</span>
                     <span>${pricing.delivery_fee > 0 ? store_info.currency_symbol + pricing.delivery_fee.toFixed(2) : 'FREE'}</span>
@@ -528,6 +529,10 @@ export function generateInvoiceHTML(data: InvoiceData): string {
                     <span>Total Amount:</span>
                     <span>${store_info.currency_symbol}${pricing.total.toFixed(2)}</span>
                 </div>
+                ${pricing.tax > 0 ? '' : `
+                <div class="pricing-row" style="border:0;padding-top:4px;">
+                    <span style="font-size:0.75rem;color:#666;">Inclusive of all taxes</span>
+                </div>`}
             </div>
             
             <!-- Payment & Status Info -->

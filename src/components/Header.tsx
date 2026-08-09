@@ -25,6 +25,43 @@ const Header: React.FC<HeaderProps> = ({ isAdminRoute = false }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [activeMegaMenu, setActiveMegaMenu] = useState<string | null>(null);
+  const [hidden, setHidden] = useState(false);
+
+  /**
+   * Auto-hiding header: slides away as you scroll down and comes straight back on the
+   * first upward scroll, so the catalogue gets the full screen without costing anyone a
+   * trip to the top to reach search or the bag.
+   *
+   * Reads are throttled to one per animation frame — a scroll listener that calls
+   * setState on every event is the classic way to make a page feel heavy.
+   */
+  useEffect(() => {
+    let lastY = window.scrollY;
+    let ticking = false;
+
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+
+      window.requestAnimationFrame(() => {
+        const y = window.scrollY;
+        const delta = y - lastY;
+
+        // Ignore rubber-banding at the very top, and jitter below the noise floor.
+        if (y < 96) setHidden(false);
+        else if (Math.abs(delta) > 6) setHidden(delta > 0);
+
+        lastY = y;
+        ticking = false;
+      });
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  // Never hide the bar while a menu that hangs off it is open.
+  const isHidden = hidden && !activeMegaMenu && !isMobileMenuOpen && !isSearchOpen;
 
   // Nav categories: one cached query for the whole app (see hooks/queries.ts),
   // so route changes never refetch it.
@@ -61,7 +98,11 @@ const Header: React.FC<HeaderProps> = ({ isAdminRoute = false }) => {
   if (isAdminRoute) return null;
 
   return (
-    <header className="w-full z-50 sticky top-0 bg-brand-white">
+    <header
+      className={`w-full z-50 sticky top-0 bg-brand-white transition-transform duration-300 ease-out will-change-transform ${
+        isHidden ? '-translate-y-full' : 'translate-y-0'
+      }`}
+    >
       {/* PART 2.A: ANNOUNCEMENT BAR */}
       <div className="w-full bg-brand-black h-[36px] md:h-[40px] flex items-center justify-center text-brand-white text-[12px] font-medium tracking-wide px-4">
         <span>Free Shipping Sitewide on Every Order, Don't Miss Out!!</span>

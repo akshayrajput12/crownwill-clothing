@@ -295,6 +295,8 @@ function renderEmail(options: {
               : ""}
             ${summaryRow("Total", money(order.total, currency), "total")}
           </table>
+          ${Number(order.tax ?? 0) > 0 ? "" : `
+          <div style="font-size:11px;color:${MUTED};padding-top:6px;text-align:right;">Inclusive of all taxes</div>`}
         </td></tr>` : ""}
 
         <!-- Delivery -->

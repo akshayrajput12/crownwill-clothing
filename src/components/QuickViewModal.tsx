@@ -153,7 +153,10 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, isOpen, onClos
                the capped height instead and scroll inside it.
                Mobile: fixed-height bottom sheet. Desktop: height follows the content up to
                86vh, so short products get a short dialog rather than a wall of whitespace. */
-            className="relative bg-brand-white w-full h-[90vh] sm:h-auto sm:max-h-[86vh] sm:max-w-4xl rounded-t-[20px] sm:rounded-[16px] shadow-[0_30px_80px_rgba(0,0,0,0.35)] overflow-hidden flex flex-col sm:flex-row sm:items-stretch"
+            /* dvh, not vh: mobile browsers size vh against the *largest* viewport, so a
+               90vh sheet puts its buy bar underneath the address bar until you scroll.
+               dvh tracks the visible viewport, which is what a bottom sheet needs. */
+            className="relative bg-brand-white w-full h-[88dvh] sm:h-auto sm:max-h-[86vh] sm:max-w-4xl rounded-t-[20px] sm:rounded-[16px] shadow-[0_30px_80px_rgba(0,0,0,0.35)] overflow-hidden flex flex-col sm:flex-row sm:items-stretch"
             initial={{ opacity: 0, y: 40, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 30, scale: 0.98 }}
@@ -175,7 +178,7 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, isOpen, onClos
                 producing a letterbox sliver. */}
             <div className="relative bg-brand-offwhite flex-shrink-0 sm:w-1/2 sm:min-h-[460px]">
               <div
-                className="relative h-[34vh] sm:absolute sm:inset-0 sm:h-full overflow-hidden"
+                className="relative h-[32dvh] sm:absolute sm:inset-0 sm:h-full overflow-hidden"
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
               >
@@ -355,8 +358,9 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, isOpen, onClos
                 </div>
               </div>
 
-              {/* Buy bar — outside the scroll area, so it is always reachable */}
-              <div className="flex-shrink-0 border-t border-brand-gray-200 bg-brand-white p-4 sm:p-6 space-y-2.5">
+              {/* Buy bar — outside the scroll area, so it is always reachable. The bottom
+                  padding clears the iPhone home indicator. */}
+              <div className="flex-shrink-0 border-t border-brand-gray-200 bg-brand-white px-4 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:p-6 space-y-2.5">
                 <button
                   onClick={handleAddToCart}
                   disabled={isOutOfStock}

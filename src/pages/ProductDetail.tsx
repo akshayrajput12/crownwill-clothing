@@ -2,7 +2,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useMemo, useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-  Star, Heart, ChevronRight, Truck, CheckCircle2, Shield,
+  Star, Heart, ChevronRight, ArrowLeft, Truck, CheckCircle2, Shield,
   ChevronDown, Tag, Copy, Check, BadgeIndianRupee, RefreshCcw, ShoppingBag
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -197,6 +197,16 @@ const ProductDetail: React.FC = () => {
     <div className="bg-brand-white min-h-screen py-6">
       <div className="max-w-[1280px] mx-auto px-4">
 
+        {/* Back to the catalogue — the browser's back button is not a reliable way home
+            when the shopper landed here from a search result or a shared link. */}
+        <Link
+          to="/products"
+          className="inline-flex items-center gap-2 mb-4 text-[12px] uppercase tracking-[0.16em] text-brand-gray-500 hover:text-brand-black transition-colors group"
+        >
+          <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
+          Back to products
+        </Link>
+
         {/* Breadcrumb Trail — real category, not a hardcoded aisle */}
         <div className="flex items-center gap-2 text-[12px] text-brand-gray-500 mb-6 overflow-x-auto">
           <Link to="/" className="hover:text-brand-black">Home</Link>
@@ -324,11 +334,9 @@ const ProductDetail: React.FC = () => {
                   </span>
                 )}
               </div>
-              {savings > 0 && (
-                <p className="text-[12px] text-brand-gray-500">
-                  You save {formatPrice(savings)} on this piece
-                </p>
-              )}
+              <p className="text-[12px] text-brand-gray-500">
+                {savings > 0 ? `You save ${formatPrice(savings)} · ` : ''}Inclusive of all taxes
+              </p>
             </motion.div>
 
             {/* Live offers — codes the admin is actually running */}

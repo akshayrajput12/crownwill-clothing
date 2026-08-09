@@ -63,7 +63,8 @@ const CartSidebar: React.FC<CartSidebarProps> = ({ isAdminRoute = false }) => {
     return total + (price * quantity);
   }, 0);
 
-  const tax = calculatePercentage(subtotal, settings.tax_rate);
+  // Prices are tax-inclusive; the sidebar shows goods + delivery only.
+  const tax = 0;
 
   // For the cart sidebar, we don't have pincode information, so we use standard delivery charge
   // In a real implementation, you might store the pincode in localStorage or get it from user profile
@@ -211,7 +212,7 @@ const CartSidebar: React.FC<CartSidebarProps> = ({ isAdminRoute = false }) => {
                     <span className="text-brand-black font-semibold">{formatCurrency(total, settings.currency_symbol)}</span>
                   </div>
                   <p className="text-xs text-brand-gray-700/80 text-center pt-1">
-                    Shipping & Taxes calculated at checkout
+                    Inclusive of all taxes
                   </p>
                 </div>
 

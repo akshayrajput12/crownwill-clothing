@@ -217,10 +217,13 @@ const CheckoutSummary = ({
                       {deliveryFee === 0 ? <span className="text-green-700">Free</span> : formatPrice(deliveryFee)}
                     </span>
                   </div>
-                  <div className="flex justify-between text-brand-gray-700">
-                    <span>Tax</span>
-                    <span className="font-normal text-brand-black font-instrument">{formatPrice(tax)}</span>
-                  </div>
+                  {/* Prices are tax-inclusive now; older orders that carried tax still show it. */}
+                  {tax > 0 && (
+                    <div className="flex justify-between text-brand-gray-700">
+                      <span>Tax</span>
+                      <span className="font-normal text-brand-black font-instrument">{formatPrice(tax)}</span>
+                    </div>
+                  )}
                   {paymentMethod === 'cod' && codFee > 0 && (
                     <div className="flex justify-between text-brand-gray-700">
                       <span>COD Fee</span>

@@ -439,10 +439,12 @@ const AdminOrderDetail = () => {
                       </div>
                     )}
 
-                    <div className="flex justify-between text-sm">
-                      <span>Tax & Charges</span>
-                      <span>₹{order.tax.toLocaleString('en-IN')}</span>
-                    </div>
+                    {order.tax > 0 && (
+                      <div className="flex justify-between text-sm">
+                        <span>Tax & Charges</span>
+                        <span>₹{order.tax.toLocaleString('en-IN')}</span>
+                      </div>
+                    )}
 
                     {order.discount > 0 && (
                       <div className="flex justify-between text-sm text-green-600">

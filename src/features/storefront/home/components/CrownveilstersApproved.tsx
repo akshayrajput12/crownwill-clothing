@@ -113,7 +113,7 @@ const CrownveilstersApproved: React.FC = () => {
                 </div>
 
                 <p className="text-[14px] text-brand-gray-700 leading-[1.7] mb-4">
-                  "{rev.comment}"
+                  {rev.comment}
                 </p>
 
                 <div className="text-right">

@@ -232,7 +232,9 @@ const Checkout = () => {
   };
 
   const subtotal = cartItems.reduce((sum, item) => sum + (toNumber(item.price) * toNumber(item.quantity)), 0);
-  const tax = calculatePercentage(subtotal, settings.tax_rate);
+  // Listed prices are inclusive of all taxes, so nothing is added on top at checkout.
+  // The column is still written (as 0) so historical orders keep rendering their own tax.
+  const tax = 0;
 
   const deliveryFee = meetsThreshold(subtotal, settings.free_delivery_threshold) ? 0 : toNumber(settings.delivery_charge);
   const estimatedDeliveryTime = `${settings.delivery_time_estimate || '3-5 business days'}`;
@@ -898,11 +900,6 @@ const Checkout = () => {
                 </div>
 
                 <div className="flex justify-between text-brand-gray-700 font-inter text-sm">
-                  <span className="uppercase tracking-wide">Tax ({toNumber(settings.tax_rate).toFixed(0)}%)</span>
-                  <span className="font-normal text-brand-black">{formatPrice(tax)}</span>
-                </div>
-
-                <div className="flex justify-between text-brand-gray-700 font-inter text-sm">
                   <span className="uppercase tracking-wide">Delivery Fee</span>
                   <span className="font-normal text-brand-black">
                     {deliveryFee === 0 ? (
@@ -988,6 +985,7 @@ const Checkout = () => {
                   <span className="uppercase tracking-wide">Total</span>
                   <span className="text-brand-black">{formatPrice(total)}</span>
                 </div>
+                <p className="text-[11px] text-brand-gray-500 -mt-2">Inclusive of all taxes</p>
 
                 {/* Minimum Order Warning */}
                 {subtotal < toNumber(settings.min_order_amount) && (

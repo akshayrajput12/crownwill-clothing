@@ -149,8 +149,10 @@ const GuestOrderPopup: React.FC<GuestOrderPopupProps> = ({ isOpen, onClose, orde
     let summaryY = finalY + 15;
     doc.text(`Subtotal: ₹${orderData.subtotal.toFixed(2)}`, 20, summaryY);
     summaryY += 10;
-    doc.text(`Tax: ₹${orderData.tax.toFixed(2)}`, 20, summaryY);
-    summaryY += 10;
+    if (orderData.tax > 0) {
+      doc.text(`Tax: ₹${orderData.tax.toFixed(2)}`, 20, summaryY);
+      summaryY += 10;
+    }
     doc.text(`Delivery Fee: ${orderData.deliveryFee === 0 ? 'FREE' : '₹' + orderData.deliveryFee.toFixed(2)}`, 20, summaryY);
 
     if (orderData.codFee > 0) {
@@ -360,10 +362,12 @@ const GuestOrderPopup: React.FC<GuestOrderPopupProps> = ({ isOpen, onClose, orde
                   <span className="text-sm">Subtotal</span>
                   <span className="text-sm">₹{orderData.subtotal.toLocaleString('en-IN')}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-sm">Tax</span>
-                  <span className="text-sm">₹{orderData.tax.toLocaleString('en-IN')}</span>
-                </div>
+                {orderData.tax > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-sm">Tax</span>
+                    <span className="text-sm">₹{orderData.tax.toLocaleString('en-IN')}</span>
+                  </div>
+                )}
                 <div className="flex justify-between">
                   <span className="text-sm">Delivery Fee</span>
                   <span className="text-sm">
