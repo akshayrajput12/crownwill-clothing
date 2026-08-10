@@ -1,7 +1,7 @@
 import { Suspense, lazy } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import ScrollToTop from '@/components/ScrollToTop';
+import ScrollRestoration from '@/components/ScrollRestoration';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import CartSidebar from '@/components/CartSidebar';
@@ -82,7 +82,7 @@ const AppContent = () => {
     <ErrorBoundary>
       <TooltipProvider>
         <div className="min-h-screen bg-background">
-          <ScrollToTop />
+          <ScrollRestoration />
           <Header isAdminRoute={isAdminRoute} />
           <Suspense fallback={<PageLoader text="Loading crownveil..." />}>
           <Routes>

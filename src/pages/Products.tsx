@@ -10,7 +10,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { applyProductSearch, noteSearchError } from '@/lib/productSearch';
 import { cardColumns, noteSizesJoinError, useStorefrontRealtime } from '@/hooks/queries';
 import QuickViewModal from '@/components/QuickViewModal';
-import { scrollToTopInstant } from '@/utils/scrollToTop';
 import { Button } from '@/components/ui/button';
 
 const Products = () => {
@@ -54,7 +53,6 @@ const Products = () => {
   // Sync state with URL params
   // Sync state with URL params
   useEffect(() => {
-    scrollToTopInstant();
     const categoryParam = searchParams.get('category');
     const sortParam = searchParams.get('sort');
     // Deep links from search ("/products?search=linen shirt") must actually filter.

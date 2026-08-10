@@ -521,9 +521,10 @@ const Checkout = () => {
 
         if (dbError) throw new Error(`Database error: ${dbError.message}`);
 
-        // Confirmation email. Never awaited into the success path — a mail outage must
-        // not fail an order that is already in the database.
+        // Customer confirmation + shop alert. Never awaited into the success path — a mail
+        // outage must not fail an order that is already in the database.
         void sendOrderEmail(orderNumber, 'confirmation');
+        void sendOrderEmail(orderNumber, 'admin-alert');
 
         if (!useExistingAddress && currentUser) {
           await saveAddressToProfile();
@@ -617,8 +618,10 @@ const Checkout = () => {
 
               if (dbError) throw new Error(`Database error: ${dbError.message}`);
 
-              // Paid confirmation. Deliberately not awaited — see the COD path above.
+              // Paid confirmation + shop alert. Deliberately not awaited — see the COD
+              // path above.
               void sendOrderEmail(orderNumber, 'confirmation');
+              void sendOrderEmail(orderNumber, 'admin-alert');
 
               if (!useExistingAddress && currentUser) {
                 await saveAddressToProfile();

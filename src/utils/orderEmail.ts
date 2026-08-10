@@ -6,7 +6,15 @@ import { supabase } from '@/integrations/supabase/client';
  * The recipient is decided server-side from the order row, so callers only name the
  * order and the kind of email — there is no way to aim one of these at another address.
  */
-export type OrderEmailType = 'confirmation' | 'invoice' | 'status';
+export type OrderEmailType =
+  /** To the customer, on checkout. */
+  | 'confirmation'
+  /** To the shop, on checkout — new order, amount, payment method. */
+  | 'admin-alert'
+  /** To the customer, on demand. */
+  | 'invoice'
+  /** To the customer, when an admin moves the order along. */
+  | 'status';
 
 export interface OrderEmailResult {
   sent: boolean;

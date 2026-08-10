@@ -11,20 +11,31 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
  * This function is the smallest possible server — no host to run, deployed with
  * `supabase functions deploy`.
  *
+ * Four kinds of mail:
+ *  confirmation  to the customer, on checkout
+ *  admin-alert   to the shop, on checkout ("new order, this much, this payment method")
+ *  status        to the customer, when an admin moves the order along
+ *  invoice       to the customer, on demand from either side
+ *
  * Security model:
- *  - The recipient is ALWAYS read from the order row, never from the request body, so
- *    this cannot be used to mail arbitrary addresses.
- *  - `confirmation` is callable without a login (guests check out) but only within
- *    CONFIRMATION_WINDOW_MINUTES of the order being created, so an old order number
- *    cannot be replayed to spam that customer.
+ *  - The recipient is ALWAYS resolved server-side — from the order row for customer mail,
+ *    from configuration for the shop alert. Nothing in the request body can redirect it.
+ *  - `confirmation` and `admin-alert` are callable without a login (guests check out) but
+ *    only within CONFIRMATION_WINDOW_MINUTES of the order being created, so an old order
+ *    number cannot be replayed to spam anyone.
  *  - `invoice` and `status` require a signed-in caller who either owns the order or
  *    is an admin.
  *
  * Secrets (supabase secrets set):
- *  ZEPTOMAIL_TOKEN      Send Mail token from ZeptoMail → Mail Agents → SMTP/API
- *  ZEPTOMAIL_FROM       verified sender, e.g. orders@yourdomain.com
- *  ZEPTOMAIL_FROM_NAME  optional display name, defaults to the store name
- *  ZEPTOMAIL_HOST       optional, api.zeptomail.in (default) or api.zeptomail.com
+ *  ZEPTOMAIL_TOKEN      required. Send Mail token from ZeptoMail → Mail Agents → SMTP/API
+ *  ZEPTOMAIL_FROM       required. Verified sender, e.g. orders@yourdomain.com
+ *  ZEPTOMAIL_FROM_NAME  optional. Display name, defaults to the store name
+ *  ZEPTOMAIL_HOST       optional. api.zeptomail.in (default) or api.zeptomail.com
+ *  ADMIN_ALERT_EMAIL    optional. Where new-order alerts go; defaults to the store_email setting
+ *  STORE_SITE_URL       optional. Absolute base for the logo and links inside the email
+ *
+ * POST `{ "diagnose": true }` to see which of these have actually landed, without
+ * echoing any secret back.
  */
 
 const corsHeaders = {
@@ -34,7 +45,7 @@ const corsHeaders = {
 
 const CONFIRMATION_WINDOW_MINUTES = 60;
 
-type EmailType = "confirmation" | "invoice" | "status";
+type EmailType = "confirmation" | "invoice" | "status" | "admin-alert";
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
@@ -355,6 +366,35 @@ serve(async (req) => {
   try {
     const token = Deno.env.get("ZEPTOMAIL_TOKEN");
     const from = Deno.env.get("ZEPTOMAIL_FROM");
+
+    const { orderNumber, type = "confirmation", diagnose } = (await req.json()) as {
+      orderNumber?: string;
+      type?: EmailType;
+      diagnose?: boolean;
+    };
+
+    /**
+     * `{ "diagnose": true }` reports which pieces of configuration have landed, without
+     * ever echoing a secret back. Deploy, call this once, and you know whether the
+     * problem is the token, the sender, the database or ZeptoMail itself.
+     */
+    if (diagnose) {
+      return json({
+        ok: Boolean(token && from),
+        checks: {
+          ZEPTOMAIL_TOKEN: token ? `set (${token.length} chars)` : "MISSING",
+          ZEPTOMAIL_FROM: from ?? "MISSING",
+          ZEPTOMAIL_FROM_NAME: Deno.env.get("ZEPTOMAIL_FROM_NAME") ?? "(defaults to store name)",
+          ZEPTOMAIL_HOST: Deno.env.get("ZEPTOMAIL_HOST") || "api.zeptomail.in (default)",
+          ADMIN_ALERT_EMAIL: Deno.env.get("ADMIN_ALERT_EMAIL") ?? "(falls back to store_email setting)",
+          STORE_SITE_URL: Deno.env.get("STORE_SITE_URL") || "https://crownveil.com (default)",
+          SUPABASE_URL: Deno.env.get("SUPABASE_URL") ? "set" : "MISSING",
+          SUPABASE_SERVICE_ROLE_KEY: Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ? "set" : "MISSING",
+        },
+        note: "Token scheme must be 'Zoho-enczapikey'. Use api.zeptomail.in for the India data centre, api.zeptomail.com otherwise.",
+      });
+    }
+
     if (!token || !from) {
       return json(
         { error: "Email is not configured. Set ZEPTOMAIL_TOKEN and ZEPTOMAIL_FROM." },
@@ -362,13 +402,8 @@ serve(async (req) => {
       );
     }
 
-    const { orderNumber, type = "confirmation" } = (await req.json()) as {
-      orderNumber?: string;
-      type?: EmailType;
-    };
-
     if (!orderNumber) return json({ error: "orderNumber is required" }, 400);
-    if (!["confirmation", "invoice", "status"].includes(type)) {
+    if (!["confirmation", "invoice", "status", "admin-alert"].includes(type)) {
       return json({ error: `Unknown email type: ${type}` }, 400);
     }
 
@@ -389,10 +424,12 @@ serve(async (req) => {
     if (!order) return json({ error: "Order not found" }, 404);
 
     /* Authorisation. */
-    if (type === "confirmation") {
+    if (type === "confirmation" || type === "admin-alert") {
+      // Both fire straight after checkout, including for guests, so neither can require a
+      // login. The replay window is what stops an old order number being used to spam.
       const ageMinutes = (Date.now() - new Date(order.created_at ?? 0).getTime()) / 60000;
       if (ageMinutes > CONFIRMATION_WINDOW_MINUTES) {
-        return json({ error: "This order is too old to send a confirmation for." }, 403);
+        return json({ error: "This order is too old to notify about." }, 403);
       }
     } else {
       const authHeader = req.headers.get("Authorization") ?? "";
@@ -415,10 +452,7 @@ serve(async (req) => {
       }
     }
 
-    /* Recipient always comes from the order, never from the caller. */
     const customer = (order.customer_info ?? {}) as { name?: string; email?: string };
-    const to = customer.email;
-    if (!to) return json({ error: "This order has no customer email on it." }, 422);
 
     /* Store details for the template. */
     const { data: settingsRows } = await admin
@@ -440,6 +474,8 @@ serve(async (req) => {
     const status = String(order.order_status ?? "placed").toLowerCase();
     const statusCopy = STATUS_COPY[status] ?? STATUS_COPY.placed;
 
+    const itemCount = items.reduce((sum, item) => sum + Number(item.quantity ?? 1), 0);
+
     const content = type === "invoice"
       ? {
           subject: `Invoice for order ${order.order_number}`,
@@ -452,11 +488,40 @@ serve(async (req) => {
             heading: statusCopy.heading,
             intro: statusCopy.body,
           }
-        : {
-            subject: `Order ${order.order_number} confirmed`,
-            heading: `Thanks${customer.name ? `, ${customer.name.split(" ")[0]}` : ""}!`,
-            intro: "We have received your order. Here is everything you ordered.",
-          };
+        : type === "admin-alert"
+          ? {
+              // Everything the shop needs to triage sits in the subject line.
+              subject: `New order ${order.order_number} · ${money(order.total, currency)} · ${String(order.payment_method ?? "").toUpperCase()}`,
+              heading: "New order received",
+              intro: `${customer.name || "A customer"} ordered ${itemCount} item${itemCount === 1 ? "" : "s"}`
+                + ` for ${money(order.total, currency)}`
+                + `${order.payment_status === "paid" ? " (paid online)" : " (cash on delivery)"}.`
+                + `${customer.email ? ` Contact: ${customer.email}.` : ""}`,
+            }
+          : {
+              subject: `Order ${order.order_number} confirmed`,
+              heading: `Thanks${customer.name ? `, ${customer.name.split(" ")[0]}` : ""}!`,
+              intro: "We have received your order. Here is everything you ordered.",
+            };
+
+    /**
+     * Recipient is resolved server-side in every case — from the order row for customer
+     * mail, from config for the shop alert. Nothing the caller sends can redirect it.
+     */
+    const to = type === "admin-alert"
+      ? (Deno.env.get("ADMIN_ALERT_EMAIL") || settings.store_email || from)
+      : customer.email;
+
+    if (!to) {
+      return json(
+        {
+          error: type === "admin-alert"
+            ? "No admin recipient. Set ADMIN_ALERT_EMAIL or the store_email setting."
+            : "This order has no customer email on it.",
+        },
+        422
+      );
+    }
 
     const html = renderEmail({
       storeName,
@@ -465,13 +530,15 @@ serve(async (req) => {
       order,
       items,
       currency,
-      // A status nudge does not need the whole bill repeated; confirmations and invoices do.
+      // A status nudge does not need the whole bill repeated; the others do.
       showItems: type !== "status",
       // The progress rail only means something on a status update.
       showTimeline: type === "status",
-      footerNote: settings.store_email
-        ? `Questions about this order? Write to ${settings.store_email}.`
-        : undefined,
+      footerNote: type === "admin-alert"
+        ? "Open the admin dashboard to accept, pack and dispatch this order."
+        : settings.store_email
+          ? `Questions about this order? Write to ${settings.store_email}.`
+          : undefined,
     });
 
     /* Send. ZeptoMail's India data centre is api.zeptomail.in; global is .com. */
@@ -486,7 +553,7 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         from: { address: from, name: Deno.env.get("ZEPTOMAIL_FROM_NAME") || storeName },
-        to: [{ email_address: { address: to, name: customer.name || to } }],
+        to: [{ email_address: { address: to, name: type === "admin-alert" ? storeName : (customer.name || to) } }],
         subject: content.subject,
         htmlbody: html,
       }),

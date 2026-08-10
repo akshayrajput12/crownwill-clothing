@@ -22,7 +22,6 @@ import { describeCoupon } from '@/lib/coupons';
 import { outfitTotals } from '@/lib/outfit';
 import { marketingImages, PLACEHOLDER_PRODUCT_IMAGE } from '@/lib/brandImages';
 import { formatPrice } from '@/utils/currency';
-import { scrollToTopInstant } from '@/utils/scrollToTop';
 
 /** Shared entrance for the buy-panel blocks, driven by the column's stagger. */
 const fadeUp = {
@@ -71,7 +70,8 @@ const ProductDetail: React.FC = () => {
   const similarProducts = relatedProducts.slice(0, 5);
 
   useEffect(() => {
-    scrollToTopInstant();
+    // Scroll position is handled centrally by <ScrollRestoration />, which knows the
+    // difference between a fresh navigation and a back button press.
     setSelectedImageIndex(0);
     setSelectedSize(null);
     setSizeError(false);
