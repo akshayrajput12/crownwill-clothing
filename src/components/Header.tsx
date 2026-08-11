@@ -98,14 +98,25 @@ const Header: React.FC<HeaderProps> = ({ isAdminRoute = false }) => {
   if (isAdminRoute) return null;
 
   return (
-    <header
-      className={`w-full z-50 sticky top-0 bg-brand-white transition-transform duration-300 ease-out will-change-transform ${
-        isHidden ? '-translate-y-full' : 'translate-y-0'
-      }`}
-    >
-      {/* PART 2.A: ANNOUNCEMENT BAR */}
-      <div className="w-full bg-brand-black h-[36px] md:h-[40px] flex items-center justify-center text-brand-white text-[12px] font-medium tracking-wide px-4">
-        <span>Free Shipping Sitewide on Every Order, Don't Miss Out!!</span>
+    <>
+      {/*
+        The sliding header is deliberately kept separate from the drawer and the search
+        panel below. Any transform — including translate-y-0 — makes an element the
+        containing block for its position:fixed descendants, so a drawer nested in here
+        would size itself against the 112px header instead of the viewport.
+      */}
+      <header
+        className={`w-full z-50 sticky top-0 bg-brand-white transition-transform duration-300 ease-out ${
+          isHidden ? '-translate-y-full' : 'translate-y-0'
+        }`}
+      >
+      {/* PART 2.A: ANNOUNCEMENT BAR — the full sentence needs two lines on a 360px screen,
+          which a fixed 36px bar simply clips. Short copy on phones, full copy from sm up. */}
+      <div className="w-full bg-brand-black h-[36px] md:h-[40px] flex items-center justify-center text-brand-white text-[11px] sm:text-[12px] font-medium tracking-wide px-4 overflow-hidden">
+        <span className="whitespace-nowrap sm:hidden">Free Shipping on Every Order</span>
+        <span className="hidden sm:inline whitespace-nowrap">
+          Free Shipping Sitewide on Every Order, Don't Miss Out!!
+        </span>
       </div>
 
       {/* PART 2.B: NAVBAR (Sticky Header) */}
@@ -114,16 +125,22 @@ const Header: React.FC<HeaderProps> = ({ isAdminRoute = false }) => {
 
           {/* Left: Brand Logo — the real crown/CV mark, cut out of public/logo.png so it
               sits on the white navbar without its original dark tile. */}
-          <Link to="/" className="flex items-center gap-2.5 group" aria-label="Crownveil — home">
+          {/* Tracked-out serif wordmark is wide; it steps down on small screens so the
+              search / bag / menu controls keep their tap targets. */}
+          <Link
+            to="/"
+            className="flex items-center gap-2 sm:gap-2.5 group min-w-0 flex-shrink"
+            aria-label="Crownveil — home"
+          >
             <img
               src="/assets/logo-mark.png"
               alt=""
               width={173}
               height={184}
-              className="h-8 md:h-10 w-auto group-hover:scale-105 transition-transform"
+              className="h-7 sm:h-8 md:h-10 w-auto flex-shrink-0 group-hover:scale-105 transition-transform"
               decoding="async"
             />
-            <span className="crownveil-wordmark text-[19px] md:text-[22px]">
+            <span className="crownveil-wordmark text-[14px] sm:text-[17px] md:text-[22px] truncate">
               Crownveil
             </span>
           </Link>
@@ -204,12 +221,13 @@ const Header: React.FC<HeaderProps> = ({ isAdminRoute = false }) => {
             </Link>
           </nav>
 
-          {/* Right: Search, Cart, Login/Signup */}
-          <div className="flex items-center gap-5">
+          {/* Right: Search, Cart, Login/Signup. Tighter gaps on phones, but each control
+              keeps a 44px tap target thanks to the padding on the buttons themselves. */}
+          <div className="flex items-center gap-2 sm:gap-4 md:gap-5 flex-shrink-0">
             {/* Search Icon */}
             <button
               onClick={() => setIsSearchOpen(true)}
-              className="text-brand-black hover:text-brand-gray-500 p-1"
+              className="text-brand-black hover:text-brand-gray-500 p-2 -m-1"
               aria-label="Search"
             >
               <Search className="w-5 h-5 stroke-[2]" />
@@ -218,7 +236,7 @@ const Header: React.FC<HeaderProps> = ({ isAdminRoute = false }) => {
             {/* Cart Icon with Yellow Circular Badge */}
             <button
               onClick={toggleCart}
-              className="relative text-brand-black hover:text-brand-gray-500 p-1"
+              className="relative text-brand-black hover:text-brand-gray-500 p-2 -m-1"
               aria-label="Cart"
             >
               <ShoppingCart className="w-5 h-5 stroke-[2]" />
@@ -272,7 +290,7 @@ const Header: React.FC<HeaderProps> = ({ isAdminRoute = false }) => {
             {/* Mobile Hamburger */}
             <button
               onClick={() => setIsMobileMenuOpen(true)}
-              className="lg:hidden text-brand-black p-1"
+              className="lg:hidden text-brand-black p-2 -m-1"
               aria-label="Menu"
             >
               <Menu className="w-6 h-6" />
@@ -281,7 +299,9 @@ const Header: React.FC<HeaderProps> = ({ isAdminRoute = false }) => {
         </div>
       </div>
 
-      {/* Mobile Drawer Navigation */}
+      </header>
+
+      {/* Mobile Drawer Navigation — fixed to the viewport, outside the transformed header */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <>
@@ -356,7 +376,7 @@ const Header: React.FC<HeaderProps> = ({ isAdminRoute = false }) => {
       </AnimatePresence>
 
       <SearchSidebar isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
-    </header>
+    </>
   );
 };
 

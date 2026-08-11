@@ -53,7 +53,6 @@ const SeasonalHero: React.FC = () => {
                 className="w-full h-full object-cover"
                 style={{ objectPosition: s.position }}
                 loading={idx === 0 ? 'eager' : 'lazy'}
-                fetchPriority={idx === 0 ? 'high' : 'auto'}
                 decoding="async"
               />
             )}

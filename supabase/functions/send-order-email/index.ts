@@ -108,6 +108,30 @@ const STATUS_COPY: Record<string, { subject: string; heading: string; body: stri
   },
 };
 
+/**
+ * Where to POST the message.
+ *
+ * Accepts three shapes, because people configure this three ways: a full endpoint
+ * (`ZEPTOMAIL_API_URL=https://api.zeptomail.in/v1.1/email`), a bare host
+ * (`ZEPTOMAIL_HOST=api.zeptomail.in`), or nothing at all — in which case the India data
+ * centre is assumed, since that is where accounts opened from India live.
+ */
+function zeptoEndpoint(): string {
+  const url = Deno.env.get("ZEPTOMAIL_API_URL");
+  if (url) {
+    const trimmed = url.trim().replace(/\/$/, "");
+    // A host was pasted into the URL variable — accept it anyway.
+    if (!/^https?:\/\//i.test(trimmed)) return `https://${trimmed}/v1.1/email`;
+    return /\/v1\.1\/email$/.test(trimmed) ? trimmed : `${trimmed}/v1.1/email`;
+  }
+
+  const host = (Deno.env.get("ZEPTOMAIL_HOST") || "api.zeptomail.in")
+    .trim()
+    .replace(/^https?:\/\//i, "")
+    .replace(/\/.*$/, "");
+  return `https://${host}/v1.1/email`;
+}
+
 /* ------------------------------------------------------------------ template ---- */
 
 const GOLD = "#C9A227";
@@ -364,8 +388,11 @@ serve(async (req) => {
   }
 
   try {
-    const token = Deno.env.get("ZEPTOMAIL_TOKEN");
-    const from = Deno.env.get("ZEPTOMAIL_FROM");
+    const token = Deno.env.get("ZEPTOMAIL_TOKEN") || Deno.env.get("ZEPTOMAIL_API_KEY");
+    // Accept either name for the sender: ZEPTOMAIL_FROM is what this file documents,
+    // ZEPTOMAIL_FROM_ADDRESS is what ZeptoMail's own docs call it. Renaming a working
+    // secret is a needless step.
+    const from = Deno.env.get("ZEPTOMAIL_FROM") || Deno.env.get("ZEPTOMAIL_FROM_ADDRESS");
 
     const { orderNumber, type = "confirmation", diagnose } = (await req.json()) as {
       orderNumber?: string;
@@ -379,19 +406,23 @@ serve(async (req) => {
      * problem is the token, the sender, the database or ZeptoMail itself.
      */
     if (diagnose) {
+      const projectUrl = Deno.env.get("SUPABASE_URL") ?? "";
       return json({
         ok: Boolean(token && from),
+        // If this ref is not the one in your app's VITE_SUPABASE_URL, the browser is
+        // calling a project this function was never deployed to — which looks exactly
+        // like "the function is never invoked".
+        deployedToProject: projectUrl.replace(/^https?:\/\//, "").replace(/\.supabase\.co.*$/, ""),
+        endpoint: zeptoEndpoint(),
         checks: {
-          ZEPTOMAIL_TOKEN: token ? `set (${token.length} chars)` : "MISSING",
-          ZEPTOMAIL_FROM: from ?? "MISSING",
-          ZEPTOMAIL_FROM_NAME: Deno.env.get("ZEPTOMAIL_FROM_NAME") ?? "(defaults to store name)",
-          ZEPTOMAIL_HOST: Deno.env.get("ZEPTOMAIL_HOST") || "api.zeptomail.in (default)",
-          ADMIN_ALERT_EMAIL: Deno.env.get("ADMIN_ALERT_EMAIL") ?? "(falls back to store_email setting)",
-          STORE_SITE_URL: Deno.env.get("STORE_SITE_URL") || "https://crownveil.com (default)",
-          SUPABASE_URL: Deno.env.get("SUPABASE_URL") ? "set" : "MISSING",
-          SUPABASE_SERVICE_ROLE_KEY: Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ? "set" : "MISSING",
+          token: token ? `set (${token.length} chars)` : "MISSING — set ZEPTOMAIL_TOKEN",
+          from: from ?? "MISSING — set ZEPTOMAIL_FROM or ZEPTOMAIL_FROM_ADDRESS",
+          fromName: Deno.env.get("ZEPTOMAIL_FROM_NAME") ?? "(defaults to store name)",
+          adminAlertEmail: Deno.env.get("ADMIN_ALERT_EMAIL") ?? "(falls back to store_email setting)",
+          siteUrl: siteUrl,
+          serviceRoleKey: Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ? "set" : "MISSING",
         },
-        note: "Token scheme must be 'Zoho-enczapikey'. Use api.zeptomail.in for the India data centre, api.zeptomail.com otherwise.",
+        note: "Auth scheme is 'Zoho-enczapikey', not Bearer. The from address must exist on a domain verified in ZeptoMail.",
       });
     }
 
@@ -542,8 +573,7 @@ serve(async (req) => {
     });
 
     /* Send. ZeptoMail's India data centre is api.zeptomail.in; global is .com. */
-    const host = Deno.env.get("ZEPTOMAIL_HOST") || "api.zeptomail.in";
-    const response = await fetch(`https://${host}/v1.1/email`, {
+    const response = await fetch(zeptoEndpoint(), {
       method: "POST",
       headers: {
         // Note: the scheme really is "Zoho-enczapikey", not "Bearer".

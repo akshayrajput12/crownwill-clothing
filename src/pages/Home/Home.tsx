@@ -22,7 +22,9 @@ import FeaturedProductWidget from '@/features/storefront/home/components/Feature
  */
 const Home: React.FC = () => {
   return (
-    <main className="min-h-screen bg-brand-white">
+    // `relative` so framer-motion can measure scroll offsets for the sections that
+    // animate from scroll progress (see BrandManifesto).
+    <main className="relative min-h-screen bg-brand-white">
       {/* 1. Hero carousel */}
       <SeasonalHero />
 
